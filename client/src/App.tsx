@@ -26,8 +26,7 @@ function App() {
       <Routes>
         <Route path="login" element={<Login />} />
 
-        <Route element={<ProtectedRoute auth={true} />}>
-          {/* TODO: Setup real authentication system */}
+        <Route element={<ProtectedRoute />}>
           <Route element={<NavLayout />}>
             <Route index element={<Dashboard />} />
             <Route path="modules" element={<Modules />} />
