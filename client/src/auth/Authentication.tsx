@@ -30,11 +30,11 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
   }, []);
 
-  const login = async (email: string, password: string) => {
+  const login = async (email: string, password_hash: string) => {
     try {
       await axios.post("/api/login", {
         email: email,
-        password: password,
+        password: password_hash,
       });
       navigate("/");
       setIsAuthenticated(true);
