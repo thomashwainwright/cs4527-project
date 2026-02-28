@@ -1,10 +1,12 @@
-import axios from "axios";
+// import axios from "axios";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { AuthContext } from "./authContext";
 
-axios.defaults.baseURL = "http://localhost:3000";
-axios.defaults.withCredentials = true; // Required for cookies
+import api from "../api/axios";
+
+// axios.defaults.baseURL = "http://localhost:3000";
+// axios.defaults.withCredentials = true; // Required for cookies
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -15,7 +17,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   useEffect(() => {
     // Check if user is already authenticated (e.g., by checking cookies)
     console.log("Checking authentication status...");
-    axios
+    api
       .get("/api/check-auth")
       .then((response) => {
         console.log("Authentication status:", response.data.isAuthenticated);
@@ -32,7 +34,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const login = async (email: string, password_hash: string) => {
     try {
-      await axios.post("/api/login", {
+      await api.post("/api/login", {
         email: email,
         password: password_hash,
       });
@@ -45,7 +47,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const logout = async () => {
     try {
-      await axios.get("/api/logout", {});
+      await api.get("/api/logout", {});
       setIsAuthenticated(false);
       navigate("/login");
     } catch (error) {

@@ -59,6 +59,16 @@ app.get("/api/logout", (req, res) => {
     res.json({message: "Logout successful"})
 })
 
+app.get("/api/modules", async (req, res) => {
+    try {
+        const result = await pool.query("SELECT * FROM modules")
+        res.json(result.rows)
+    } catch (error) {
+        console.error("Error fetching modules:", error)
+        res.status(500).json({message: "Error fetching modules"})
+    }
+})
+
 
 app.listen(3000, () => {
     console.log("Server running on http://localhost:3000")
