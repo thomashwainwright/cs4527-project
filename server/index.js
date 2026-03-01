@@ -61,6 +61,7 @@ app.get("/api/logout", (req, res) => {
 
 app.get("/api/modules", async (req, res) => {
     try {
+        console.log("req")
         const result = await pool.query("SELECT * FROM modules")
         res.json(result.rows)
     } catch (error) {
@@ -72,6 +73,7 @@ app.get("/api/modules", async (req, res) => {
 app.get("/api/modules/:code", async (req, res) => {
     try {
         const result = await pool.query("SELECT * FROM modules WHERE code = $1", [req.params.code])
+        
         if (result.rows.length === 0) {
             return res.status(404).json({message: "Module not found"})
         }

@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { fetchModules } from "../api/modules";
 import { useNavigate } from "react-router-dom";
 import type { Module } from "../types/module_type";
+import PageTitle from "@/ui_components/PageTitle";
 
 export function Modules() {
   const navigate = useNavigate();
@@ -12,13 +13,15 @@ export function Modules() {
 
   const [data, setData] = useState([]);
 
-  fetchModules().then((modules) => {
-    setData(modules);
-  });
+  useEffect(() => {
+    fetchModules().then((modules) => {
+      setData(modules);
+    });
+  }, []);
 
   return (
     <div>
-      <h1 className="text-5xl font-bold">Modules</h1>
+      <PageTitle>Modules</PageTitle>
 
       <table className="min-w-full mt-10 text-xl">
         <thead>

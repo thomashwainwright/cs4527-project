@@ -12,7 +12,7 @@ export default function NavBar() {
   return (
     <nav className="flex flex-col gap-4 p-8 text-4xl">
       {/* Title */}
-      <h1 className="text-6xl pb-16 font-bold">
+      <h1 className="text-6xl pb-16 font-bold cursor-default select-none">
         Workload
         <br />
         Manager

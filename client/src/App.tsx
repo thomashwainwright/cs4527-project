@@ -13,7 +13,7 @@ function NavLayout() {
   return (
     <>
       <NavBar />
-      <div className="p-8 w-full">
+      <div className="p-12 w-full">
         <Outlet />
       </div>
     </>
