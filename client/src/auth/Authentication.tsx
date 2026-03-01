@@ -5,12 +5,10 @@ import { AuthContext } from "./authContext";
 
 import api from "../api/axios";
 
-// axios.defaults.baseURL = "http://localhost:3000";
-// axios.defaults.withCredentials = true; // Required for cookies
-
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [user_email, setUserEmail] = useState(null);
 
   const navigate = useNavigate();
 
@@ -22,6 +20,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       .then((response) => {
         console.log("Authentication status:", response.data.isAuthenticated);
         setIsAuthenticated(response.data.isAuthenticated);
+        setUserEmail(response.data.email);
       })
       .catch((error) => {
         console.error("Error checking authentication status:", error);
@@ -34,12 +33,13 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   const login = async (email: string, password_hash: string) => {
     try {
-      await api.post("/api/login", {
+      const res = await api.post("/api/login", {
         email: email,
         password: password_hash,
       });
       navigate("/");
       setIsAuthenticated(true);
+      setUserEmail(res.data.email);
     } catch (error) {
       console.error("Login failed:", error);
     }
@@ -56,7 +56,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, isLoading, login, logout }}>
+    <AuthContext.Provider
+      value={{ isAuthenticated, isLoading, login, logout, user_email }}
+    >
       {children}
     </AuthContext.Provider>
   );

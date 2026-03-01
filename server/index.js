@@ -35,7 +35,7 @@ app.post("/api/login", async (req, res) => {
     if (await checkAccount(email, password)) {
         const token = jwt.sign({email: email}, "secret_key", {expiresIn: "1h"})
         res.cookie("token", token, {httpOnly: true, secure: false}) // secure = true in production
-        res.json({message: "Login successful", token: token})
+        res.json({message: "Login successful", token: token, email: email})
     } else {
         res.status(401).json({message: "Invalid credentials"})
     }

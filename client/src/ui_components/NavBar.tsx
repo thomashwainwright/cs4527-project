@@ -2,7 +2,7 @@ import { useAuth } from "@/auth/useAuth";
 import NavButton from "./NavButton";
 
 export default function NavBar() {
-  const { logout } = useAuth();
+  const { logout, user_email } = useAuth();
 
   const handleLogout = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -27,7 +27,7 @@ export default function NavBar() {
       <div className="mt-auto flex flex-row items-center gap-4">
         <div>
           <p className="text-lg text-gray-500">Logged in as</p>
-          <p className="text-lg font-bold">(user)</p>{" "}
+          <p className="text-lg font-bold">{user_email}</p>{" "}
           {/* TODO: Implement real user system from db */}
         </div>
         <form className="ml-auto" onSubmit={handleLogout} method="POST">
