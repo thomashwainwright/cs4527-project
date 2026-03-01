@@ -9,3 +9,13 @@ export const fetchModules = async () => {
     throw error;
   }
 };
+
+export const fetchModuleDetails = async (code: string) => {
+  try {
+    const response = await api.get(`/api/modules/${code}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching module details:", error);
+    throw error;
+  }
+};

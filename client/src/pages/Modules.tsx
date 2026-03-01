@@ -1,22 +1,13 @@
 import { useState } from "react";
 import { fetchModules } from "../api/modules";
 import { useNavigate } from "react-router-dom";
-
-type Module = {
-  module_id: number;
-  code: string;
-  name: string;
-  module_type: string;
-  estimated_number_students: number;
-  alpha: number;
-  beta: number;
-};
+import type { Module } from "../types/module_type";
 
 export function Modules() {
   const navigate = useNavigate();
 
-  const handleRowClick = () => {
-    navigate("/");
+  const handleRowClick = (code: string) => {
+    navigate(`/module/${code}`);
   };
 
   const [data, setData] = useState([]);
@@ -46,7 +37,7 @@ export function Modules() {
             <tr
               key={module.code}
               className="clickable-row hover:bg-gray-100 cursor-pointer"
-              onClick={handleRowClick}
+              onClick={() => handleRowClick(module.code)}
             >
               <td className="px-4 py-2 border">{module.code}</td>
               <td className="px-4 py-2 border">{module.name}</td>

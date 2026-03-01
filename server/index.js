@@ -69,6 +69,19 @@ app.get("/api/modules", async (req, res) => {
     }
 })
 
+app.get("/api/modules/:code", async (req, res) => {
+    try {
+        const result = await pool.query("SELECT * FROM modules WHERE code = $1", [req.params.code])
+        if (result.rows.length === 0) {
+            return res.status(404).json({message: "Module not found"})
+        }
+        res.json(result.rows[0])
+    } catch (error) {
+        console.error("Error fetching module details:", error)
+        res.status(500).json({message: "Error fetching module details"})
+    }
+})
+
 
 app.listen(3000, () => {
     console.log("Server running on http://localhost:3000")

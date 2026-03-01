@@ -6,6 +6,7 @@ import { Staff } from "./pages/Staff";
 import NavBar from "./ui_components/NavBar";
 import Login from "./pages/Login";
 import ProtectedRoute from "./routes/ProtectedRoute";
+import ModuleDetails from "./pages/ModuleDetails";
 
 // layout for pages with navigation bar
 function NavLayout() {
@@ -30,6 +31,7 @@ function App() {
           <Route element={<NavLayout />}>
             <Route index element={<Dashboard />} />
             <Route path="modules" element={<Modules />} />
+            <Route path="module/:code" element={<ModuleDetails />} />
             <Route path="staff" element={<Staff />} />
           </Route>
         </Route>
