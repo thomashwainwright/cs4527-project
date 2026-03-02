@@ -85,6 +85,28 @@ app.get("/api/modules/:code", async (req, res) => {
 })
 
 
+app.get("/api/staff", async (req, res) => {
+    try {
+        console.log("req")
+        const result = await pool.query(`SELECT 
+    u.user_id,
+    u.staff_id,
+    u.role,
+    u.name,
+    u.email,
+    s.contract_type,
+    s.contract_hours
+FROM users u
+INNER JOIN staff s 
+    ON u.staff_id = s.staff_id;`)
+        res.json(result.rows)
+    } catch (error) {
+        console.error("Error fetching staff:", error)
+        res.status(500).json({message: "Error fetching staff"})
+    }
+})
+
+
 app.listen(3000, () => {
     console.log("Server running on http://localhost:3000")
 })
