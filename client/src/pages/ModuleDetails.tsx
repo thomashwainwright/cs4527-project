@@ -1,17 +1,24 @@
 import { useParams } from "react-router-dom";
 import type { Module } from "../types/module_type";
 import { useEffect, useState } from "react";
-import { fetchModuleDetails } from "../api/modules";
+import { fetchModuleDetails, fetchModuleAssignments } from "../api/modules";
 import PageTitle from "@/ui_components/PageTitle";
+import type { Assignment } from "@/types/assignment_type";
 
 export default function ModuleDetails() {
   const code = useParams().code as string;
   const [moduleDetails, setModuleDetails] = useState<Module | null>(null);
+  const [moduleAssignments, setModuleAssignments] = useState<Assignment[]>([]);
 
   useEffect(() => {
     if (!code) return;
     fetchModuleDetails(code).then((details: Module) => {
       setModuleDetails(details);
+      fetchModuleAssignments(details.module_id).then(
+        (assignments: Assignment[]) => {
+          setModuleAssignments(assignments);
+        },
+      );
     });
   }, [code]);
 
@@ -26,7 +33,7 @@ export default function ModuleDetails() {
           </PageTitle>
 
           {/* Module details page content*/}
-          <div className="flex mt-10 gap-4 flex-col md:flex-row h-screen text-2xl">
+          <div className="flex mt-10 gap-4 flex-col md:flex-row text-2xl">
             {/* Module type, estimated number of students, alpha and beta */}
             <div className="lg:w-1/2 pr-8">
               <div className="flex flex-row">
@@ -116,7 +123,36 @@ export default function ModuleDetails() {
               </p>
             </div>
             {/* Staff assignments table */}
-            <div className="lg:w-1/2 pl-8"> Staff Assigment Table (todo) </div>
+            <div className="lg:w-1/2 pl-8">
+              {" "}
+              <b>Assignments</b>
+              <table className="min-w-full mt-10 text-xl">
+                <thead>
+                  <tr>
+                    <th className="px-4 py-2 border">Staff Member</th>
+                    <th className="px-4 py-2 border">Delta</th>
+                    <th className="px-4 py-2 border">Share</th>
+                    <th className="px-4 py-2 border">Coordinator</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {moduleAssignments.map((assignment: Assignment) => (
+                    <tr
+                      key={assignment.user_id}
+                      className="clickable-row hover:bg-gray-100 cursor-pointer"
+                    >
+                      <td className="px-4 py-2 border">{assignment.name}</td>
+                      <td className="px-4 py-2 border">{assignment.delta}</td>
+                      <td className="px-4 py-2 border">{assignment.share}</td>
+                      <td className="px-4 py-2 border">
+                        {assignment.coordinator ? "Yes" : "No"}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         </>
       )}

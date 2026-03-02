@@ -19,3 +19,13 @@ export const fetchModuleDetails = async (code: string) => {
     throw error;
   }
 };
+
+export const fetchModuleAssignments = async (module_id: number) => {
+  try {
+    const response = await api.get(`/api/assignments/${module_id.toString()}`);
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching module assignments:", error);
+    throw error;
+  }
+};

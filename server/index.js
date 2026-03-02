@@ -84,6 +84,27 @@ app.get("/api/modules/:code", async (req, res) => {
     }
 })
 
+app.get("/api/assignments/:module_id", async (req, res) => {
+    try {
+        console.log(req.params.module_id)
+        const result = await pool.query(`    SELECT 
+        staff_assignments.*, 
+        users.name
+    FROM staff_assignments
+    JOIN users 
+        ON staff_assignments.user_id = users.user_id
+    WHERE staff_assignments.module_id = $1`, [Number(req.params.module_id)])
+        
+        if (result.rows.length === 0) {
+            return res.status(404).json({message: "Module assignments not found"})
+        }
+        res.json(result.rows)
+    } catch (error) {
+        console.error("Error fetching module assignments:", error)
+        res.status(500).json({message: "Error fetching module assignments"})
+    }
+})
+
 
 app.get("/api/staff", async (req, res) => {
     try {
