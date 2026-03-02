@@ -26,7 +26,7 @@ export default function ModuleDetails() {
           </PageTitle>
 
           {/* Module details page content*/}
-          <div className="flex mt-10 gap-4 lg:flex-row sm:flex-col h-screen text-2xl">
+          <div className="flex mt-10 gap-4 flex-col md:flex-row h-screen text-2xl">
             {/* Module type, estimated number of students, alpha and beta */}
             <div className="lg:w-1/2 pr-8">
               <div className="flex flex-row">
@@ -51,7 +51,7 @@ export default function ModuleDetails() {
                 <p className="pt-2 pb-2">Module Type: </p>
                 <select
                   name="module_type"
-                  className="border border-gray-300 rounded-md p-2  hover:border-black w-fit ml-auto"
+                  className="border border-gray-300 rounded-md p-2  hover:border-black w-75 ml-auto"
                   value={moduleDetails.module_type}
                   onChange={(e) => {
                     setModuleDetails({
@@ -63,7 +63,7 @@ export default function ModuleDetails() {
                   <option value="teaching">Teaching</option>
                   <option value="admin">Admin</option>
                   <option value="supervision/marking">
-                    Project Supervision/Marking
+                    Supervision/Marking
                   </option>
                 </select>
               </div>

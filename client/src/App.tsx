@@ -1,4 +1,4 @@
-import { Outlet, Route, Routes } from "react-router";
+import { NavLink, Outlet, Route, Routes } from "react-router";
 import "./App.css";
 import { Dashboard } from "./pages/Dashboard";
 import { Modules } from "./pages/Modules";
@@ -13,7 +13,7 @@ function NavLayout() {
   return (
     <>
       <NavBar />
-      <div className="p-12 w-full">
+      <div className="p-12 w-full mr-48">
         <Outlet />
       </div>
     </>
@@ -39,7 +39,17 @@ function App() {
         {/* Invalid page (must be last route) */}
         <Route
           path="*"
-          element={<div className="m-auto text-6xl">Page not found</div>}
+          element={
+            <div className="m-auto text-6xl flex flex-col items-center gap-4">
+              Page not found{" "}
+              <NavLink
+                to="/"
+                className="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded"
+              >
+                Redirect
+              </NavLink>
+            </div>
+          }
         />
       </Routes>
     </div>

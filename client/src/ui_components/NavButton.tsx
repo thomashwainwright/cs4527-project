@@ -10,7 +10,7 @@ export default function NavButton({
   return (
     <NavLink
       className={({ isActive }: { isActive: boolean }) =>
-        "px-6 py-4 rounded " +
+        "p-2 sm:px-6 sm:py-4 rounded flex items-center " +
         (isActive
           ? "bg-blue-600 text-white "
           : "text-gray-700 hover:bg-gray-200")
