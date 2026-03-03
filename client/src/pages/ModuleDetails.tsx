@@ -1,14 +1,22 @@
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import type { Module } from "../types/module_type";
 import { useEffect, useState } from "react";
 import { fetchModuleDetails, fetchModuleAssignments } from "../api/modules";
 import PageTitle from "@/ui_components/PageTitle";
 import type { Assignment } from "@/types/assignment_type";
+import { fetchStaffByUserId } from "@/api/staff";
 
 export default function ModuleDetails() {
   const code = useParams().code as string;
   const [moduleDetails, setModuleDetails] = useState<Module | null>(null);
   const [moduleAssignments, setModuleAssignments] = useState<Assignment[]>([]);
+  const navigate = useNavigate();
+
+  const handleRowClick = (user_id: number) => {
+    fetchStaffByUserId(user_id).then((staff) => {
+      navigate(`/staff/${staff.email}`);
+    });
+  };
 
   useEffect(() => {
     if (!code) return;
@@ -141,6 +149,7 @@ export default function ModuleDetails() {
                     <tr
                       key={assignment.user_id}
                       className="clickable-row hover:bg-gray-100 cursor-pointer"
+                      onClick={() => handleRowClick(assignment.user_id)}
                     >
                       <td className="px-4 py-2 border">{assignment.name}</td>
                       <td className="px-4 py-2 border">{assignment.delta}</td>

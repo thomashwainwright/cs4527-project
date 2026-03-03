@@ -128,6 +128,20 @@ INNER JOIN staff s
 })
 
 
+app.get("/api/staff/:user_id", async (req, res) => {
+    try {
+        const result = await pool.query(`SELECT * FROM users WHERE user_id = $1`, [Number(req.params.user_id)])
+        
+        if (result.rows.length === 0) {
+            return res.status(404).json({message: "Staff member not found"})
+        }
+        res.json(result.rows[0])
+    } catch (error) {
+        console.error("Error fetching staff details:", error)
+        res.status(500).json({message: "Error fetching staff details"})
+    }
+})
+
 app.listen(3000, () => {
     console.log("Server running on http://localhost:3000")
 })
