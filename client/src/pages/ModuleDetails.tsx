@@ -43,7 +43,7 @@ export default function ModuleDetails() {
           {/* Module details page content*/}
           <div className="flex mt-10 gap-4 flex-col md:flex-row text-2xl">
             {/* Module type, estimated number of students, alpha and beta */}
-            <div className="lg:w-1/2 pr-8">
+            <div className="lg:w-1/2 pr-16">
               <div className="flex flex-row">
                 <p className="pt-2 pb-2">Module Code: </p>
                 <input
@@ -98,7 +98,27 @@ export default function ModuleDetails() {
                 />
               </p>
 
-              <b className="flex mt-10">Calculation Parameters</b>
+              <b className="flex mt-16">Calculation Parameters</b>
+
+              <p className="mt-8 flex flex-row">
+                Preset:{" "}
+                <select
+                  name="module_type"
+                  className="border border-gray-300 rounded-md p-2  hover:border-black w-75 ml-auto"
+                  defaultValue={"Standard classroom based"}
+                >
+                  <option value="teaching">Standard classroom based</option>
+                  <option value="admin">Standard computer lab based</option>
+                  <option value="supervision/marking">
+                    Standard project based
+                  </option>
+                  <option value="supervision/marking">
+                    Individual project
+                  </option>
+                  <option value="supervision/marking">Group project</option>
+                  <option value="supervision/marking">Custom</option>
+                </select>
+              </p>
 
               <p className="mt-2 flex flex-row">
                 Alpha:{" "}
@@ -131,10 +151,10 @@ export default function ModuleDetails() {
               </p>
             </div>
             {/* Staff assignments table */}
-            <div className="lg:w-1/2 pl-8">
+            <div className="lg:w-1/2 pr-16">
               {" "}
               <b>Assignments</b>
-              <table className="min-w-full mt-10 text-xl">
+              <table className="min-w-full mt-8 text-xl">
                 <thead>
                   <tr>
                     <th className="px-4 py-2 border">Staff Member</th>
@@ -145,20 +165,21 @@ export default function ModuleDetails() {
                 </thead>
 
                 <tbody>
-                  {moduleAssignments.map((assignment: Assignment) => (
-                    <tr
-                      key={assignment.user_id}
-                      className="clickable-row hover:bg-gray-100 cursor-pointer"
-                      onClick={() => handleRowClick(assignment.user_id)}
-                    >
-                      <td className="px-4 py-2 border">{assignment.name}</td>
-                      <td className="px-4 py-2 border">{assignment.delta}</td>
-                      <td className="px-4 py-2 border">{assignment.share}</td>
-                      <td className="px-4 py-2 border">
-                        {assignment.coordinator ? "Yes" : "No"}
-                      </td>
-                    </tr>
-                  ))}
+                  {moduleAssignments &&
+                    moduleAssignments.map((assignment: Assignment) => (
+                      <tr
+                        key={assignment.user_id}
+                        className="clickable-row hover:bg-gray-100 cursor-pointer"
+                        onClick={() => handleRowClick(assignment.user_id)}
+                      >
+                        <td className="px-4 py-2 border">{assignment.name}</td>
+                        <td className="px-4 py-2 border">{assignment.delta}</td>
+                        <td className="px-4 py-2 border">{assignment.share}</td>
+                        <td className="px-4 py-2 border">
+                          {assignment.coordinator ? "Yes" : "No"}
+                        </td>
+                      </tr>
+                    ))}
                 </tbody>
               </table>
             </div>

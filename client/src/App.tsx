@@ -7,6 +7,11 @@ import NavBar from "./ui_components/NavBar";
 import Login from "./pages/Login";
 import ProtectedRoute from "./routes/ProtectedRoute";
 import ModuleDetails from "./pages/ModuleDetails";
+import StaffDetails from "./pages/StaffDetails";
+import StaffOverview from "./pages/StaffOverview";
+import StaffTeaching from "./pages/StaffTeaching";
+import StaffSupervisionMarking from "./pages/StaffSupervisionMarking";
+import StaffAdmin from "./pages/StaffAdmin";
 
 // layout for pages with navigation bar
 function NavLayout() {
@@ -33,6 +38,16 @@ function App() {
             <Route path="modules" element={<Modules />} />
             <Route path="module/:code" element={<ModuleDetails />} />
             <Route path="staff" element={<Staff />} />
+            <Route path="staff/:email" element={<StaffDetails />}>
+              <Route index element={<StaffOverview />} />
+              <Route path="teaching" element={<StaffTeaching />} />
+              <Route
+                path="supervision_marking"
+                element={<StaffSupervisionMarking />}
+              />
+              <Route path="admin" element={<StaffAdmin />} />
+            </Route>
+            {/* <Route path="staff/:email/:section" element={<StaffDetails />} /> */}
           </Route>
         </Route>
 

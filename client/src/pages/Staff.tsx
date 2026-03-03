@@ -36,7 +36,7 @@ export function Staff() {
         <tbody>
           {data.map((staff: Staff) => (
             <tr
-              key={staff.email}
+              key={staff.user_id}
               className="clickable-row hover:bg-gray-100 cursor-pointer"
               onClick={() => handleRowClick(staff.email.toString())}
             >
