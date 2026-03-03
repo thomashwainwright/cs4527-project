@@ -20,7 +20,7 @@ export function Staff() {
   }, []);
 
   return (
-    <div>
+    <div className="p-12">
       <PageTitle>Staff</PageTitle>
 
       <table className="min-w-full mt-10 text-xl">

@@ -6,4 +6,6 @@ export type Module = {
   estimated_number_students: number;
   alpha: number;
   beta: number;
+  credits: number;
+  crit: number;
 };

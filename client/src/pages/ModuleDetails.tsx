@@ -31,7 +31,7 @@ export default function ModuleDetails() {
   }, [code]);
 
   return (
-    <div>
+    <div className="p-12">
       {moduleDetails && (
         <>
           {/* Module code and name title */}

@@ -18,7 +18,9 @@ function NavLayout() {
   return (
     <>
       <NavBar />
-      <div className="p-12 w-full mr-48">
+      <div className="w-full min-h-0 mr-48">
+        {" "}
+        {/*p-12*/}
         <Outlet />
       </div>
     </>
@@ -28,7 +30,7 @@ function NavLayout() {
 // main app component
 function App() {
   return (
-    <div className="flex flex-row min-h-screen">
+    <div className="flex flex-row h-dvh overflow-hidden">
       <Routes>
         <Route path="login" element={<Login />} />
 

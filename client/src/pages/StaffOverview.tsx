@@ -1,3 +1,3 @@
 export default function StaffOverview() {
-  return <div>overview</div>;
+  return <div className="p-12">overview</div>;
 }

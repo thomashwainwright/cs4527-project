@@ -26,7 +26,7 @@ export default function StaffSupervisionMarking() {
   }, [staff]);
 
   return (
-    <div>
+    <div className="p-12">
       <table className="min-w-full mt-10 text-xl">
         <thead>
           <tr>

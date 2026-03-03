@@ -18,7 +18,7 @@ export default function StaffDetails() {
   }, [email]);
 
   return (
-    <div>
+    <div className="p-12">
       <PageTitle>{email}</PageTitle>
       <div className="w-full flex flex-row gap-16 mt-10 text-2xl">
         <NavButton route={`/staff/${email}`}>Overview</NavButton>
