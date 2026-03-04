@@ -3,6 +3,9 @@ import { fetchModules } from "../api/modules";
 import { useNavigate } from "react-router-dom";
 import type { Module } from "../types/module_type";
 import PageTitle from "../ui_components/PageTitle";
+import type { ModuleOffering } from "@/types/module_offering_type";
+import AcademicYearSelector from "@/ui_components/AcademicYearSelector";
+
 export function Modules() {
   const navigate = useNavigate();
   const [data, setData] = useState([]);
@@ -32,7 +35,7 @@ export function Modules() {
   }, []);
 
   function getFilteredData() {
-    return data.filter((item: Module) => {
+    return data.filter((item: Module & ModuleOffering) => {
       let type_filter = false;
       if (filter.teaching && item.module_type == "teaching") {
         type_filter = true;
@@ -107,7 +110,7 @@ export function Modules() {
           </thead>
 
           <tbody>
-            {getFilteredData().map((module: Module) => (
+            {getFilteredData().map((module: Module & ModuleOffering) => (
               <tr
                 key={module.code}
                 className="clickable-row hover:bg-gray-100 cursor-pointer"

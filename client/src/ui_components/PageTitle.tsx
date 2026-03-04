@@ -1,9 +1,14 @@
 import type { ReactNode } from "react";
+import AcademicYearSelector from "./AcademicYearSelector";
 
 export default function PageTitle({ children }: { children: ReactNode }) {
   return (
-    <h1 className="text-5xl font-bold cursor-default select-none mb-10">
-      {children}
-    </h1>
+    <div className="flex flex-row items-center mb-10">
+      <h1 className="text-5xl font-bold cursor-default select-none ">
+        {children}
+      </h1>
+
+      <AcademicYearSelector />
+    </div>
   );
 }

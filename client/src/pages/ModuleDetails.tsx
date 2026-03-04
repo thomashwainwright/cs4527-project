@@ -5,10 +5,13 @@ import { fetchModuleDetails, fetchModuleAssignments } from "../api/modules";
 import PageTitle from "../ui_components/PageTitle";
 import type { Assignment } from "@/types/assignment_type";
 import { fetchStaffByUserId } from "@/api/staff";
+import type { ModuleOffering } from "@/types/module_offering_type";
 
 export default function ModuleDetails() {
   const code = useParams().code as string;
-  const [moduleDetails, setModuleDetails] = useState<Module | null>(null);
+  const [moduleDetails, setModuleDetails] = useState<
+    (Module & ModuleOffering) | null
+  >(null);
   const [moduleAssignments, setModuleAssignments] = useState<Assignment[]>([]);
   const navigate = useNavigate();
 
@@ -20,7 +23,7 @@ export default function ModuleDetails() {
 
   useEffect(() => {
     if (!code) return;
-    fetchModuleDetails(code).then((details: Module) => {
+    fetchModuleDetails(code).then((details: Module & ModuleOffering) => {
       setModuleDetails(details);
       fetchModuleAssignments(details.module_id).then(
         (assignments: Assignment[]) => {

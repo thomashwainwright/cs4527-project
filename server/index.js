@@ -173,6 +173,21 @@ app.get("/api/assignments/user_id/:user_id/type/:type", async (req, res) => {
     }
 })
 
+app.get("/api/academic_years", async (req, res) => {
+    try {
+        const result = await pool.query(
+        `
+            SELECT * FROM academic_years
+        `,
+        []
+        );
+        res.json(result.rows)
+    } catch (error) {
+        console.error("Error fetching staff details:", error)
+        res.status(500).json({message: "Error fetching staff details"})
+    }
+})
+
 app.listen(3000, () => {
     console.log("Server running on http://localhost:3000")
 })

@@ -12,6 +12,7 @@ import StaffOverview from "./pages/StaffOverview";
 import StaffTeaching from "./pages/StaffTeaching";
 import StaffSupervisionMarking from "./pages/StaffSupervisionMarking";
 import StaffAdmin from "./pages/StaffAdmin";
+import { AcademicYearProvider } from "./context/AcademicYearProvider";
 
 // layout for pages with navigation bar
 function NavLayout() {
@@ -31,44 +32,46 @@ function NavLayout() {
 function App() {
   return (
     <div className="flex flex-row h-dvh overflow-hidden">
-      <Routes>
-        <Route path="login" element={<Login />} />
+      <AcademicYearProvider>
+        <Routes>
+          <Route path="login" element={<Login />} />
 
-        <Route element={<ProtectedRoute />}>
-          <Route element={<NavLayout />}>
-            <Route index element={<Dashboard />} />
-            <Route path="modules" element={<Modules />} />
-            <Route path="module/:code" element={<ModuleDetails />} />
-            <Route path="staff" element={<Staff />} />
-            <Route path="staff/:email" element={<StaffDetails />}>
-              <Route index element={<StaffOverview />} />
-              <Route path="teaching" element={<StaffTeaching />} />
-              <Route
-                path="supervision_marking"
-                element={<StaffSupervisionMarking />}
-              />
-              <Route path="admin" element={<StaffAdmin />} />
+          <Route element={<ProtectedRoute />}>
+            <Route element={<NavLayout />}>
+              <Route index element={<Dashboard />} />
+              <Route path="modules" element={<Modules />} />
+              <Route path="module/:code" element={<ModuleDetails />} />
+              <Route path="staff" element={<Staff />} />
+              <Route path="staff/:email" element={<StaffDetails />}>
+                <Route index element={<StaffOverview />} />
+                <Route path="teaching" element={<StaffTeaching />} />
+                <Route
+                  path="supervision_marking"
+                  element={<StaffSupervisionMarking />}
+                />
+                <Route path="admin" element={<StaffAdmin />} />
+              </Route>
+              {/* <Route path="staff/:email/:section" element={<StaffDetails />} /> */}
             </Route>
-            {/* <Route path="staff/:email/:section" element={<StaffDetails />} /> */}
           </Route>
-        </Route>
 
-        {/* Invalid page (must be last route) */}
-        <Route
-          path="*"
-          element={
-            <div className="m-auto text-6xl flex flex-col items-center gap-4">
-              Page not found{" "}
-              <NavLink
-                to="/"
-                className="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded"
-              >
-                Redirect
-              </NavLink>
-            </div>
-          }
-        />
-      </Routes>
+          {/* Invalid page (must be last route) */}
+          <Route
+            path="*"
+            element={
+              <div className="m-auto text-6xl flex flex-col items-center gap-4">
+                Page not found{" "}
+                <NavLink
+                  to="/"
+                  className="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded"
+                >
+                  Redirect
+                </NavLink>
+              </div>
+            }
+          />
+        </Routes>
+      </AcademicYearProvider>
     </div>
   );
 }
