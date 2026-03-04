@@ -2,8 +2,7 @@ import { useEffect, useState, type ChangeEvent } from "react";
 import { fetchModules } from "../api/modules";
 import { useNavigate } from "react-router-dom";
 import type { Module } from "../types/module_type";
-import PageTitle from "@/ui_components/PageTitle";
-
+import PageTitle from "../ui_components/PageTitle";
 export function Modules() {
   const navigate = useNavigate();
   const [data, setData] = useState([]);

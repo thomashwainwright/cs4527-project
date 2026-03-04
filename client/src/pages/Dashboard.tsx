@@ -1,4 +1,4 @@
-import PageTitle from "@/ui_components/PageTitle";
+import PageTitle from "../ui_components/PageTitle";
 
 export function Dashboard() {
   return (

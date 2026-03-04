@@ -2,7 +2,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import type { Module } from "../types/module_type";
 import { useEffect, useState } from "react";
 import { fetchModuleDetails, fetchModuleAssignments } from "../api/modules";
-import PageTitle from "@/ui_components/PageTitle";
+import PageTitle from "../ui_components/PageTitle";
 import type { Assignment } from "@/types/assignment_type";
 import { fetchStaffByUserId } from "@/api/staff";
 

@@ -1,7 +1,7 @@
 import { fetchStaffByEmail } from "@/api/staff";
 import type { Staff } from "@/types/staff_type";
 import NavButton from "@/ui_components/NavButton";
-import PageTitle from "@/ui_components/PageTitle";
+import PageTitle from "../ui_components/PageTitle";
 import { useEffect, useState } from "react";
 import { Outlet, useParams } from "react-router-dom";
 
