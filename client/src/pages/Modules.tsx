@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom";
 import type { Module } from "../types/module_type";
 import PageTitle from "../ui_components/PageTitle";
 import type { ModuleOffering } from "@/types/module_offering_type";
-import AcademicYearSelector from "@/ui_components/AcademicYearSelector";
 
 export function Modules() {
   const navigate = useNavigate();
