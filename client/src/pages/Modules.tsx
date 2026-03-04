@@ -1,18 +1,20 @@
 import { useEffect, useState, type ChangeEvent } from "react";
-import { fetchModules } from "../api/modules";
 import { useNavigate } from "react-router-dom";
 import type { Module } from "../types/module_type";
 import PageTitle from "../ui_components/PageTitle";
 import type { ModuleOffering } from "@/types/module_offering_type";
+import { useAcademicYear } from "@/context/AcademicYear";
+import { fetchModulesWithOfferings } from "@/api/modules";
 
 export function Modules() {
   const navigate = useNavigate();
-  const [data, setData] = useState([]);
+  const [data, setData] = useState<(Module & ModuleOffering)[] | null>();
   const [filter, setFilter] = useState({
     teaching: true,
     admin: true,
     search: "",
   });
+  const { selectedYear } = useAcademicYear();
 
   const handleRowClick = (code: string) => {
     navigate(`/module/${code}`);
@@ -28,28 +30,37 @@ export function Modules() {
   };
 
   useEffect(() => {
-    fetchModules().then((modules) => {
-      setData(modules);
-    });
-  }, []);
+    if (!selectedYear) {
+      return;
+    }
+    fetchModulesWithOfferings(selectedYear?.year_id).then(
+      (modules: (Module & ModuleOffering)[]) => {
+        console.log(modules);
+        setData(modules);
+      },
+    );
+  }, [selectedYear]);
 
   function getFilteredData() {
-    return data.filter((item: Module & ModuleOffering) => {
-      let type_filter = false;
-      if (filter.teaching && item.module_type == "teaching") {
-        type_filter = true;
-      }
+    return (
+      data &&
+      data.filter((item: Module & ModuleOffering) => {
+        let type_filter = false;
+        if (filter.teaching && item.module_type == "teaching") {
+          type_filter = true;
+        }
 
-      if (filter.admin && item.module_type == "admin") {
-        type_filter = true;
-      }
+        if (filter.admin && item.module_type == "admin") {
+          type_filter = true;
+        }
 
-      const searchFilter =
-        item.code.toLowerCase().includes(filter.search.toLowerCase()) ||
-        item.name.toLowerCase().includes(filter.search.toLowerCase());
+        const searchFilter =
+          item.code.toLowerCase().includes(filter.search.toLowerCase()) ||
+          item.name.toLowerCase().includes(filter.search.toLowerCase());
 
-      return type_filter && searchFilter;
-    });
+        return type_filter && searchFilter;
+      })
+    );
   }
 
   return (
@@ -84,7 +95,7 @@ export function Modules() {
         <div className="ml-auto flex flex-row gap-4 items-center">
           <input
             className="border border-gray-300 rounded-md p-2 hover:border-black w-120"
-            placeholder="search"
+            placeholder="Search"
             onChange={(e) => {
               setFilter((previous) => ({
                 ...previous,
@@ -109,7 +120,7 @@ export function Modules() {
           </thead>
 
           <tbody>
-            {getFilteredData().map((module: Module & ModuleOffering) => (
+            {getFilteredData()?.map((module: Module & ModuleOffering) => (
               <tr
                 key={module.code}
                 className="clickable-row hover:bg-gray-100 cursor-pointer"

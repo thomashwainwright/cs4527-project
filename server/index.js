@@ -69,6 +69,22 @@ app.get("/api/modules", async (req, res) => {
     }
 })
 
+app.get("/api/module_offerings/:year_id", async (req, res) => {
+    try {
+        const result = await pool.query(  `
+            SELECT *
+            FROM module_offerings mo
+            INNER JOIN modules m
+                ON mo.module_id = m.module_id
+            WHERE mo.year_id = $1
+        `, [req.params.year_id])
+        res.json(result.rows)
+    } catch (error) {
+        console.error("Error fetching modules:", error)
+        res.status(500).json({message: "Error fetching modules"})
+    }
+})
+
 app.get("/api/modules/:code", async (req, res) => {
     try {
         const result = await pool.query("SELECT * FROM modules WHERE code = $1", [req.params.code])
