@@ -69,14 +69,36 @@ app.get("/api/modules", async (req, res) => {
     }
 })
 
+// app.get("/api/module_offerings/:year_id", async (req, res) => {
+//     try {
+//         const result = await pool.query(  `
+//             SELECT *
+//             FROM module_offerings mo
+//             INNER JOIN modules m
+//                 ON mo.module_id = m.module_id
+//             WHERE mo.year_id = $1
+//         `, [req.params.year_id])
+//         res.json(result.rows)
+//     } catch (error) {
+//         console.error("SS Error fetching modules offerings:", error)
+//         res.status(500).json({message: "Error fetching modules"})
+//     }
+// })
+
 app.get("/api/module_offerings/:year_id", async (req, res) => {
     try {
         const result = await pool.query(  `
-            SELECT *
+            SELECT 
+                mo.*,
+                m.*,
+                COALESCE(SUM(sa.share), 0) AS allocation
             FROM module_offerings mo
             INNER JOIN modules m
                 ON mo.module_id = m.module_id
+            LEFT JOIN staff_assignments sa
+                ON sa.offering_id = mo.offering_id
             WHERE mo.year_id = $1
+            GROUP BY mo.offering_id, m.module_id
         `, [req.params.year_id])
         res.json(result.rows)
     } catch (error) {

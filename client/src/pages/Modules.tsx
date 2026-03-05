@@ -8,7 +8,9 @@ import { fetchModulesWithOfferings } from "@/api/modules";
 
 export function Modules() {
   const navigate = useNavigate();
-  const [data, setData] = useState<(Module & ModuleOffering)[] | null>();
+  const [data, setData] = useState<
+    (Module & ModuleOffering & { allocation: number })[] | null
+  >();
   const [filter, setFilter] = useState({
     teaching: true,
     admin: true,
@@ -34,7 +36,7 @@ export function Modules() {
       return;
     }
     fetchModulesWithOfferings(selectedYear?.year_id).then(
-      (modules: (Module & ModuleOffering)[]) => {
+      (modules: (Module & ModuleOffering & { allocation: number })[]) => {
         console.log("Fetched modules with offerings");
         setData(modules);
       },
@@ -116,26 +118,40 @@ export function Modules() {
               <th className="px-4 py-2 border">Estimated Number of Students</th>
               <th className="px-4 py-2 border">Alpha</th>
               <th className="px-4 py-2 border">Beta</th>
+              <th className="px-4 py-2 border">Allocation</th>
             </tr>
           </thead>
 
           <tbody>
-            {getFilteredData()?.map((module: Module & ModuleOffering) => (
-              <tr
-                key={module.code}
-                className="clickable-row hover:bg-gray-100 cursor-pointer"
-                onClick={() => handleRowClick(module.code)}
-              >
-                <td className="px-4 py-2 border">{module.code}</td>
-                <td className="px-4 py-2 border">{module.name}</td>
-                <td className="px-4 py-2 border">{module.module_type}</td>
-                <td className="px-4 py-2 border">
-                  {module.estimated_number_students}
-                </td>
-                <td className="px-4 py-2 border">{module.alpha}</td>
-                <td className="px-4 py-2 border">{module.beta}</td>
-              </tr>
-            ))}
+            {getFilteredData()
+              ?.slice()
+              .sort((a, b) => a.code.localeCompare(b.code))
+              .map(
+                (module: Module & ModuleOffering & { allocation: number }) => (
+                  <tr
+                    key={module.code}
+                    className="clickable-row hover:bg-gray-100 cursor-pointer"
+                    onClick={() => handleRowClick(module.code)}
+                  >
+                    <td className="px-4 py-2 border">{module.code}</td>
+                    <td className="px-4 py-2 border">{module.name}</td>
+                    <td className="px-4 py-2 border">{module.module_type}</td>
+                    <td className="px-4 py-2 border">
+                      {module.estimated_number_students}
+                    </td>
+                    <td className="px-4 py-2 border">{module.alpha}</td>
+                    <td className="px-4 py-2 border">{module.beta}</td>
+                    <td
+                      className={
+                        "px-4 py-2 border " +
+                        (module.allocation == 1 ? "bg-green-200" : "bg-red-200")
+                      }
+                    >
+                      {module.allocation}
+                    </td>
+                  </tr>
+                ),
+              )}
           </tbody>
         </table>
       </div>
