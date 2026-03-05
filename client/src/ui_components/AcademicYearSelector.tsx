@@ -1,5 +1,5 @@
 import { fetchAcademicYears } from "@/api/academic_years";
-import { useAcademicYear } from "@/context/AcademicYear";
+import { useAcademicYear } from "@/context/useAcademicYear";
 import type { AcademicYear } from "@/types/academic_year_type";
 import { useEffect, useState, type ChangeEvent } from "react";
 

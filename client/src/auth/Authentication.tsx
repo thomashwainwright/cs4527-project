@@ -8,7 +8,7 @@ import api from "../api/axios";
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [user_email, setUserEmail] = useState(null);
+  const [userEmail, setUserEmail] = useState(null);
 
   const navigate = useNavigate();
 
@@ -57,7 +57,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, isLoading, login, logout, user_email }}
+      value={{ isAuthenticated, isLoading, login, logout, userEmail }}
     >
       {children}
     </AuthContext.Provider>

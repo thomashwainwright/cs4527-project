@@ -6,14 +6,19 @@ import PageTitle from "../ui_components/PageTitle";
 import type { Assignment } from "@/types/assignment_type";
 import { fetchStaffByUserId } from "@/api/staff";
 import type { ModuleOffering } from "@/types/module_offering_type";
+import { useAcademicYear } from "@/context/useAcademicYear";
+import type { Staff } from "@/types/staff_type";
 
 export default function ModuleDetails() {
   const code = useParams().code as string;
   const [moduleDetails, setModuleDetails] = useState<
     (Module & ModuleOffering) | null
   >(null);
-  const [moduleAssignments, setModuleAssignments] = useState<Assignment[]>([]);
+  const [moduleAssignments, setModuleAssignments] = useState<
+    (Assignment & Staff)[]
+  >([]);
   const navigate = useNavigate();
+  const { selectedYear } = useAcademicYear();
 
   const handleRowClick = (user_id: number) => {
     fetchStaffByUserId(user_id).then((staff) => {
@@ -24,14 +29,18 @@ export default function ModuleDetails() {
   useEffect(() => {
     if (!code) return;
     fetchModuleDetails(code).then((details: Module & ModuleOffering) => {
+      console.log("Fetched module details.");
       setModuleDetails(details);
-      fetchModuleAssignments(details.module_id).then(
-        (assignments: Assignment[]) => {
+      if (!selectedYear) return;
+      fetchModuleAssignments(details.module_id, selectedYear?.year_id).then(
+        (assignments: (Assignment & Staff)[]) => {
+          console.log("Fetched module assignments");
+
           setModuleAssignments(assignments);
         },
       );
     });
-  }, [code]);
+  }, [code, selectedYear]);
 
   return (
     <div className="p-12">
@@ -85,7 +94,20 @@ export default function ModuleDetails() {
                   </option>
                 </select>
               </div>
-
+              <p className="mt-4 flex flex-row">
+                Credits:{" "}
+                <input
+                  type="number"
+                  className="border border-gray-300 rounded-md p-2 ml-auto"
+                  value={moduleDetails.credits}
+                  onChange={(e) => {
+                    setModuleDetails({
+                      ...moduleDetails,
+                      credits: parseInt(e.target.value),
+                    });
+                  }}
+                />
+              </p>
               <p className="mt-4 flex flex-row">
                 Estimated Number of Students:{" "}
                 <input
@@ -169,9 +191,9 @@ export default function ModuleDetails() {
 
                 <tbody>
                   {moduleAssignments &&
-                    moduleAssignments.map((assignment: Assignment) => (
+                    moduleAssignments.map((assignment: Assignment & Staff) => (
                       <tr
-                        key={assignment.user_id}
+                        key={assignment.assignment_id}
                         className="clickable-row hover:bg-gray-100 cursor-pointer"
                         onClick={() => handleRowClick(assignment.user_id)}
                       >

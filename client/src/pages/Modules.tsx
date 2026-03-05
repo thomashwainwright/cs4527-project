@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import type { Module } from "../types/module_type";
 import PageTitle from "../ui_components/PageTitle";
 import type { ModuleOffering } from "@/types/module_offering_type";
-import { useAcademicYear } from "@/context/AcademicYear";
+import { useAcademicYear } from "@/context/useAcademicYear";
 import { fetchModulesWithOfferings } from "@/api/modules";
 
 export function Modules() {
@@ -35,7 +35,7 @@ export function Modules() {
     }
     fetchModulesWithOfferings(selectedYear?.year_id).then(
       (modules: (Module & ModuleOffering)[]) => {
-        console.log(modules);
+        console.log("Fetched modules with offerings");
         setData(modules);
       },
     );

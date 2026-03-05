@@ -64,7 +64,7 @@ app.get("/api/modules", async (req, res) => {
         const result = await pool.query("SELECT * FROM modules")
         res.json(result.rows)
     } catch (error) {
-        console.error("Error fetching modules:", error)
+        console.error("SS Error fetching modules:", error)
         res.status(500).json({message: "Error fetching modules"})
     }
 })
@@ -80,41 +80,55 @@ app.get("/api/module_offerings/:year_id", async (req, res) => {
         `, [req.params.year_id])
         res.json(result.rows)
     } catch (error) {
-        console.error("Error fetching modules:", error)
+        console.error("SS Error fetching modules offerings:", error)
         res.status(500).json({message: "Error fetching modules"})
     }
 })
 
 app.get("/api/modules/:code", async (req, res) => {
     try {
-        const result = await pool.query("SELECT * FROM modules WHERE code = $1", [req.params.code])
-        
+        const result = await pool.query(`
+            SELECT 
+                modules.*,
+                module_offerings.*
+            FROM modules
+            JOIN module_offerings
+                ON modules.module_id = module_offerings.module_id
+            WHERE modules.code = $1;`, 
+        [req.params.code])
+ 
         if (result.rows.length === 0) {
             return res.status(404).json({message: "Module not found"})
         }
         res.json(result.rows[0])
     } catch (error) {
-        console.error("Error fetching module details:", error)
+        console.error("SS Error fetching module details:", error)
         res.status(500).json({message: "Error fetching module details"})
     }
 })
 
-app.get("/api/assignments/module_id/:module_id", async (req, res) => {
+app.get("/api/assignments/module_id/:module_id/year_id/:year_id", async (req, res) => {
     try {
-        const result = await pool.query(`    SELECT 
-        staff_assignments.*, 
-        users.name
-    FROM staff_assignments
-    JOIN users 
-        ON staff_assignments.user_id = users.user_id
-    WHERE staff_assignments.module_id = $1`, [Number(req.params.module_id)])
-        
+        const result = await pool.query(
+            `SELECT 
+                staff_assignments.*, 
+                users.name,
+                module_offerings.module_id,
+                module_offerings.year_id
+             FROM staff_assignments
+             JOIN users 
+                ON staff_assignments.user_id = users.user_id
+             JOIN module_offerings
+                ON staff_assignments.offering_id = module_offerings.offering_id
+             WHERE module_offerings.module_id = $1
+             AND module_offerings.year_id = $2`,
+            [Number(req.params.module_id), Number(req.params.year_id)])
         if (result.rows.length === 0) {
             return res.status(404).json({message: "Module assignments not found"})
         }
         res.json(result.rows)
     } catch (error) {
-        console.error("Error fetching module assignments:", error)
+        console.error("SS Error fetching module assignments:", error)
         res.status(500).json({message: "Error fetching module assignments"})
     }
 })
@@ -135,7 +149,7 @@ INNER JOIN staff s
     ON u.staff_id = s.staff_id;`)
         res.json(result.rows)
     } catch (error) {
-        console.error("Error fetching staff:", error)
+        console.error("SS Error fetching staff:", error)
         res.status(500).json({message: "Error fetching staff"})
     }
 })
@@ -150,8 +164,8 @@ app.get("/api/staff/user_id/:user_id", async (req, res) => {
         }
         res.json(result.rows[0])
     } catch (error) {
-        console.error("Error fetching staff details:", error)
-        res.status(500).json({message: "Error fetching staff details"})
+        console.error("SS Error fetching staff details by user id:", error)
+        res.status(500).json({message: "Error fetching staff details by user id:", error})
     }
 })
 
@@ -163,29 +177,34 @@ app.get("/api/staff/email/:email", async (req, res) => {
         }
         res.json(result.rows[0])
     } catch (error) {
-        console.error("Error fetching staff details:", error)
-        res.status(500).json({message: "Error fetching staff details"})
+        console.error("SS Error fetching staff details by email:", error)
+        res.status(500).json({message: "Error fetching staff details by email"})
     }
 })
 
-app.get("/api/assignments/user_id/:user_id/type/:type", async (req, res) => {
+app.get("/api/assignments/user_id/:user_id/year_id/:year_id/type/:type", async (req, res) => {
     try {
         const result = await pool.query(
-        `
-        SELECT 
-            staff_assignments.*, 
-            modules.*
-        FROM staff_assignments
-        JOIN modules
-            ON staff_assignments.module_id = modules.module_id
-        WHERE staff_assignments.user_id = $1 AND modules.module_type = $2
-        `,
-        [Number(req.params.user_id), decodeURIComponent(req.params.type)]
+                `
+            SELECT 
+                sa.*,
+                m.*,
+                mo.*
+            FROM staff_assignments sa
+            JOIN module_offerings mo
+                ON sa.offering_id = mo.offering_id
+            JOIN modules m
+                ON mo.module_id = m.module_id
+            WHERE sa.user_id = $1
+                AND mo.year_id = $2
+                AND m.module_type = $3
+            `,
+        [Number(req.params.user_id), Number(req.params.year_id), decodeURIComponent(req.params.type)]
         );
         res.json(result.rows)
     } catch (error) {
-        console.error("Error fetching staff details:", error)
-        res.status(500).json({message: "Error fetching staff details"})
+        console.error("SS Error staff assignments by year:", error)
+        res.status(500).json({message: "Error staff assignments by year"})
     }
 })
 
@@ -199,8 +218,8 @@ app.get("/api/academic_years", async (req, res) => {
         );
         res.json(result.rows)
     } catch (error) {
-        console.error("Error fetching staff details:", error)
-        res.status(500).json({message: "Error fetching staff details"})
+        console.error("SS Error fetching academic years:", error)
+        res.status(500).json({message: "Error fetching academic years"})
     }
 })
 

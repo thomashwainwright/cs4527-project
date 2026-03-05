@@ -13,6 +13,7 @@ export default function StaffDetails() {
 
   useEffect(() => {
     fetchStaffByEmail(email).then((staff: Staff) => {
+      console.log("Fetched staff by email");
       setStaff(staff);
     });
   }, [email]);
@@ -20,7 +21,7 @@ export default function StaffDetails() {
   return (
     <div className="p-12">
       <PageTitle>{email}</PageTitle>
-      <div className="w-full flex flex-row gap-16 mt-10 text-2xl">
+      <div className="w-full flex flex-row gap-16 mt-10 mb-10 text-2xl">
         <NavButton route={`/staff/${email}`}>Overview</NavButton>
         <NavButton route={`/staff/${email}/teaching`}>Teaching</NavButton>
         <NavButton route={`/staff/${email}/supervision_marking`}>

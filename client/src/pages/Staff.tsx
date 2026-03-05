@@ -18,6 +18,7 @@ export function Staff() {
 
   useEffect(() => {
     fetchStaff().then((staff: Staff[]) => {
+      console.log("Fetched staff data.");
       setData(staff);
     });
   }, []);
@@ -29,7 +30,7 @@ export function Staff() {
   }
 
   return (
-    <div className="p-12">
+    <div className="flex flex-col h-dvh p-12">
       <PageTitle>Staff</PageTitle>
       <div className="flex flex-row mb-10 items-center gap-4 text-xl">
         <div className="ml-auto flex flex-row gap-4 items-center">
@@ -45,31 +46,34 @@ export function Staff() {
           />
         </div>
       </div>
-      <table className="min-w-full mt-10 text-xl">
-        <thead>
-          <tr>
-            <th className="px-4 py-2 border">Name</th>
-            <th className="px-4 py-2 border">Email</th>
-            <th className="px-4 py-2 border">Contract Type</th>
-            <th className="px-4 py-2 border">Total Hours Permitted</th>
-          </tr>
-        </thead>
 
-        <tbody>
-          {getFilteredData().map((staff: Staff) => (
-            <tr
-              key={staff.user_id}
-              className="clickable-row hover:bg-gray-100 cursor-pointer"
-              onClick={() => handleRowClick(staff.email.toString())}
-            >
-              <td className="px-4 py-2 border">{staff.name}</td>
-              <td className="px-4 py-2 border">{staff.email}</td>
-              <td className="px-4 py-2 border">{staff.contract_type}</td>
-              <td className="px-4 py-2 border">{staff.contract_hours}</td>
+      <div className="flex-1 min-h-0 overflow-auto">
+        <table className="min-w-full text-xl ">
+          <thead>
+            <tr>
+              <th className="px-4 py-2 border">Name</th>
+              <th className="px-4 py-2 border">Email</th>
+              <th className="px-4 py-2 border">Contract Type</th>
+              <th className="px-4 py-2 border">Total Hours Permitted</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
+          </thead>
+
+          <tbody>
+            {getFilteredData().map((staff: Staff) => (
+              <tr
+                key={staff.user_id}
+                className="clickable-row hover:bg-gray-100 cursor-pointer"
+                onClick={() => handleRowClick(staff.email.toString())}
+              >
+                <td className="px-4 py-2 border">{staff.name}</td>
+                <td className="px-4 py-2 border">{staff.email}</td>
+                <td className="px-4 py-2 border">{staff.contract_type}</td>
+                <td className="px-4 py-2 border">{staff.contract_hours}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 }

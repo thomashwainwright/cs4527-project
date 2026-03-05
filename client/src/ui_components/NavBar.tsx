@@ -6,7 +6,7 @@ import ModuleIcon from "../assets/icons/module-tab.svg";
 import StaffIcon from "../assets/icons/staff-tab.svg";
 
 export default function NavBar() {
-  const { logout, user_email } = useAuth();
+  const { logout, userEmail } = useAuth();
 
   const handleLogout = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -38,7 +38,7 @@ export default function NavBar() {
       <div className="mt-auto flex flex-row items-center gap-4">
         <div className="hidden sm:block">
           <p className="text-lg text-gray-500">Logged in as</p>
-          <p className="text-lg font-bold">{user_email}</p>{" "}
+          <p className="text-lg font-bold">{userEmail}</p>{" "}
           {/* TODO: Implement real user system from db */}
         </div>
         <form className="ml-auto" onSubmit={handleLogout} method="POST">

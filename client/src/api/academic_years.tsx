@@ -5,7 +5,7 @@ export const fetchAcademicYears = async () => {
     const response = await api.get("/api/academic_years");
     return response.data;
   } catch (error) {
-    console.error("Error fetching modules:", error);
+    console.error("Error fetching academic years:", error);
     throw error;
   }
 };

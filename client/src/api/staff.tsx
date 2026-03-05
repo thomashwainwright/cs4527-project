@@ -22,7 +22,6 @@ export const fetchStaffByUserId = async (user_id: number) => {
 
 export const fetchStaffByEmail = async (email: string) => {
   try {
-    console.log(email);
     const response = await api.get(`/api/staff/email/${email}`);
     return response.data;
   } catch (error) {
@@ -31,11 +30,14 @@ export const fetchStaffByEmail = async (email: string) => {
   }
 };
 
-export const fetchStaffAssignments = async (user_id: number, type: string) => {
+export const fetchStaffAssignments = async (
+  user_id: number,
+  year_id: number,
+  type: string,
+) => {
   try {
-    console.log(user_id);
     const response = await api.get(
-      `/api/assignments/user_id/${user_id}/type/${encodeURIComponent(type)}`,
+      `/api/assignments/user_id/${user_id}/year_id/${year_id}/type/${encodeURIComponent(type)}`,
     ); // /api/assignments/user_id/:user_id/type/:type
     return response.data;
   } catch (error) {
