@@ -144,7 +144,11 @@ export function Modules() {
                     <td
                       className={
                         "px-4 py-2 border " +
-                        (module.allocation == 1 ? "bg-green-200" : "bg-red-200")
+                        (module.allocation == 1
+                          ? "bg-green-200"
+                          : module.allocation == 0
+                            ? "bg-red-200"
+                            : "bg-orange-200")
                       }
                     >
                       {module.allocation}

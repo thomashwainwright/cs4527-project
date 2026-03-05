@@ -46,7 +46,7 @@ export default function StaffTeaching() {
               <th className="px-4 py-2 border">Delta</th>
               <th className="px-4 py-2 border">Share</th>
               <th className="px-4 py-2 border">Credits</th>
-              <th className="px-4 py-2 border">Est Students</th>
+              <th className="px-4 py-2 border">Number of Students</th>
 
               <th className="px-4 py-2 border">Coordinator</th>
               <th className="px-4 py-2 border">Hours</th>
