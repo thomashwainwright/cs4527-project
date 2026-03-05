@@ -12,8 +12,19 @@ export default function AcademicYearSelector() {
     fetchAcademicYears().then((data) => {
       setAcademicYears(data);
       if (!selectedYear) {
-        setSelectedYear(data[data.length - 1]);
-      } // TODO possibly add saved prefs
+        // setSelectedYear(data[data.length - 1]);
+        const year_id = localStorage.getItem("academicYearId");
+        const label = localStorage.getItem("academicYearLabel");
+
+        if (year_id && label) {
+          setSelectedYear({
+            year_id: Number(year_id),
+            label: label,
+          });
+        } else {
+          setSelectedYear(data[data.length - 1]);
+        }
+      }
     });
   });
 
