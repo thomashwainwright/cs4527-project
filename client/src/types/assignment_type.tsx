@@ -5,4 +5,5 @@ export type Assignment = {
   delta: number;
   share: number;
   coordinator: number;
+  custom_formula: string;
 };

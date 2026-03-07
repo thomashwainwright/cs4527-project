@@ -7,6 +7,9 @@ import { useEffect, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import { useAcademicYear } from "@/context/useAcademicYear";
 import type { ModuleOffering } from "@/types/module_offering_type";
+import evaluateFormula from "@/lib/formula";
+
+type CombinedAssignmentType = (Assignment & Module & ModuleOffering & {hours: number | string, focused: boolean})
 
 export default function StaffTeaching() {
   const navigate = useNavigate();
@@ -17,9 +20,27 @@ export default function StaffTeaching() {
     navigate(`/module/${code}`);
   };
 
-  const [data, setData] = useState<(Assignment & Module & ModuleOffering)[]>(
+  const [data, setData] = useState<CombinedAssignmentType[]>(
     [],
   );
+
+  const handleFormulaSubmit = (assignment: CombinedAssignmentType, text: string) => {
+    console.log("submit")
+    console.log(text)
+    
+    
+    if (text == "") {
+      return
+    }
+
+    setData((prev) =>
+      prev.map((item) =>
+        item.assignment_id === assignment.assignment_id
+          ? { ...item, custom_formula: text, hours: evaluateFormula(assignment, text), focused: false }
+          : item
+      )
+    );
+  }
 
   useEffect(() => {
     if (!staff || !selectedYear) return;
@@ -27,11 +48,21 @@ export default function StaffTeaching() {
       staff.user_id,
       selectedYear?.year_id,
       "teaching",
-    ).then((assignments: (Assignment & Module & ModuleOffering)[]) => {
+    ).then((assignments: (CombinedAssignmentType)[]) => {
       console.log("Fetched staff teaching assignments.");
       setData(assignments);
     });
   }, [staff, selectedYear]);
+
+  const setFocused = (assignment: CombinedAssignmentType, focus: boolean) => {
+    setData((prev) =>
+      prev.map((item) =>
+        item.assignment_id === assignment.assignment_id
+          ? { ...item, focused: focus }
+          : item
+      )
+    );
+  }
 
   return (
     <div className="flex flex-col h-dvh">
@@ -46,7 +77,7 @@ export default function StaffTeaching() {
               <th className="px-4 py-2 border">Delta</th>
               <th className="px-4 py-2 border">Share</th>
               <th className="px-4 py-2 border">Credits</th>
-              <th className="px-4 py-2 border">Number of Students</th>
+              <th className="px-4 py-2 border">Students</th>
 
               <th className="px-4 py-2 border">Coordinator</th>
               <th className="px-4 py-2 border">Hours</th>
@@ -54,7 +85,7 @@ export default function StaffTeaching() {
           </thead>
 
           <tbody>
-            {data.map((assignment: Assignment & Module & ModuleOffering) => (
+            {data.map((assignment: CombinedAssignmentType) => (
               <tr
                 key={assignment.assignment_id}
                 className="clickable-row hover:bg-gray-100 cursor-pointer"
@@ -74,16 +105,22 @@ export default function StaffTeaching() {
                 <td className="px-4 py-2 border">
                   {assignment.coordinator ? "Yes" : "No"}
                 </td>
-                <td className="px-4 py-2 border">
-                  {(
-                    assignment.credits *
-                      (assignment.alpha * assignment.delta +
-                        assignment.beta *
-                          assignment.estimated_number_students) *
-                      assignment.share +
-                    assignment.coordinator
-                  ).toString()}
-                </td>
+                <td className={"px-4 py-2 border " + (!assignment.focused && assignment.hours == "ERROR" && "bg-red-200")} contentEditable suppressContentEditableWarning onClick={(e)=>{
+                  e.stopPropagation()
+                  setFocused(assignment, true)
+                  console.log(assignment.custom_formula)
+                }} onKeyDown={(e: React.KeyboardEvent<HTMLTableCellElement> ) => {
+                  if (e.key == "Enter") {
+                    console.log("Enter submit")
+                    e.preventDefault();
+                    e.currentTarget?.blur();
+                    handleFormulaSubmit(assignment, e.currentTarget.textContent)
+                  }
+                }} onBlur={(e: React.FocusEvent<HTMLTableCellElement>) => {
+                  handleFormulaSubmit(assignment, e.currentTarget.textContent)}
+                }>
+                  {assignment.focused ? assignment.custom_formula : assignment.hours}
+               </td>
               </tr>
             ))}
           </tbody>
@@ -92,3 +129,5 @@ export default function StaffTeaching() {
     </div>
   );
 }
+
+
