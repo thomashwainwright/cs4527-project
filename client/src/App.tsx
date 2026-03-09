@@ -9,10 +9,8 @@ import ProtectedRoute from "./routes/ProtectedRoute";
 import ModuleDetails from "./pages/ModuleDetails";
 import StaffDetails from "./pages/StaffDetails";
 import StaffOverview from "./pages/StaffOverview";
-import StaffTeaching from "./pages/StaffTeaching";
-import StaffSupervisionMarking from "./pages/StaffSupervisionMarking";
-import StaffAdmin from "./pages/StaffAdmin";
 import { AcademicYearProvider } from "./context/AcademicYearProvider";
+import HoursTab from "./pages/StaffHoursTab";
 
 // layout for pages with navigation bar
 function NavLayout() {
@@ -44,14 +42,13 @@ function App() {
               <Route path="staff" element={<Staff />} />
               <Route path="staff/:email" element={<StaffDetails />}>
                 <Route index element={<StaffOverview />} />
-                <Route path="teaching" element={<StaffTeaching />} />
+                <Route path="teaching" element={<HoursTab tab="teaching" include={["alpha", "beta", "delta", "share", "credits", "students", "coordinator"]}/>} />
                 <Route
                   path="supervision_marking"
-                  element={<StaffSupervisionMarking />}
+                  element={<HoursTab tab="supervision_marking" include={["credits", "students", "delta"]}/>}
                 />
-                <Route path="admin" element={<StaffAdmin />} />
+                <Route path="admin" element={<HoursTab tab="admin" include={["credits", "students"]}/>} />
               </Route>
-              {/* <Route path="staff/:email/:section" element={<StaffDetails />} /> */}
             </Route>
           </Route>
 

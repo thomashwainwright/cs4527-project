@@ -26,7 +26,7 @@ export default function AcademicYearSelector() {
         }
       }
     });
-  });
+  }, [selectedYear, setSelectedYear]);
 
   return (
     selectedYear && (

@@ -15,13 +15,14 @@ export default function evaluateFormula(assignment: Assignment & Module & Module
 
     let replacedText = text;
 
+    // replace variables
     for (const key in replacements) {
         const assignment_value = replacements[key]
         const regex_match = new RegExp(`\\b${key}\\b`, "gi");
         replacedText = replacedText.replace(regex_match, String(assignment_value))
     }
 
-    replacedText = replacedText.replace(/x/gi, "*"); // Replace  "x" with "*" for multiplication.
+    //replacedText = replacedText.replace(/x/gi, "*"); // Replace  "x" with "*" for multiplication.
 
     try {
         return Function(`return (${replacedText})`)()
