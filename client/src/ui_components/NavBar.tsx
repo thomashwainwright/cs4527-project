@@ -16,7 +16,7 @@ export default function NavBar() {
   return (
     <nav className="flex flex-col gap-4 p-8 w-32 sm:w-auto text-3xl h-screen">
       {/* Title */}
-      <h1 className="hidden sm:block text-xl sm:text-5xl pb-16 font-bold cursor-default select-none">
+      <h1 className="hidden sm:block text-xl sm:text-5xl pb-16 pl-6 pt-4 font-bold cursor-default select-none">
         Workload Manager
       </h1>
 

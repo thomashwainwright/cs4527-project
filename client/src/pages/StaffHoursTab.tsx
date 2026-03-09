@@ -9,6 +9,11 @@ import { useAcademicYear } from "@/context/useAcademicYear";
 import type { ModuleOffering } from "@/types/module_offering_type";
 import evaluateFormula from "@/lib/formula";
 
+import restoreIcon from "../assets/icons/restore.svg"
+import Fullscreen from "@/ui_components/Fullscreen";
+import LoadFormulaPopup from "@/ui_components/LoadFormulaPopup";
+import type { AcademicYear } from "@/types/academic_year_type";
+
 type CombinedAssignmentType = (Assignment & Module & ModuleOffering & {hours: number | string, focused: boolean})
 
 export default function HoursTab({tab, include}: {tab: string, include: string[]}) {
@@ -26,13 +31,16 @@ export default function HoursTab({tab, include}: {tab: string, include: string[]
     [],
   );
 
+  const [fullscreenOpen, setFullscreenOpen] = useState<number>(-1);
+
+
   const handleFormulaSubmit = (assignment: CombinedAssignmentType, text: string) => {
     console.log("submit")
     console.log(text)
     
     
     if (text == "") {
-      return
+      text = default_formula;
     }
 
     setData((prev) =>
@@ -89,8 +97,6 @@ export default function HoursTab({tab, include}: {tab: string, include: string[]
     { key: "hours", label: "Hours", render: (a: CombinedAssignmentType) => a.hours }
   ];
 
-
-
   return (
     <div className="flex flex-col h-dvh">
       <div className="flex-1 min-h-0 overflow-auto">
@@ -108,7 +114,7 @@ export default function HoursTab({tab, include}: {tab: string, include: string[]
             {data.map((assignment: CombinedAssignmentType) => (
               <tr
                 key={assignment.assignment_id}
-                className="clickable-row hover:bg-gray-100 cursor-pointer"
+                className="clickable-row hover:bg-gray-100 cursor-pointer group"
                 onClick={() => handleRowClick(assignment.code)}
               >
                 <td className="px-4 py-2 border">{assignment.code}</td>
@@ -135,8 +141,13 @@ export default function HoursTab({tab, include}: {tab: string, include: string[]
                   handleFormulaSubmit(assignment, e.currentTarget.textContent)}
                 }>
                   {assignment.focused ? assignment.custom_formula : assignment.hours}
-               </td>
+                </td>
+                <td className="group-hover:bg-white">
+                  <button aria-label="Restore from previous year" title="Restore from previous year" className="hover:bg-gray-200 ml-2 rounded-lg" onClick={(e) => {e.stopPropagation(); setFullscreenOpen(assignment.assignment_id)}}><img alt="" src={restoreIcon} className="w-10"/></button>
+                  <Fullscreen open={fullscreenOpen == assignment.assignment_id} onClose={() => setFullscreenOpen(-1)}><LoadFormulaPopup loadFormula={(year: AcademicYear & {custom_formula: string}) => {setFullscreenOpen(-1); handleFormulaSubmit(assignment, year.custom_formula ?? "")}} offering_id={assignment.offering_id} user_id={assignment.user_id} code={assignment.code}/></Fullscreen>
+                </td>
               </tr>
+                
             ))}
           </tbody>
         </table>

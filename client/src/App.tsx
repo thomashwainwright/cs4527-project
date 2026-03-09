@@ -18,8 +18,6 @@ function NavLayout() {
     <>
       <NavBar />
       <div className="w-full min-h-0 mr-48">
-        {" "}
-        {/*p-12*/}
         <Outlet />
       </div>
     </>
@@ -28,6 +26,7 @@ function NavLayout() {
 
 // main app component
 function App() {
+
   return (
     <div className="flex flex-row h-dvh overflow-hidden">
       <AcademicYearProvider>

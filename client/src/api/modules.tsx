@@ -52,3 +52,26 @@ export const fetchModuleAssignments = async (
     }
   }
 };
+
+
+export const fetchOtherYearsFormula = async (
+  offering_id: number,
+  user_id: number
+) => {
+  try {
+    // app.get("/api/assignments/module_id/:module_id/year_id/:year_id", async (req, res) => {
+
+    const response = await api.get(
+      `/api/formula/by_offering_id/${offering_id.toString()}/user_id/${user_id.toString()}`,
+    );
+
+    return response.data;
+  } catch (error: unknown) {
+    if (isAxiosError(error)) {
+      console.log(error.response?.data.message); // do something with this (no assignments)
+    } else {
+      console.error("Error fetching module assignments:", error);
+      throw error;
+    }
+  }
+};

@@ -245,6 +245,33 @@ app.get("/api/academic_years", async (req, res) => {
     }
 })
 
+//   `/api/formula/by_offering_id/${offering_id.toString()}`,
+
+app.get("/api/formula/by_offering_id/:offering_id/user_id/:user_id", async (req, res) => {
+    try {
+        const result = await pool.query(
+        `
+            SELECT
+                ay.label,
+                sa.custom_formula
+            FROM staff_assignments sa
+            JOIN module_offerings mo ON sa.offering_id = mo.offering_id
+            JOIN academic_years ay ON mo.year_id = ay.year_id
+            JOIN module_offerings current_mo ON current_mo.offering_id = $1
+            WHERE mo.module_id = current_mo.module_id
+            AND sa.user_id = $2
+            AND mo.year_id != current_mo.year_id;
+        `,
+        [Number(req.params.offering_id), Number(req.params.user_id)]
+        );
+        res.json(result.rows)
+    } catch (error) {
+        console.error("SS Error fetching formula:", error)
+        res.status(500).json({message: "Error fetching academic years"})
+    }
+})
+
+
 app.listen(3000, () => {
     console.log("Server running on http://localhost:3000")
 })
