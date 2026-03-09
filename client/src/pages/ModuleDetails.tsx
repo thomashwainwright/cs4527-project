@@ -17,8 +17,18 @@ export default function ModuleDetails() {
   const [moduleAssignments, setModuleAssignments] = useState<
     (Assignment & Staff)[]
   >([]);
+  const [calculationParameterPreset, setCalculationParameterPreset] = useState<string>("");
+
   const navigate = useNavigate();
   const { selectedYear } = useAcademicYear();
+
+  const calculationParameterMap: Record<string, {alpha: number, beta: number}> = {
+    std_classroom: { alpha: 4.4, beta: 0.15 },
+    std_comp_lab: { alpha: 5.14, beta: 0.15 },
+    std_proj: { alpha: 3.7, beta: 0 },
+    ind_proj: { alpha: 0, beta: 0.5 },
+    group_proj: { alpha: 0, beta: 0.8 }
+  };
 
   const handleRowClick = (user_id: number) => {
     fetchStaffByUserId(user_id).then((staff) => {
@@ -131,17 +141,27 @@ export default function ModuleDetails() {
                   name="module_type"
                   className="border border-gray-300 rounded-md p-2  hover:border-black w-75 ml-auto"
                   defaultValue={"Standard classroom based"}
+                  onChange={(e) => {
+                    console.log(e.target.value);
+                    setCalculationParameterPreset(e.target.value);
+                    const map = calculationParameterMap[e.target.value];
+                    setModuleDetails({
+                      ...moduleDetails,
+                      alpha: (map.alpha),
+                      beta: (map.beta)
+                    });
+                  }}
                 >
-                  <option value="teaching">Standard classroom based</option>
-                  <option value="admin">Standard computer lab based</option>
-                  <option value="supervision/marking">
+                  <option value="std_classroom">Standard classroom based</option>
+                  <option value="std_comp_lab">Standard computer lab based</option>
+                  <option value="std_proj">
                     Standard project based
                   </option>
-                  <option value="supervision/marking">
+                  <option value="ind_proj">
                     Individual project
                   </option>
-                  <option value="supervision/marking">Group project</option>
-                  <option value="supervision/marking">Custom</option>
+                  <option value="group_proj">Group project</option>
+                  <option value="custom">Custom</option>
                 </select>
               </p>
 
@@ -157,6 +177,7 @@ export default function ModuleDetails() {
                       alpha: parseFloat(e.target.value),
                     });
                   }}
+                  disabled={calculationParameterPreset != "custom"}
                 ></input>
               </p>
 
@@ -172,6 +193,7 @@ export default function ModuleDetails() {
                       beta: parseFloat(e.target.value),
                     });
                   }}
+                  disabled={calculationParameterPreset != "custom"}
                 ></input>
               </p>
             </div>
