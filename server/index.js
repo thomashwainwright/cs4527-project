@@ -204,7 +204,7 @@ app.get("/api/staff/email/:email", async (req, res) => {
     }
 })
 
-app.get("/api/assignments/user_id/:user_id/year_id/:year_id/type/:type", async (req, res) => {
+app.get("/api/assignments/user_id/:user_id/year_id/:year_id", async (req, res) => {
     try {
         const result = await pool.query(
                 `
@@ -219,10 +219,10 @@ app.get("/api/assignments/user_id/:user_id/year_id/:year_id/type/:type", async (
                 ON mo.module_id = m.module_id
             WHERE sa.user_id = $1
                 AND mo.year_id = $2
-                AND m.module_type = $3
             `,
-        [Number(req.params.user_id), Number(req.params.year_id), decodeURIComponent(req.params.type)]
+        [Number(req.params.user_id), Number(req.params.year_id)]
         );
+
         res.json(result.rows)
     } catch (error) {
         console.error("SS Error staff assignments by year:", error)

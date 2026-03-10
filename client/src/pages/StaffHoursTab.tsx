@@ -1,11 +1,11 @@
-import { fetchStaffAssignments } from "@/api/staff";
+// import { fetchStaffAssignments } from "@/api/staff";
 import type { Assignment } from "@/types/assignment_type";
-import type { Staff } from "@/types/staff_type";
+// import type { Staff } from "@/types/staff_type";
 import type { Module } from "@/types/module_type";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
-import { useAcademicYear } from "@/context/useAcademicYear";
+// import { useAcademicYear } from "@/context/useAcademicYear";
 import type { ModuleOffering } from "@/types/module_offering_type";
 import evaluateFormula from "@/lib/formula";
 
@@ -18,8 +18,12 @@ type CombinedAssignmentType = (Assignment & Module & ModuleOffering & {hours: nu
 
 export default function HoursTab({tab, include}: {tab: string, include: string[]}) {
   const navigate = useNavigate();
-  const staff = useOutletContext<Staff>();
-  const { selectedYear } = useAcademicYear();
+  const { data, setData } = useOutletContext<{
+    data: CombinedAssignmentType[];
+    setData: React.Dispatch<React.SetStateAction<CombinedAssignmentType[]>>;
+  }>();
+
+  
 
   const default_formula = tab == "teaching" ? "credits * (alpha * delta + beta * students) * share + coordinator" : (tab == "supervision_marking" ? "credits * students" : "")
 
@@ -27,18 +31,10 @@ export default function HoursTab({tab, include}: {tab: string, include: string[]
     navigate(`/module/${code}`);
   };
 
-  const [data, setData] = useState<CombinedAssignmentType[]>(
-    [],
-  );
-
   const [fullscreenOpen, setFullscreenOpen] = useState<number>(-1);
 
 
   const handleFormulaSubmit = (assignment: CombinedAssignmentType, text: string) => {
-    console.log("submit")
-    console.log(text)
-    
-    
     if (text == "") {
       text = default_formula;
     }
@@ -51,30 +47,6 @@ export default function HoursTab({tab, include}: {tab: string, include: string[]
       )
     );
   }
-
-  useEffect(() => {
-    if (!staff || !selectedYear) return;
-    fetchStaffAssignments(
-      staff.user_id,
-      selectedYear?.year_id,
-      tab,
-    ).then((assignments: (CombinedAssignmentType)[]) => {
-      console.log(`Fetched staff ${tab} assignments.`);
-      setData(assignments);
-      setData((prev) =>
-        prev.map((item) => {
-          console.log(item.custom_formula)
-          const formula = item.custom_formula != null ? item.custom_formula : default_formula
-          return ({
-            ...item,
-            custom_formula: formula,
-            hours: evaluateFormula(item, formula)
-          })
-        })
-        
-      );
-    });
-  }, [staff, selectedYear, tab, default_formula]);
 
   const setFocused = (assignment: CombinedAssignmentType, focus: boolean) => {
     setData((prev) =>
@@ -111,7 +83,8 @@ export default function HoursTab({tab, include}: {tab: string, include: string[]
           </thead>
 
           <tbody>
-            {data.map((assignment: CombinedAssignmentType) => (
+            {// filter data and render
+            data.filter((item) => item.module_type === tab).map((assignment: CombinedAssignmentType) => (
               <tr
                 key={assignment.assignment_id}
                 className="clickable-row hover:bg-gray-100 cursor-pointer group"
