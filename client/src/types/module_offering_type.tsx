@@ -3,4 +3,9 @@ export type ModuleOffering = {
   module_id: number;
   year_id: number;
   estimated_number_students: number;
+  alpha: number;
+  beta: number;
+  credits: number;
+  crit: number;
+  h: number;
 };

@@ -1,5 +1,8 @@
 import { isAxiosError } from "axios";
 import api from "./axios";
+import type { CombinedModuleType } from "@/types/combined_module_type";
+import type { AcademicYear } from "@/types/academic_year_type";
+
 
 export const fetchModules = async () => {
   try {
@@ -71,6 +74,79 @@ export const fetchOtherYearsFormula = async (
       console.log(error.response?.data.message); // do something with this (no assignments)
     } else {
       console.error("Error fetching module assignments:", error);
+      throw error;
+    }
+  }
+};
+
+export const fetchModulesNotAssignedTo = async (
+  year: AcademicYear
+) => {
+  try {
+    // app.get("/api/assignments/module_id/:module_id/year_id/:year_id", async (req, res) => {
+
+    const response = await api.get(
+      `/api/modules/not_assigned_to/${year.year_id.toString()}`,
+    );
+
+    return response.data;
+  } catch (error: unknown) {
+    if (isAxiosError(error)) {
+      console.log(error.response?.data.message); // do something with this (no assignments)
+    } else {
+      console.error("Error fetching module assignments:", error);
+      throw error;
+    }
+  }
+};
+
+// POSTs
+
+export const commitModuleChanges =  async (
+  deletedData: CombinedModuleType[] | undefined,
+  editedData: CombinedModuleType[] | undefined,
+  newData: CombinedModuleType[] | undefined,
+) => {
+  try {
+    const response = await api.post("/api/modules/commit", {
+      deleted: deletedData,
+      edited: editedData,
+      created: newData,
+    });
+
+    return response.data;
+  } catch (error: unknown) {
+    if (isAxiosError(error)) {
+      console.error(error.response?.data?.message);
+    } else {
+      console.error("Error committing module changes:", error);
+      throw error;
+    }
+  }
+};
+
+export const commitModuleOfferingChanges =  async (
+  deletedData: CombinedModuleType[] | undefined,
+  editedData: CombinedModuleType[] | undefined,
+  newData: CombinedModuleType[] | undefined,
+  year_id: number
+) => {
+
+
+  try {
+    const response = await api.post("/api/module_offerings/commit", {
+      deleted: deletedData,
+      edited: editedData,
+      created: newData,
+      year_id: year_id
+    });
+
+    return response.data;
+  } catch (error: unknown) {
+    if (isAxiosError(error)) {
+      console.error(error.response?.data?.message);
+    } else {
+      console.error("Error committing module offering changes:", error);
       throw error;
     }
   }

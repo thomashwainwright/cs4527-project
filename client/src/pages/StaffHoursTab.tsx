@@ -1,20 +1,13 @@
-// import { fetchStaffAssignments } from "@/api/staff";
-import type { Assignment } from "@/types/assignment_type";
-// import type { Staff } from "@/types/staff_type";
-import type { Module } from "@/types/module_type";
 
 import { useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
-// import { useAcademicYear } from "@/context/useAcademicYear";
-import type { ModuleOffering } from "@/types/module_offering_type";
 import evaluateFormula from "@/lib/formula";
-
 import restoreIcon from "../assets/icons/restore.svg"
 import Fullscreen from "@/ui_components/Fullscreen";
-import LoadFormulaPopup from "@/ui_components/LoadFormulaPopup";
+import LoadFormulaPopup from "@/fullscreen_popups/LoadFormulaPopup";
 import type { AcademicYear } from "@/types/academic_year_type";
+import type { CombinedAssignmentType } from "@/types/combined_assignment_type";
 
-type CombinedAssignmentType = (Assignment & Module & ModuleOffering & {hours: number | string, focused: boolean})
 
 export default function HoursTab({tab, include}: {tab: string, include: string[]}) {
   const navigate = useNavigate();
@@ -22,8 +15,6 @@ export default function HoursTab({tab, include}: {tab: string, include: string[]
     data: CombinedAssignmentType[];
     setData: React.Dispatch<React.SetStateAction<CombinedAssignmentType[]>>;
   }>();
-
-  
 
   const default_formula = tab == "teaching" ? "credits * (alpha * delta + beta * students) * share + coordinator" : (tab == "supervision_marking" ? "credits * students" : "")
 
@@ -102,7 +93,6 @@ export default function HoursTab({tab, include}: {tab: string, include: string[]
                 <td className={"px-4 py-2 border " + (!assignment.focused && assignment.hours == "ERROR" && "bg-red-200")} contentEditable suppressContentEditableWarning onClick={(e)=>{
                   e.stopPropagation()
                   setFocused(assignment, true)
-                  console.log(assignment.custom_formula)
                 }} onKeyDown={(e: React.KeyboardEvent<HTMLTableCellElement> ) => {
                   if (e.key == "Enter") {
                     console.log("Enter submit")

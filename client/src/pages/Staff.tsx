@@ -36,7 +36,7 @@ export function Staff() {
         <div className="ml-auto flex flex-row gap-4 items-center">
           <input
             className="border border-gray-300 rounded-md p-2 hover:border-black w-120"
-            placeholder="search"
+            placeholder="Search"
             onChange={(e) => {
               setFilter((previous) => ({
                 ...previous,

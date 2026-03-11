@@ -5,20 +5,19 @@ import PageTitle from "../ui_components/PageTitle";
 import { useEffect, useState } from "react";
 import { Outlet, useParams } from "react-router-dom";
 import { useAcademicYear } from "@/context/useAcademicYear";
-import type { Assignment } from "@/types/assignment_type";
-import type { ModuleOffering } from "@/types/module_offering_type";
 import evaluateFormula from "@/lib/formula";
-import type { Module } from "@/types/module_type";
+import type { CombinedAssignmentType } from "@/types/combined_assignment_type";
 
-type CombinedAssignmentType = (Assignment & Module & ModuleOffering & {hours: number | string, focused: boolean})
 
 export default function StaffDetails() {
   const params = useParams();
   const email = params.email as string;
   const { selectedYear } = useAcademicYear();
 
+  // TODO: temp
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [staff, setStaff] = useState<Staff | null>(null);
+  //
 
   const [data, setData] = useState<CombinedAssignmentType[]>(
     [],
@@ -38,7 +37,6 @@ export default function StaffDetails() {
       ).then((assignments: (CombinedAssignmentType)[]) => {
         console.log(`Fetched staff assignments.`);
         setData(assignments);
-        console.log(assignments);
         setData((prev) =>
           prev.map((item) => {
             console.log(item.custom_formula)

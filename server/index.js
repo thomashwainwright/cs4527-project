@@ -271,6 +271,122 @@ app.get("/api/formula/by_offering_id/:offering_id/user_id/:user_id", async (req,
     }
 })
 
+app.get("/api/modules/not_assigned_to/:year_id", async (req, res) => {
+    try {
+        const result = await pool.query(
+        `
+            SELECT m.*
+            FROM modules m
+            WHERE NOT EXISTS (
+                SELECT 1
+                FROM module_offerings mo
+                WHERE mo.module_id = m.module_id
+                AND mo.year_id = $1
+            )
+        `,
+        [Number(req.params.year_id)]
+        );
+        res.json(result.rows)
+    } catch (error) {
+        console.error("SS Error fetching modules not assigned to academic year: ", error)
+        res.status(500).json({message: "Error fetching modules not assigned to academic year"})
+    }
+})
+
+app.post("/api/modules/commit", async (req, res) => {
+    const {deleted, edited, created} = req.body;
+    const client = await pool.connect();
+
+    try {
+        await client.query("BEGIN")
+
+        // delete modules (deleted)
+        for (const item of deleted || []) {
+            await client.query(
+                `
+                    DELETE FROM modules
+                    WHERE module_id = $1
+                `,
+                [item.module_id]
+            )
+        }
+
+        // update existing modules (edit)
+        for (const item of edited || []) {
+            await client.query(
+                `
+                    UPDATE modules
+                    SET code = $1,
+                        name = $2,
+                        module_type = $3
+                    WHERE module_id = $4
+                `,
+                [item.code, item.name, item.module_type, item.module_id]
+            )
+        }
+
+        // insert new modules
+        for (const item of created || []) {
+            await client.query(
+                `
+                    INSERT INTO modules (code, module_type, name)
+                    VALUES ($1, $2, $3)
+                `,
+                [item.code, item.module_type, item.name]
+            )
+        }
+
+        await client.query("COMMIT");
+        res.json({message: "Success."});
+
+    } catch (error) {
+        await client.query("ROLLBACK");
+        console.log("Error committing saved changes to modules: ", error);
+    } finally {
+        client.release()
+    }
+});
+
+app.post("/api/module_offerings/commit", async (req, res) => {
+    const {deleted, edited, created, year_id} = req.body;
+    const client = await pool.connect();
+
+    try {
+        await client.query("BEGIN")
+
+        // delete modules (deleted)
+        for (const item of deleted || []) {
+            await client.query(
+                `
+                    DELETE FROM module_offerings
+                    WHERE offering_id = $1
+                `,
+                [item.offering_id]
+            )
+        }
+
+        // insert new modules
+        for (const item of created || []) {
+            await client.query(
+                `
+                    INSERT INTO module_offerings (module_id, year_id)
+                    VALUES ($1, $2)
+                `,
+                [item.module_id, year_id]
+            )
+        }
+
+        await client.query("COMMIT");
+        res.json({message: "Success."});
+
+    } catch (error) {
+        await client.query("ROLLBACK");
+        console.log("Error committing saved changes to modules: ", error);
+    } finally {
+        client.release()
+    }
+});
+
 
 app.listen(3000, () => {
     console.log("Server running on http://localhost:3000")
