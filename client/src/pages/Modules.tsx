@@ -162,10 +162,18 @@ export function Modules() {
 
     if (editModules) {
       // editModules => data is module, to update the "modules" table.
-      commitModuleChanges(deletedData, editedData, newData).then(() => setRefreshKey(refreshKey + 1))
+      let err = false;
+      newData?.forEach(item => {
+        console.log(item.code)
+        if (item.code == "") {
+          err = true;
+          alert("Missing required field: Code");
+          return;
+        }
+      })
+      if (!err) commitModuleChanges(deletedData, editedData, newData).then(() => setRefreshKey(refreshKey + 1));
     } else {
       // !editModules => data is module offering, to update "module_offerings" table. This represents assignments of a module to a specific year.
-      // commitModuleOfferingChanges()
       if (!selectedYear) return;
       commitModuleOfferingChanges(deletedData, editedData, newData, selectedYear?.year_id).then(() => setRefreshKey(refreshKey + 1))
     }
@@ -296,7 +304,6 @@ export function Modules() {
                         handleRowClick(module.code);
                       }
                     }}
-                    contentEditable={editModules}
                     suppressContentEditableWarning
                     onKeyDown={(e) => {
                       if (e.key == "Enter") {
@@ -313,10 +320,10 @@ export function Modules() {
                       updateStateData(row, module)}
                     }  
                   >
-                    <td className="px-4 py-2 border" tabIndex={0}>
+                    <td className="px-4 py-2 border" tabIndex={0} contentEditable={editModules}>
                       {module.code}
                     </td>
-                    <td className="px-4 py-2 border" tabIndex={0}>
+                    <td className="px-4 py-2 border" tabIndex={0} contentEditable={editModules}>
                       {module.name}
                     </td>
                     <td className="px-4 py-2 border" tabIndex={0}>
