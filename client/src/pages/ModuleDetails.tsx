@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
 import type { Module } from "../types/module_type";
 import { useEffect, useState } from "react";
-import { fetchModuleDetails, fetchModuleAssignments } from "../api/modules";
+import { fetchModuleDetails, fetchModuleAssignments, commitModuleOfferingDetailChanges } from "../api/modules";
 import PageTitle from "../ui_components/PageTitle";
 import type { Assignment } from "@/types/assignment_type";
 import { fetchStaffByUserId } from "@/api/staff";
@@ -37,11 +37,12 @@ export default function ModuleDetails() {
   };
 
   useEffect(() => {
-    if (!code) return;
-    fetchModuleDetails(code).then((details: Module & ModuleOffering) => {
+    if (!code || !selectedYear) return;
+    fetchModuleDetails(code, selectedYear?.year_id).then((details: Module & ModuleOffering) => {
       console.log("Fetched module details.");
       setModuleDetails(details);
-      if (!selectedYear) return;
+      console.log(details)
+
       fetchModuleAssignments(details.module_id, selectedYear?.year_id).then(
         (assignments: (Assignment & Staff)[]) => {
           console.log("Fetched module assignments");
@@ -51,6 +52,13 @@ export default function ModuleDetails() {
       );
     });
   }, [code, selectedYear]);
+
+  console.log(moduleDetails?.estimated_number_students)
+  
+  function saveData() {
+    // save data to db
+    commitModuleOfferingDetailChanges(moduleDetails?.offering_id, moduleDetails?.estimated_number_students, moduleDetails?.alpha, moduleDetails?.beta, moduleDetails?.crit, moduleDetails?.credits, moduleDetails?.h)
+  }
 
   return (
     <div className="p-12">
@@ -65,51 +73,48 @@ export default function ModuleDetails() {
           {/* Module details page content*/}
           <div className="flex mt-10 gap-4 flex-col md:flex-row text-2xl">
             {/* Module type, estimated number of students, alpha and beta */}
-            <div className="lg:w-1/2 pr-16">
+            <div className="lg:w-1/2 pr-16 flex flex-col">
               <div className="flex flex-row">
                 <p className="pt-2 pb-2">Module Code: </p>
                 <input
-                  className="border border-gray-300 rounded-md p-2 ml-auto"
+                  className="border border-gray-300 rounded-md p-2 ml-auto bg-gray-50"
                   value={moduleDetails.code}
-                  readOnly
+                  disabled
                 />
               </div>
 
               <div className="mt-4 flex flex-row">
                 <p className="pt-2 pb-2">Module Name: </p>
                 <input
-                  className="border border-gray-300 rounded-md p-2 ml-auto"
+                  className="border border-gray-300 rounded-md p-2 ml-auto bg-gray-50"
                   value={moduleDetails.name}
-                  readOnly
+                  disabled
                 />
               </div>
 
               <div className="mt-4 flex flex-row">
                 <p className="pt-2 pb-2">Module Type: </p>
-                <select
-                  name="module_type"
-                  className="border border-gray-300 rounded-md p-2  hover:border-black w-75 ml-auto"
-                  value={moduleDetails.module_type}
-                  onChange={(e) => {
-                    setModuleDetails({
-                      ...moduleDetails,
-                      module_type: e.target.value,
-                    });
-                  }}
-                >
-                  <option value="teaching">Teaching</option>
-                  <option value="admin">Admin</option>
-                  <option value="supervision/marking">
-                    Supervision/Marking
-                  </option>
-                </select>
+                <input
+                  className="border border-gray-300 rounded-md p-2 ml-auto bg-gray-50"
+                  value={moduleDetails.module_type[0].toUpperCase() + moduleDetails.module_type.slice(1)}
+                  disabled
+                />
+              </div>
+
+              <div className="mt-4 flex flex-row">
+                <p className="pt-2 pb-2">Academic Year: </p>
+                <input
+                  className="border border-gray-300 rounded-md p-2 ml-auto bg-gray-50"
+                  value={selectedYear?.label}
+                  disabled
+                />
               </div>
               <p className="mt-4 flex flex-row">
                 Credits:{" "}
                 <input
                   type="number"
                   className="border border-gray-300 rounded-md p-2 ml-auto"
-                  value={moduleDetails.credits}
+                  value={moduleDetails.credits ?? ""}
                   onChange={(e) => {
                     setModuleDetails({
                       ...moduleDetails,
@@ -123,7 +128,7 @@ export default function ModuleDetails() {
                 <input
                   type="number"
                   className="border border-gray-300 rounded-md p-2 ml-auto"
-                  value={moduleDetails.estimated_number_students}
+                  value={moduleDetails.estimated_number_students ?? ""}
                   onChange={(e) => {
                     setModuleDetails({
                       ...moduleDetails,
@@ -140,7 +145,6 @@ export default function ModuleDetails() {
                 <select
                   name="module_type"
                   className="border border-gray-300 rounded-md p-2  hover:border-black w-75 ml-auto"
-                  defaultValue={"Standard classroom based"}
                   onChange={(e) => {
                     console.log(e.target.value);
                     setCalculationParameterPreset(e.target.value);
@@ -152,6 +156,7 @@ export default function ModuleDetails() {
                     });
                   }}
                 >
+                  <option value="">Select preset</option>
                   <option value="std_classroom">Standard classroom based</option>
                   <option value="std_comp_lab">Standard computer lab based</option>
                   <option value="std_proj">
@@ -170,7 +175,7 @@ export default function ModuleDetails() {
                 <input
                   type="number"
                   className="border border-gray-300 rounded-md p-2 ml-auto"
-                  value={moduleDetails.alpha}
+                  value={moduleDetails.alpha ?? ""}
                   onChange={(e) => {
                     setModuleDetails({
                       ...moduleDetails,
@@ -186,7 +191,7 @@ export default function ModuleDetails() {
                 <input
                   type="number"
                   className="border border-gray-300 rounded-md p-2 ml-auto"
-                  value={moduleDetails.beta}
+                  value={moduleDetails.beta ?? ""}
                   onChange={(e) => {
                     setModuleDetails({
                       ...moduleDetails,
@@ -196,6 +201,10 @@ export default function ModuleDetails() {
                   disabled={calculationParameterPreset != "custom"}
                 ></input>
               </p>
+
+              <div className="flex ml-auto mt-8">
+                <button className={"border border-gray-200 rounded-md px-4 py-2 cursor-pointer text-gray text-gray-700 hover:bg-gray-200"} title="Save changes to modules." onClick={saveData}>Save</button>
+              </div>
             </div>
             {/* Staff assignments table */}
             <div className="lg:w-1/2 pr-16">

@@ -263,8 +263,8 @@ export function Modules() {
       <div className="flex flex-row gap-4 mb-4 items-center">
         <p className="text-xl">{editModules ? <>Showing all modules</> : <>Showing active modules for <b>{selectedYear?.label}</b></>}</p>
         <div className="flex ml-auto gap-2">
-          <button className={"border border-gray-200 rounded-md px-4 py-2 cursor-pointer text-gray text-xl text-gray-700"} onClick={() => {return editModules ? addModule() : setAssignModuleWindow(true)}} title="Add module.">Add</button>
-          <button className={"border border-gray-200 rounded-md px-4 py-2 cursor-pointer text-gray text-xl text-gray-700"} onClick={saveData} title="Save changes to modules.">Save</button>
+          <button className={"border border-gray-200 rounded-md px-4 py-2 cursor-pointer text-gray text-xl text-gray-700 hover:bg-gray-200"} onClick={() => {return editModules ? addModule() : setAssignModuleWindow(true)}} title="Add module.">Add</button>
+          <button className={"border border-gray-200 rounded-md px-4 py-2 cursor-pointer text-gray text-xl text-gray-700 hover:bg-gray-200"} onClick={saveData} title="Save changes to modules.">Save</button>
           <button className={"border border-gray-200 rounded-md px-4 py-2 cursor-pointer text-gray text-xl " + (editModules ? "bg-blue-600 text-white hover:bg-blue-400" : "text-gray-700 hover:bg-gray-200")} onClick={() => setEditModules(!editModules)} title="Edit all modules available to all academic years.">Edit all modules</button>
         </div>
         <Fullscreen open={assignModuleWindow} onClose={()=>{setAssignModuleWindow(false)}}><AddModule onAdd={(d: Module[] | undefined) => onModuleOfferingAdd(d)} /></Fullscreen>
@@ -346,7 +346,7 @@ export function Modules() {
                         <option value="teaching">Teaching</option>
                         <option value="admin">Admin</option>
                         <option value="supervision/marking">
-                          Supervision/Marking
+                          Supervision/marking
                         </option>
                       </select>
                     </td>

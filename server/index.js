@@ -107,7 +107,7 @@ app.get("/api/module_offerings/:year_id", async (req, res) => {
     }
 })
 
-app.get("/api/modules/:code", async (req, res) => {
+app.get("/api/module_offerings/:code/year_id/:year_id", async (req, res) => {
     try {
         const result = await pool.query(`
             SELECT 
@@ -116,8 +116,9 @@ app.get("/api/modules/:code", async (req, res) => {
             FROM modules
             JOIN module_offerings
                 ON modules.module_id = module_offerings.module_id
-            WHERE modules.code = $1;`, 
-        [req.params.code])
+            WHERE modules.code = $1 AND module_offerings.year_id = $2;`, 
+        [req.params.code, req.params.year_id])
+
  
         if (result.rows.length === 0) {
             return res.status(404).json({message: "Module not found"})
@@ -384,6 +385,38 @@ app.post("/api/module_offerings/commit", async (req, res) => {
         console.log("Error committing saved changes to modules: ", error);
     } finally {
         client.release()
+    }
+});
+
+app.post("/api/module_offerings/commit-details", async (req, res) => {
+    const {offering_id, estimated_number_students, alpha, beta, crit, credits, h} = req.body;
+    const client = await pool.connect();
+    console.log("doing it " + credits)
+    try {
+        await client.query("BEGIN")
+
+        await client.query(
+            `
+                UPDATE module_offerings
+                SET 
+                    estimated_number_students = $1,
+                    alpha = $2,
+                    beta = $3,
+                    crit = $4,
+                    credits = $5,
+                    h = $6
+                WHERE offering_id = $7
+            `,
+            [estimated_number_students, alpha, beta, crit, credits, h, offering_id]
+        );
+        
+        await client.query("COMMIT");
+        
+    } catch (error) {
+        await client.query("ROLLBACK");
+        console.log("Error committing saved changes to modules: ", error);
+    } finally {
+        client.release();
     }
 });
 

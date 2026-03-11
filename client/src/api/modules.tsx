@@ -24,9 +24,9 @@ export const fetchModulesWithOfferings = async (year_id: number) => {
   }
 };
 
-export const fetchModuleDetails = async (code: string) => {
+export const fetchModuleDetails = async (code: string, year_id: number) => {
   try {
-    const response = await api.get(`/api/modules/${code}`);
+    const response = await api.get(`/api/module_offerings/${code}/year_id/${year_id}`);
     return response.data;
   } catch (error) {
     console.error("Error fetching module details:", error);
@@ -139,6 +139,37 @@ export const commitModuleOfferingChanges =  async (
       edited: editedData,
       created: newData,
       year_id: year_id
+    });
+
+    return response.data;
+  } catch (error: unknown) {
+    if (isAxiosError(error)) {
+      console.error(error.response?.data?.message);
+    } else {
+      console.error("Error committing module offering changes:", error);
+      throw error;
+    }
+  }
+}
+
+export const commitModuleOfferingDetailChanges =  async (
+  offering_id: number | undefined,
+  estimated_number_students: number | undefined, 
+  alpha: number | undefined, 
+  beta: number | undefined, 
+  crit: number | undefined, 
+  credits: number | undefined, 
+  h: number | undefined,
+) => {
+  try {
+    const response = await api.post("/api/module_offerings/commit-details", {
+      offering_id: offering_id,
+      estimated_number_students: estimated_number_students,
+      alpha: alpha,
+      beta: beta,
+      crit: crit,
+      credits: credits,
+      h: h,
     });
 
     return response.data;
