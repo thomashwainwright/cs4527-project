@@ -10,7 +10,11 @@ export default function AssignModule({offering_id, moduleAssignments, onAdd}: {o
 
     useEffect(() => {
         fetchAvailableStaff(offering_id).then(data => {
-            setData(data.filter((item: AssignmentRow) => !moduleAssignments.some(a => a.user_id === item.user_id))) // filter data added in current state before saving
+            let filteredData = data;
+            if (moduleAssignments) {
+                filteredData = data.filter((item: AssignmentRow) => !moduleAssignments.some(a => a.user_id === item.user_id))
+            }
+            setData(filteredData) // filter data added in current state before saving
         })
     }, [offering_id, moduleAssignments]);
 

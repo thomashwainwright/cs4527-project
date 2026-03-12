@@ -146,9 +146,7 @@ app.get("/api/assignments/module_id/:module_id/year_id/:year_id", async (req, re
              WHERE module_offerings.module_id = $1
              AND module_offerings.year_id = $2`,
             [Number(req.params.module_id), Number(req.params.year_id)])
-        if (result.rows.length === 0) {
-            return res.status(404).json({message: "Module assignments not found"})
-        }
+
         res.json(result.rows)
     } catch (error) {
         console.error("SS Error fetching module assignments:", error)

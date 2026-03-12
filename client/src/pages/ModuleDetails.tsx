@@ -49,17 +49,16 @@ export default function ModuleDetails() {
   useEffect(() => {
     if (!code || !selectedYear) return;
     fetchModuleDetails(code, selectedYear?.year_id).then((details: Module & ModuleOffering) => {
-      console.log("Fetched module details.");
+      // console.log("Fetched module details.");
       setModuleDetails(details);
-      console.log(details)
 
       fetchModuleAssignments(details.module_id, selectedYear?.year_id).then(
-        (assignments: (Assignment & Staff & {
-    unique_id: number;
-    new: number;
-    edit: boolean;
-    del: boolean;
-  })[]) => {
+            (assignments: (Assignment & Staff & {
+        unique_id: number;
+        new: number;
+        edit: boolean;
+        del: boolean;
+      })[]) => {
           console.log("Fetched module assignments");
 
           setModuleAssignments(assignments);
@@ -91,8 +90,8 @@ export default function ModuleDetails() {
     // console.log(newData);
     // console.log(deletedData);
 
-    commitAssignmentData(deletedData, editedData, newData);
-    setRefreshKey(refreshKey + 1);
+    commitAssignmentData(deletedData, editedData, newData).then(()=>setRefreshKey(refreshKey + 1))
+    
   }
 
   function addAssignments(staff: Staff[] | undefined): void {
@@ -124,8 +123,8 @@ export default function ModuleDetails() {
         new: Date.now() + index,
         unique_id: maxId + index + 1,
         edit: false,
-        delta: 0,
-        share: 0,
+        delta: 0.00,
+        share: 0.00,
         coordinator: 0,
        }));
 
@@ -394,8 +393,8 @@ export default function ModuleDetails() {
                         } 
                         >
                         <td className="px-4 py-2 border">{assignment.name}</td>
-                        <td className="px-4 py-2 border" contentEditable={editAssignments}>{assignment.delta}</td>
-                        <td className="px-4 py-2 border" contentEditable={editAssignments}>{assignment.share}</td>
+                        <td className="px-4 py-2 border" contentEditable={editAssignments} suppressContentEditableWarning>{assignment.delta}</td>
+                        <td className="px-4 py-2 border" contentEditable={editAssignments} suppressContentEditableWarning>{assignment.share}</td>
                         <td className="px-4 py-2 border">
                           {/* {assignment.coordinator ? "Yes" : "No"} */}
                           <select
