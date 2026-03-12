@@ -294,6 +294,30 @@ app.get("/api/modules/not_assigned_to/:year_id", async (req, res) => {
     }
 })
 
+//       `/api/staff/not_assigned_to/${offering_id.toString()}`,
+app.get("/api/staff/not_assigned_to/:offering_id", async (req, res) => {
+    try {
+        const result = await pool.query(
+        `
+            SELECT *
+            FROM users u
+            WHERE u.staff_id IS NOT NULL
+            AND NOT EXISTS (
+                SELECT 1
+                FROM staff_assignments sa
+                WHERE sa.user_id = u.user_id
+                AND sa.offering_id = $1
+            );
+        `,
+        [Number(req.params.offering_id)]
+        );
+        res.json(result.rows)
+    } catch (error) {
+        console.error("SS Error fetching modules not assigned to academic year: ", error)
+        res.status(500).json({message: "Error fetching modules not assigned to academic year"})
+    }
+})
+
 app.post("/api/modules/commit", async (req, res) => {
     const {deleted, edited, created} = req.body;
     const client = await pool.connect();
@@ -391,7 +415,6 @@ app.post("/api/module_offerings/commit", async (req, res) => {
 app.post("/api/module_offerings/commit-details", async (req, res) => {
     const {offering_id, estimated_number_students, alpha, beta, crit, credits, h} = req.body;
     const client = await pool.connect();
-    console.log("doing it " + credits)
     try {
         await client.query("BEGIN")
 
@@ -417,6 +440,63 @@ app.post("/api/module_offerings/commit-details", async (req, res) => {
         console.log("Error committing saved changes to modules: ", error);
     } finally {
         client.release();
+    }
+});
+
+
+//     const response = await api.post("/api/staff_assignments/commit", {
+
+app.post("/api/staff_assignments/commit", async (req, res) => {
+    const {deleted, edited, created} = req.body;
+    const client = await pool.connect();
+
+    try {
+        await client.query("BEGIN")
+
+        // delete modules (deleted)
+        for (const item of deleted || []) {
+            await client.query(
+                `
+                    DELETE FROM staff_assignments
+                    WHERE assignment_id = $1
+                `,
+                [item.assignment_id]
+            )
+        }
+
+        // update existing modules (edit)
+        for (const item of edited || []) {
+            await client.query(
+                `
+                    UPDATE staff_assignments
+                    SET delta = $1,
+                        share = $2,
+                        coordinator = $3
+                    WHERE assignment_id = $4
+                `,
+                [item.delta, item.share, item.coordinator, item.assignment_id]
+            )
+        }
+
+        // insert new modules
+        for (const item of created || []) {
+            await client.query(
+                `
+                    INSERT INTO staff_assignments (user_id, offering_id, delta, share, coordinator)
+                    VALUES ($1, $2, $3, $4, $5)
+                `,
+                [item.user_id, item.offering_id, item.delta, item.share, item.coordinator]
+            )
+        }
+
+        await client.query("COMMIT");
+        res.json({message: "Success."});
+
+    } catch (error) {
+        await client.query("ROLLBACK");
+        console.log("Error committing saved changes to modules: ", error);
+    } finally {
+        client.release()
     }
 });
 

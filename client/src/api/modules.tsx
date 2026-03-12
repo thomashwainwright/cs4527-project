@@ -2,6 +2,7 @@ import { isAxiosError } from "axios";
 import api from "./axios";
 import type { CombinedModuleType } from "@/types/combined_module_type";
 import type { AcademicYear } from "@/types/academic_year_type";
+import type { AssignmentRow } from "@/types/assignment_row";
 
 
 export const fetchModules = async () => {
@@ -94,7 +95,28 @@ export const fetchModulesNotAssignedTo = async (
     if (isAxiosError(error)) {
       console.log(error.response?.data.message); // do something with this (no assignments)
     } else {
-      console.error("Error fetching module assignments:", error);
+      console.error("Error fetching module assignments: ", error);
+      throw error;
+    }
+  }
+};
+
+export const fetchAvailableStaff = async (
+  offering_id: number
+) => {
+  try {
+    // app.get("/api/assignments/module_id/:module_id/year_id/:year_id", async (req, res) => {
+
+    const response = await api.get(
+      `/api/staff/not_assigned_to/${offering_id.toString()}`,
+    );
+
+    return response.data;
+  } catch (error: unknown) {
+    if (isAxiosError(error)) {
+      console.log(error.response?.data.message); // do something with this (no assignments)
+    } else {
+      console.error("Error fetching staff not assigned to module: ", error);
       throw error;
     }
   }
@@ -182,3 +204,28 @@ export const commitModuleOfferingDetailChanges =  async (
     }
   }
 };
+
+export const commitAssignmentData =  async (
+  deletedData: AssignmentRow[] | undefined,
+  editedData: AssignmentRow[] | undefined,
+  newData: AssignmentRow[] | undefined,
+) => {
+
+
+  try {
+    const response = await api.post("/api/staff_assignments/commit", {
+      deleted: deletedData,
+      edited: editedData,
+      created: newData,
+    });
+
+    return response.data;
+  } catch (error: unknown) {
+    if (isAxiosError(error)) {
+      console.error(error.response?.data?.message);
+    } else {
+      console.error("Error committing module offering changes:", error);
+      throw error;
+    }
+  }
+}

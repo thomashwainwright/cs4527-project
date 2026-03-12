@@ -156,9 +156,9 @@ export function Modules() {
     const editedData = data?.filter(item => item.edit && item.new == undefined && !item.del)
     const newData = data?.filter(item => item.new)
 
-    console.log(editedData)
-    console.log(newData)
-    console.log(deletedData)
+    // console.log(editedData)
+    // console.log(newData)
+    // console.log(deletedData)
 
     if (editModules) {
       // editModules => data is module, to update the "modules" table.
