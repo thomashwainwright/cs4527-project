@@ -29,7 +29,7 @@ export default function StaffDetails() {
       setStaff(staff_data);
 
       if (!staff_data || !selectedYear) return;
-      const default_formula = (tab: string) => (tab == "teaching" ? "credits * (alpha * delta + beta * students) * share + coordinator" : (tab == "supervision_marking" ? "credits * students" : ""))
+      const default_formula = (tab: string) => (tab == "teaching" ? "credits * (alpha * delta + beta * students) * share + coordinator" : (tab == "supervision_marking" ? "credits * students" : "0"))
 
       fetchStaffAssignments(
         staff_data.user_id,

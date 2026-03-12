@@ -89,7 +89,7 @@ export function Modules() {
           type_filter = true;
         }
 
-        if (filter.supervision_marking && item.module_type == "supervision/marking") {
+        if (filter.supervision_marking && item.module_type == "supervision_marking") {
           type_filter = true;
         }
 
@@ -345,7 +345,7 @@ export function Modules() {
                       >
                         <option value="teaching">Teaching</option>
                         <option value="admin">Admin</option>
-                        <option value="supervision/marking">
+                        <option value="supervision_marking">
                           Supervision/marking
                         </option>
                       </select>

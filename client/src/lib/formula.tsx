@@ -6,11 +6,11 @@ export default function evaluateFormula(assignment: Assignment & Module & Module
     const replacements: Record<string, number | string> = {
         alpha: assignment.alpha,
         beta: assignment.beta,
-        delta: assignment.delta,
-        share: assignment.share,
+        delta: assignment.delta ?? 0,
+        share: assignment.share ?? 0,
         credits: assignment.credits,
         students: assignment.estimated_number_students,
-        coordinator: assignment.coordinator
+        coordinator: assignment.coordinator ?? 0,
     }
 
     let replacedText = text;
@@ -25,7 +25,7 @@ export default function evaluateFormula(assignment: Assignment & Module & Module
     //replacedText = replacedText.replace(/x/gi, "*"); // Replace  "x" with "*" for multiplication.
 
     try {
-        return Function(`return (${replacedText})`)()
+        return Math.round(Function(`return (${replacedText})`)() * 100) / 100
     } catch {
         return "ERROR"
     }

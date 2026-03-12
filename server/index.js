@@ -499,6 +499,36 @@ app.post("/api/staff_assignments/commit", async (req, res) => {
 });
 
 
+app.post("/api/staff_assignments/commit-formula", async (req, res) => {
+    const {deleted, edited, created} = req.body;
+    const client = await pool.connect();
+
+    try {
+        await client.query("BEGIN")
+
+        // update existing modules (edit)
+        for (const item of edited || []) {
+            await client.query(
+                `
+                    UPDATE staff_assignments
+                    SET custom_formula = $1
+                    WHERE assignment_id = $2
+                `,
+                [item.custom_formula, item.assignment_id]
+            )
+        }
+
+        await client.query("COMMIT");
+        res.json({message: "Success."});
+
+    } catch (error) {
+        await client.query("ROLLBACK");
+        console.log("Error committing saved changes to modules: ", error);
+    } finally {
+        client.release()
+    }
+});
+
 app.listen(3000, () => {
     console.log("Server running on http://localhost:3000")
 })

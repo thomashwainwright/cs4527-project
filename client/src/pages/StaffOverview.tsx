@@ -1,3 +1,4 @@
+import { default_formula } from "@/lib/default_formula";
 import evaluateFormula from "@/lib/formula";
 import type { CombinedAssignmentType } from "@/types/combined_assignment_type";
 import { useOutletContext } from "react-router";
@@ -20,6 +21,10 @@ export default function StaffOverview() {
       const type = item.module_type as ("teaching" | "supervision_marking" | "admin")
 
       if (acc[type] == "ERROR") return acc;
+
+      if (!item.custom_formula) {
+        item.custom_formula = default_formula(item.module_type)
+      }
 
       const hours = evaluateFormula(item, item.custom_formula);
       if (hours == "ERROR") {

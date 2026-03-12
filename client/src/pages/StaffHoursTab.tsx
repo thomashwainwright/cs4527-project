@@ -1,5 +1,5 @@
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import evaluateFormula from "@/lib/formula";
 import restoreIcon from "../assets/icons/restore.svg"
@@ -7,6 +7,8 @@ import Fullscreen from "@/ui_components/Fullscreen";
 import LoadFormulaPopup from "@/fullscreen_popups/LoadFormulaPopup";
 import type { AcademicYear } from "@/types/academic_year_type";
 import type { CombinedAssignmentType } from "@/types/combined_assignment_type";
+import { default_formula } from "@/lib/default_formula";
+import { commitFormulaChanges } from "@/api/modules";
 
 
 export default function HoursTab({tab, include}: {tab: string, include: string[]}) {
@@ -16,24 +18,31 @@ export default function HoursTab({tab, include}: {tab: string, include: string[]
     setData: React.Dispatch<React.SetStateAction<CombinedAssignmentType[]>>;
   }>();
 
-  const default_formula = tab == "teaching" ? "credits * (alpha * delta + beta * students) * share + coordinator" : (tab == "supervision_marking" ? "credits * students" : "")
-
+  const numberOfColumns = tab == "teaching" ? 9 : (tab == "supervision_marking" ? 5 : 4)
   const handleRowClick = (code: string) => {
     navigate(`/module/${code}`);
   };
 
   const [fullscreenOpen, setFullscreenOpen] = useState<number>(-1);
+  const [totalHours, setTotalHours] = useState<number>(0);
 
+  useEffect(() => {
+    const total = data
+      .filter(a => a.module_type === tab)
+      .reduce((sum, a) => sum + Number(a.hours ?? 0), 0);
+   
+    setTotalHours(total);
+  }, [data, tab]); // run only when data or tab changes
 
   const handleFormulaSubmit = (assignment: CombinedAssignmentType, text: string) => {
     if (text == "") {
-      text = default_formula;
+      text = default_formula(tab);
     }
 
     setData((prev) =>
       prev.map((item) =>
         item.assignment_id === assignment.assignment_id
-          ? { ...item, custom_formula: text, hours: evaluateFormula(assignment, text), focused: false }
+          ? { ...item, custom_formula: text, hours: evaluateFormula(assignment, text), focused: false, edit: true }
           : item
       )
     );
@@ -60,6 +69,15 @@ export default function HoursTab({tab, include}: {tab: string, include: string[]
     { key: "hours", label: "Hours", render: (a: CombinedAssignmentType) => a.hours }
   ];
 
+  function saveData() {
+    const editedData = data?.filter(item => item.edit);
+    if (editedData.some(a => a.hours === "ERROR")) {
+      alert("Error. Attempt to save invalid formula!");
+      return;
+    }
+    commitFormulaChanges(editedData);
+  }
+
   return (
     <div className="flex flex-col h-dvh">
       <div className="flex-1 min-h-0 overflow-auto">
@@ -69,7 +87,7 @@ export default function HoursTab({tab, include}: {tab: string, include: string[]
               <th className="px-4 py-2 border">Code</th>
               <th className="px-4 py-2 border">Name</th>
               {columns.filter(col => include.includes(col.key)).map(col => (<th className="px-4 py-2 border">{col.label}</th>))}
-              <th className="px-4 py-2 border">Hours</th>
+              <th className="px-4 py-2 border w-1/3">Hours</th>
             </tr>
           </thead>
 
@@ -90,7 +108,7 @@ export default function HoursTab({tab, include}: {tab: string, include: string[]
                   </td>)
                 }
 
-                <td className={"px-4 py-2 border " + (!assignment.focused && assignment.hours == "ERROR" && "bg-red-200")} contentEditable suppressContentEditableWarning onClick={(e)=>{
+                <td className={"px-4 py-2 border " + ((!assignment.focused && assignment.hours == "ERROR") ? "bg-red-200" : "")} contentEditable suppressContentEditableWarning onClick={(e)=>{
                   e.stopPropagation()
                   setFocused(assignment, true)
                 }} onKeyDown={(e: React.KeyboardEvent<HTMLTableCellElement> ) => {
@@ -110,10 +128,29 @@ export default function HoursTab({tab, include}: {tab: string, include: string[]
                   <Fullscreen open={fullscreenOpen == assignment.assignment_id} onClose={() => setFullscreenOpen(-1)}><LoadFormulaPopup loadFormula={(year: AcademicYear & {custom_formula: string}) => {setFullscreenOpen(-1); handleFormulaSubmit(assignment, year.custom_formula ?? "")}} offering_id={assignment.offering_id} user_id={assignment.user_id} code={assignment.code}/></Fullscreen>
                 </td>
               </tr>
-                
             ))}
+            <tr> {/* Display hours total TODO */}
+              {Array.from({ length: numberOfColumns-1 }).map((_, i) => (
+                <td key={i} />
+              ))}
+              <td className="px-4 py-2 border"><b>Total</b></td>
+              <td className={"px-4 py-2 border " + (totalHours > 0 ? " " : "bg-red-200")}>
+                  {
+                    totalHours > 0 ? totalHours : "ERROR"
+                  }
+              </td>
+            </tr>
+            <tr> {/* Save formulas button */}
+              {Array.from({ length: numberOfColumns }).map((_, i) => (
+                <td key={i} />
+              ))}
+              <td className="flex pt-2">          
+                <button className={"ml-auto border border-gray-200 rounded-md px-4 py-2 cursor-pointer text-gray text-xl text-gray-700 hover:bg-gray-200"} onClick={saveData} title="Save changes to modules.">Save formulas</button>
+              </td>
+            </tr>
           </tbody>
         </table>
+      
       </div>
     </div>
   );

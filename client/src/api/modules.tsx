@@ -3,6 +3,7 @@ import api from "./axios";
 import type { CombinedModuleType } from "@/types/combined_module_type";
 import type { AcademicYear } from "@/types/academic_year_type";
 import type { AssignmentRow } from "@/types/assignment_row";
+import type { CombinedAssignmentType } from "@/types/combined_assignment_type";
 
 
 export const fetchModules = async () => {
@@ -217,6 +218,27 @@ export const commitAssignmentData =  async (
       deleted: deletedData,
       edited: editedData,
       created: newData,
+    });
+
+    return response.data;
+  } catch (error: unknown) {
+    if (isAxiosError(error)) {
+      console.error(error.response?.data?.message);
+    } else {
+      console.error("Error committing module offering changes:", error);
+      throw error;
+    }
+  }
+}
+
+export const commitFormulaChanges =  async (
+  editedData: CombinedAssignmentType[] | undefined,
+) => {
+
+
+  try {
+    const response = await api.post("/api/staff_assignments/commit-formula", {
+      edited: editedData,
     });
 
     return response.data;
