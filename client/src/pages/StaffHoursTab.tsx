@@ -134,9 +134,9 @@ export default function HoursTab({tab, include}: {tab: string, include: string[]
                 <td key={i} />
               ))}
               <td className="px-4 py-2 border"><b>Total</b></td>
-              <td className={"px-4 py-2 border " + (totalHours > 0 ? " " : "bg-red-200")}>
+              <td className={"px-4 py-2 border " + (totalHours >= 0 ? " " : ("bg-red-200"))}>
                   {
-                    totalHours > 0 ? totalHours : "ERROR"
+                    totalHours >= 0 ? totalHours : "ERROR"
                   }
               </td>
             </tr>
