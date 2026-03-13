@@ -28,7 +28,7 @@ export function Modules() {
   const { selectedYear } = useAcademicYear();
 
   const handleRowClick = (code: string) => {
-    navigate(`/module/${code}`);
+    navigate(`/modules/${code}`);
   };
 
   const handleModuleTypeFilter = (e: ChangeEvent<HTMLInputElement>) => {

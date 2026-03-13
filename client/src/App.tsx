@@ -37,7 +37,7 @@ function App() {
             <Route element={<NavLayout />}>
               <Route index element={<Dashboard />} />
               <Route path="modules" element={<Modules />} />
-              <Route path="module/:code" element={<ModuleDetails />} />
+              <Route path="modules/:code" element={<ModuleDetails />} />
               <Route path="staff" element={<Staff />} />
               <Route path="staff/:email" element={<StaffDetails />}>
                 <Route index element={<StaffOverview />} />

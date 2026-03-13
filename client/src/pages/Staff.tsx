@@ -63,7 +63,7 @@ export function Staff() {
               <tr
                 key={staff.user_id}
                 className="clickable-row hover:bg-gray-100 cursor-pointer"
-                onClick={() => handleRowClick(staff.email.toString())}
+                onClick={() => staff.email && handleRowClick(staff.email.toString())}
               >
                 <td className="px-4 py-2 border">{staff.name}</td>
                 <td className="px-4 py-2 border">{staff.email}</td>

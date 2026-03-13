@@ -20,7 +20,7 @@ export default function HoursTab({tab, include}: {tab: string, include: string[]
 
   const numberOfColumns = tab == "teaching" ? 9 : (tab == "supervision_marking" ? 5 : 4)
   const handleRowClick = (code: string) => {
-    navigate(`/module/${code}`);
+    navigate(`/modules/${code}`);
   };
 
   const [fullscreenOpen, setFullscreenOpen] = useState<number>(-1);
