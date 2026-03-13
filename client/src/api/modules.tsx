@@ -211,8 +211,6 @@ export const commitAssignmentData =  async (
   editedData: AssignmentRow[] | undefined,
   newData: AssignmentRow[] | undefined,
 ) => {
-
-
   try {
     const response = await api.post("/api/staff_assignments/commit", {
       deleted: deletedData,

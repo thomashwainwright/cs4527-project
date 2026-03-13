@@ -27,6 +27,7 @@ export default function ModuleDetails() {
   const [assignMode, setAssignMode] = useState<boolean>(false);
   const [editAssignments, setEditAssignments] = useState<boolean>(false);
   const[refreshKey, setRefreshKey] = useState<number>(0);
+  const [moduleNotFound, setModuleNotFound] = useState<boolean>(false);
 
 
   const navigate = useNavigate();
@@ -47,9 +48,13 @@ export default function ModuleDetails() {
   };
 
   useEffect(() => {
+    console.log("effect")
     if (!code || !selectedYear) return;
+    console.log("effect")
+
     fetchModuleDetails(code, selectedYear?.year_id).then((details: Module & ModuleOffering) => {
-      // console.log("Fetched module details.");
+      console.log("Fetched module details.");
+      setModuleNotFound(false);
       setModuleDetails(details);
 
       fetchModuleAssignments(details.module_id, selectedYear?.year_id).then(
@@ -70,6 +75,13 @@ export default function ModuleDetails() {
           );
         },
       );
+    }).catch(error => {
+      console.log(error)
+      if (error.response.data.message == "Module not found") {
+        setModuleNotFound(true);
+        console.log("No module found for this year. ");
+      }
+
     });
   }, [code, selectedYear, editAssignments, refreshKey]);
   
@@ -80,18 +92,32 @@ export default function ModuleDetails() {
 
   function saveAssignmentData() {
     // save data to db
+  
+    // check fields valid
+    let error = ""
+    moduleAssignments.forEach(assignment => {
+      if (assignment.share && assignment.share > 1) {
+        error = "Invalid assignment share value. "
+      }
+      // should sum(coordinator) = 1?
+    })
+
+    // Alert and don't save data if error exists.
+    if (error != "") {
+      alert(error)
+      return;
+    }
 
     // get changed data
     const deletedData = moduleAssignments?.filter(item => item.del) // only update table with data that has been modified.
     const editedData = moduleAssignments?.filter(item => item.edit && item.new == undefined && !item.del)
     const newData = moduleAssignments?.filter(item => item.new)
 
-    // console.log(editedData);
-    // console.log(newData);
-    // console.log(deletedData);
+    console.log(editedData);
+    console.log(newData);
+    console.log(deletedData);
 
     commitAssignmentData(deletedData, editedData, newData).then(()=>setRefreshKey(refreshKey + 1))
-    
   }
 
   function addAssignments(staff: Staff[] | undefined): void {
@@ -159,17 +185,17 @@ export default function ModuleDetails() {
   }
 
   return (
-    <div className="p-12">
+    <div className="p-12 h-full">
       {moduleDetails && (
         <>
           {/* Module code and name title */}
           <PageTitle>
             {moduleDetails.code}
             {moduleDetails.name ? `: ${moduleDetails.name}` : ""}
+            {"  " + moduleDetails.offering_id}
           </PageTitle>
-
           {/* Module details page content*/}
-          <div className="flex mt-10 gap-4 flex-col md:flex-row text-2xl">
+          {!moduleNotFound ? <div className="flex mt-10 gap-4 flex-col md:flex-row text-2xl">
             {/* Module type, estimated number of students, alpha and beta */}
             <div className="lg:w-1/2 pr-16 flex flex-col">
               <div className="flex flex-row">
@@ -307,13 +333,14 @@ export default function ModuleDetails() {
                       <input
                         type="number"
                         className="border border-gray-300 rounded-md p-2 ml-auto"
-                        value={moduleDetails.beta ?? ""}
+                        value={moduleDetails.crit ?? ""}
                         onChange={(e) => {
                           setModuleDetails({
                             ...moduleDetails,
                             crit: parseFloat(e.target.value),
                           });
                         }}
+
                       ></input>
                   </p>
                   
@@ -322,7 +349,7 @@ export default function ModuleDetails() {
                       <input
                         type="number"
                         className="border border-gray-300 rounded-md p-2 ml-auto"
-                        value={moduleDetails.beta ?? ""}
+                        value={moduleDetails.h ?? ""}
                         onChange={(e) => {
                           setModuleDetails({
                             ...moduleDetails,
@@ -426,7 +453,9 @@ export default function ModuleDetails() {
                 </tbody>
               </table>
             </div>
-          </div>
+          </div> 
+            : 
+          <div className="flex items-center justify-center text-4xl mt-24">Error: module not assigned to {selectedYear?.label}</div>}
         </>
       )}
     </div>
