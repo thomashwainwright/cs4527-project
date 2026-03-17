@@ -9,6 +9,7 @@ import type { AcademicYear } from "@/types/academic_year_type";
 import type { CombinedAssignmentType } from "@/types/combined_assignment_type";
 import { default_formula } from "@/lib/default_formula";
 import { commitFormulaChanges } from "@/api/modules";
+import OkDialog from "@/fullscreen_popups/OkDialog";
 
 
 export default function HoursTab({tab, include}: {tab: string, include: string[]}) {
@@ -25,6 +26,7 @@ export default function HoursTab({tab, include}: {tab: string, include: string[]
 
   const [fullscreenOpen, setFullscreenOpen] = useState<number>(-1);
   const [totalHours, setTotalHours] = useState<number>(0);
+  const [saveConfirmation, setSaveConfirmation] = useState<string>("");
 
   useEffect(() => {
     const total = data
@@ -72,10 +74,10 @@ export default function HoursTab({tab, include}: {tab: string, include: string[]
   function saveData() {
     const editedData = data?.filter(item => item.edit);
     if (editedData.some(a => a.hours === "ERROR")) {
-      alert("Error. Attempt to save invalid formula!");
+      setSaveConfirmation("Error. Attempt to save invalid formula!")
       return;
     }
-    commitFormulaChanges(editedData);
+    commitFormulaChanges(editedData).then(() => setSaveConfirmation("Saved changes.")).catch(() => setSaveConfirmation("Error saving changes."))
   }
 
   return (
@@ -146,6 +148,7 @@ export default function HoursTab({tab, include}: {tab: string, include: string[]
               ))}
               <td className="flex pt-2">          
                 <button className={"ml-auto border border-gray-200 rounded-md px-4 py-2 cursor-pointer text-gray text-xl text-gray-700 hover:bg-gray-200"} onClick={saveData} title="Save changes to modules.">Save formulas</button>
+                <Fullscreen open={saveConfirmation != ""} onClose={()=>setSaveConfirmation("")}><OkDialog onOk={() => setSaveConfirmation("")}>{saveConfirmation}</OkDialog></Fullscreen>
               </td>
             </tr>
           </tbody>

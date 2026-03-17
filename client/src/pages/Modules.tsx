@@ -8,6 +8,7 @@ import deleteIcon from "../assets/icons/delete-icon.svg"
 import Fullscreen from "@/ui_components/Fullscreen";
 import type { CombinedModuleType } from "@/types/combined_module_type";
 import AddModule from "@/fullscreen_popups/AddModule";
+import OkDialog from "@/fullscreen_popups/OkDialog";
 
 
 export function Modules() {
@@ -24,6 +25,8 @@ export function Modules() {
   const [editModules, setEditModules] = useState<boolean>(false);
   const [assignModuleWindow, setAssignModuleWindow] = useState<boolean>(false); // window to assign module to academic year => creates offering
   const[refreshKey, setRefreshKey] = useState<number>(0);
+  const [saveConfirmation, setSaveConfirmation] = useState<string>("");
+
 
   const { selectedYear } = useAcademicYear();
 
@@ -163,19 +166,22 @@ export function Modules() {
     if (editModules) {
       // editModules => data is module, to update the "modules" table.
       let err = false;
-      newData?.forEach(item => {
-        console.log(item.code)
+      ([...newData ?? [], ...editedData ?? []])?.forEach(item => {
         if (item.code == "") {
           err = true;
-          alert("Missing required field: Code");
+          setSaveConfirmation("Missing required field: Code");
           return;
         }
       })
-      if (!err) commitModuleChanges(deletedData, editedData, newData).then(() => setRefreshKey(refreshKey + 1));
+      if (!err) commitModuleChanges(deletedData, editedData, newData).then(() => setRefreshKey(refreshKey + 1)).then(() => {
+      setSaveConfirmation("Saved changes.")}).catch(() => {
+        setSaveConfirmation("Error saving changes.")})
     } else {
       // !editModules => data is module offering, to update "module_offerings" table. This represents assignments of a module to a specific year.
       if (!selectedYear) return;
-      commitModuleOfferingChanges(deletedData, editedData, newData, selectedYear?.year_id).then(() => setRefreshKey(refreshKey + 1))
+      commitModuleOfferingChanges(deletedData, editedData, newData, selectedYear?.year_id).then(() => setRefreshKey(refreshKey + 1)).then(() => {
+      setSaveConfirmation("Saved changes.")}).catch(() => {
+        setSaveConfirmation("Error saving changes.")})
     }
 
   }
@@ -264,7 +270,10 @@ export function Modules() {
         <p className="text-xl">{editModules ? <>Showing all modules</> : <>Showing active modules for <b>{selectedYear?.label}</b></>}</p>
         <div className="flex ml-auto gap-2">
           <button className={"border border-gray-200 rounded-md px-4 py-2 cursor-pointer text-gray text-xl text-gray-700 hover:bg-gray-200"} onClick={() => {return editModules ? addModule() : setAssignModuleWindow(true)}} title="Add module.">Add</button>
+          
           <button className={"border border-gray-200 rounded-md px-4 py-2 cursor-pointer text-gray text-xl text-gray-700 hover:bg-gray-200"} onClick={saveData} title="Save changes to modules.">Save</button>
+          <Fullscreen open={saveConfirmation != ""} onClose={() => setSaveConfirmation("")}><OkDialog onOk={() => setSaveConfirmation("")}>{saveConfirmation}</OkDialog></Fullscreen>
+          
           <button className={"border border-gray-200 rounded-md px-4 py-2 cursor-pointer text-gray text-xl " + (editModules ? "bg-blue-600 text-white hover:bg-blue-400" : "text-gray-700 hover:bg-gray-200")} onClick={() => setEditModules(!editModules)} title="Edit all modules available to all academic years.">Edit all modules</button>
         </div>
         <Fullscreen open={assignModuleWindow} onClose={()=>{setAssignModuleWindow(false)}} className="w-1/4 h-1/2"><AddModule onAdd={(d: Module[] | undefined) => onModuleOfferingAdd(d)} /></Fullscreen>

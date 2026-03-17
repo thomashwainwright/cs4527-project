@@ -356,6 +356,7 @@ app.post("/api/modules/commit", async (req, res) => {
     } catch (error) {
         await client.query("ROLLBACK");
         console.log("Error committing saved changes to modules: ", error);
+        res.status(500).json({ message: "Error" });
     } finally {
         client.release()
     }
@@ -396,6 +397,7 @@ app.post("/api/module_offerings/commit", async (req, res) => {
     } catch (error) {
         await client.query("ROLLBACK");
         console.log("Error committing saved changes to modules: ", error);
+        res.status(500).json({ message: "Error" });
     } finally {
         client.release()
     }
@@ -423,10 +425,12 @@ app.post("/api/module_offerings/commit-details", async (req, res) => {
         );
         
         await client.query("COMMIT");
-        
+        res.json({message: "Success."});
+
     } catch (error) {
         await client.query("ROLLBACK");
         console.log("Error committing saved changes to modules: ", error);
+        res.status(500).json({ message: "Error" });
     } finally {
         client.release();
     }
@@ -484,6 +488,7 @@ app.post("/api/staff_assignments/commit", async (req, res) => {
     } catch (error) {
         await client.query("ROLLBACK");
         console.log("Error committing saved changes to modules: ", error);
+        res.status(500).json({ message: "Error" });
     } finally {
         client.release()
     }
@@ -515,6 +520,7 @@ app.post("/api/staff_assignments/commit-formula", async (req, res) => {
     } catch (error) {
         await client.query("ROLLBACK");
         console.log("Error committing saved changes to modules: ", error);
+        res.status(500).json({ message: "Error" });
     } finally {
         client.release()
     }
@@ -583,6 +589,7 @@ app.post("/api/staff/commit", async (req, res) => {
     } catch (error) {
         await client.query("ROLLBACK");
         console.log("Error committing saved changes to modules: ", error);
+        res.status(500).json({ message: "Error" });
     } finally {
         client.release()
     }
@@ -608,6 +615,7 @@ app.post("/api/staff/delete", async (req, res) => {
     } catch (error) {
         await client.query("ROLLBACK");
         console.log("Error committing saved changes to modules: ", error);
+        res.status(500).json({ message: "Error" });
     } finally {
         client.release()
     }

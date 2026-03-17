@@ -51,6 +51,7 @@ export const fetchModuleAssignments = async (
   } catch (error: unknown) {
     if (isAxiosError(error)) {
       console.log(error.response?.data.message); // do something with this (no assignments)
+      throw error;
     } else {
       console.error("Error fetching module assignments:", error);
       throw error;
@@ -74,6 +75,7 @@ export const fetchOtherYearsFormula = async (
   } catch (error: unknown) {
     if (isAxiosError(error)) {
       console.log(error.response?.data.message); // do something with this (no assignments)
+      throw error;
     } else {
       console.error("Error fetching module assignments:", error);
       throw error;
@@ -95,6 +97,7 @@ export const fetchModulesNotAssignedTo = async (
   } catch (error: unknown) {
     if (isAxiosError(error)) {
       console.log(error.response?.data.message); // do something with this (no assignments)
+      throw error;
     } else {
       console.error("Error fetching module assignments: ", error);
       throw error;
@@ -116,6 +119,7 @@ export const fetchAvailableStaff = async (
   } catch (error: unknown) {
     if (isAxiosError(error)) {
       console.log(error.response?.data.message); // do something with this (no assignments)
+      throw error;
     } else {
       console.error("Error fetching staff not assigned to module: ", error);
       throw error;
@@ -141,6 +145,7 @@ export const commitModuleChanges =  async (
   } catch (error: unknown) {
     if (isAxiosError(error)) {
       console.error(error.response?.data?.message);
+      throw error;
     } else {
       console.error("Error committing module changes:", error);
       throw error;
@@ -168,6 +173,7 @@ export const commitModuleOfferingChanges =  async (
   } catch (error: unknown) {
     if (isAxiosError(error)) {
       console.error(error.response?.data?.message);
+      throw error;
     } else {
       console.error("Error committing module offering changes:", error);
       throw error;
@@ -194,11 +200,11 @@ export const commitModuleOfferingDetailChanges =  async (
       credits: credits,
       h: h,
     });
-
     return response.data;
   } catch (error: unknown) {
     if (isAxiosError(error)) {
       console.error(error.response?.data?.message);
+      throw error;
     } else {
       console.error("Error committing module offering changes:", error);
       throw error;
@@ -222,6 +228,7 @@ export const commitAssignmentData =  async (
   } catch (error: unknown) {
     if (isAxiosError(error)) {
       console.error(error.response?.data?.message);
+      throw error;
     } else {
       console.error("Error committing module offering changes:", error);
       throw error;
@@ -243,6 +250,7 @@ export const commitFormulaChanges =  async (
   } catch (error: unknown) {
     if (isAxiosError(error)) {
       console.error(error.response?.data?.message);
+      throw error;
     } else {
       console.error("Error committing module offering changes:", error);
       throw error;

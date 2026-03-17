@@ -58,7 +58,8 @@ export const saveStaff =  async (
     return response.data;
   } catch (error: unknown) {
     if (isAxiosError(error)) {
-      console.error(error.response?.data?.message);
+      console.error(error.response?.data);
+      throw error
     } else {
       console.error("Error committing module offering changes:", error);
       throw error;

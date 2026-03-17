@@ -1,5 +1,6 @@
 import { deleteStaff, fetchStaffByEmail, saveStaff } from "@/api/staff"
 import Confirm from "@/fullscreen_popups/Confirm";
+import OkDialog from "@/fullscreen_popups/OkDialog";
 import type { Staff } from "@/types/staff_type";
 import Fullscreen from "@/ui_components/Fullscreen";
 import { useEffect, useState } from "react";
@@ -16,7 +17,6 @@ export default function AccountDetails() {
     name: "",
     email: "",
     user_id: undefined,
-    staff_id: undefined,
     role: "teaching",
     contract_type: undefined,
     contract_hours: undefined,
@@ -28,7 +28,8 @@ export default function AccountDetails() {
 
   const [staff, setStaff] = useState<Staff & {pw_changed: boolean}>(empty_staff);
   const [confirmPopup, setConfirmPopup] = useState<boolean>(false);
-  
+  const [saveConfirmation, setSaveConfirmation] = useState<string>("");
+
   useEffect(() => {
     if (new_user) return;
 
@@ -55,22 +56,23 @@ export default function AccountDetails() {
     // check required fields present
 
     if (!staff.name) {
-      alert("Missing required field \"name\"")
+      setSaveConfirmation("Missing required field \"name\"")
       return
     }
     if (!staff.email) {
-      alert("Missing required field \"email\"")
+      setSaveConfirmation("Missing required field \"email\"")
       return
     }
 
     if (new_user && !staff.password) {
-      alert("Missing required field for new user \"password\"")
+      setSaveConfirmation("Missing required field for new user \"password\"")
       return
     }
 
     // save data
     
-    saveStaff(staff).then(() => navigate(`/staff/${staff.email}/account_details`))
+    saveStaff(staff).then(() => {navigate(`/staff/${staff.email}/account_details`); setSaveConfirmation("Changes saved.")}).catch(() => {
+      setSaveConfirmation("Error saving changes.")})
   }
 
   function deleteStaffData(): void {
@@ -167,6 +169,7 @@ export default function AccountDetails() {
             <Confirm onYes={deleteStaffData} onNo={() => setConfirmPopup(false)}>Are you sure you want to delete user: {staff.name}?</Confirm>
           </Fullscreen>
           <button className={"border border-gray-200 rounded-md px-4 py-2 cursor-pointer text-gray text-xl text-gray-700 hover:bg-gray-200"} onClick={() => saveStaffData()} title="Save changes to staff member.">Save</button>
+          <Fullscreen open={saveConfirmation != ""} onClose={() => setSaveConfirmation("")}><OkDialog onOk={() => setSaveConfirmation("")}>{saveConfirmation}</OkDialog></Fullscreen>
         </div>
       </div>
 

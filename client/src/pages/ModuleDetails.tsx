@@ -12,6 +12,7 @@ import Fullscreen from "@/ui_components/Fullscreen";
 import AssignModule from "@/fullscreen_popups/AssignModule";
 import type { AssignmentRow } from "@/types/assignment_row";
 import deleteIcon from "../assets/icons/delete-icon.svg"
+import OkDialog from "@/fullscreen_popups/OkDialog";
 
 
 
@@ -28,7 +29,7 @@ export default function ModuleDetails() {
   const [editAssignments, setEditAssignments] = useState<boolean>(false);
   const[refreshKey, setRefreshKey] = useState<number>(0);
   const [moduleNotFound, setModuleNotFound] = useState<boolean>(false);
-
+  const [saveConfirmation, setSaveConfirmation] = useState<string>("");
 
   const navigate = useNavigate();
   const { selectedYear } = useAcademicYear();
@@ -49,9 +50,7 @@ export default function ModuleDetails() {
   };
 
   useEffect(() => {
-    console.log("effect")
     if (!code || !selectedYear) return;
-    console.log("effect")
 
     fetchModuleDetails(code, selectedYear?.year_id).then((details: Module & ModuleOffering) => {
       console.log("Fetched module details.");
@@ -88,7 +87,9 @@ export default function ModuleDetails() {
   
   function saveOfferingData() {
     // save data to db
-    commitModuleOfferingDetailChanges(moduleDetails?.offering_id, moduleDetails?.estimated_number_students, moduleDetails?.alpha, moduleDetails?.beta, moduleDetails?.crit, moduleDetails?.credits, moduleDetails?.h)
+    commitModuleOfferingDetailChanges(moduleDetails?.offering_id, moduleDetails?.estimated_number_students, moduleDetails?.alpha, moduleDetails?.beta, moduleDetails?.crit, moduleDetails?.credits, moduleDetails?.h).then(() => {
+      setSaveConfirmation("Saved changes.")}).catch(() => {
+        setSaveConfirmation("Error saving changes.")})
   }
 
   function saveAssignmentData() {
@@ -118,7 +119,7 @@ export default function ModuleDetails() {
     console.log(newData);
     console.log(deletedData);
 
-    commitAssignmentData(deletedData, editedData, newData).then(()=>setRefreshKey(refreshKey + 1))
+    commitAssignmentData(deletedData, editedData, newData).then(()=>setRefreshKey(refreshKey + 1)).then(() => setSaveConfirmation("Saved changes.")).catch(() => setSaveConfirmation("Error saving changes."))
   }
 
   function addAssignments(staff: Staff[] | undefined): void {
@@ -365,6 +366,7 @@ export default function ModuleDetails() {
 
               <div className="flex ml-auto mt-8">
                 <button className={"border border-gray-200 rounded-md px-4 py-2 cursor-pointer text-gray text-gray-700 hover:bg-gray-200"} title="Save changes to modules." onClick={saveOfferingData}>Save</button>
+                <Fullscreen open={saveConfirmation != ""} onClose={() => setSaveConfirmation("")}><OkDialog onOk={() => setSaveConfirmation("")}>{saveConfirmation}</OkDialog></Fullscreen>
               </div>
             </div>
             {/* Staff assignments table */}
