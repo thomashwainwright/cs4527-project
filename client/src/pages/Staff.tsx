@@ -32,14 +32,14 @@ export function Staff() {
   function addUser() {
     const newUser: Staff = {
       user_id: undefined,
-      staff_id: undefined,
       role: undefined,
       name: undefined,
       email: undefined,
       contract_type: undefined,
       contract_hours: undefined,
       password_hash: undefined,
-      password: undefined
+      password: undefined,
+      active: true,
     }
     setData(prev => [...prev, newUser])
     navigate("new-user/account_details")
@@ -78,7 +78,7 @@ export function Staff() {
 
           <tbody>
             {getFilteredData().map((staff: Staff) => (
-              <tr
+              staff.active && <tr
                 key={staff.user_id}
                 className="clickable-row hover:bg-gray-100 cursor-pointer"
                 onClick={() => staff.email && handleRowClick(staff.email.toString())}

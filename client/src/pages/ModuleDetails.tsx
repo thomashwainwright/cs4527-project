@@ -142,7 +142,6 @@ export default function ModuleDetails() {
         email: s.email,
         user_id: s.user_id,
         role: s.role,
-        staff_id: s.staff_id,
         contract_hours: s.contract_hours,
         contract_type: s.contract_type,
         offering_id: moduleDetails?.offering_id,
@@ -154,7 +153,8 @@ export default function ModuleDetails() {
         share: 0.00,
         coordinator: 0,
         password_hash: s.password_hash,
-        password: undefined
+        password: undefined,
+        active: true
        }));
 
       return [...arr, ...newEntries];

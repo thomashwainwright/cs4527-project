@@ -125,7 +125,7 @@ export default function HoursTab({tab, include}: {tab: string, include: string[]
                 </td>
                 <td className="group-hover:bg-white">
                   <button aria-label="Restore from previous year" title="Restore from previous year" className="hover:bg-gray-200 ml-2 rounded-lg" onClick={(e) => {e.stopPropagation(); if (assignment.assignment_id) setFullscreenOpen(assignment.assignment_id)}}><img alt="" src={restoreIcon} className="w-10"/></button>
-                  <Fullscreen open={fullscreenOpen == assignment.assignment_id} onClose={() => setFullscreenOpen(-1)}><LoadFormulaPopup loadFormula={(year: AcademicYear & {custom_formula: string}) => {setFullscreenOpen(-1); handleFormulaSubmit(assignment, year.custom_formula ?? "")}} offering_id={assignment.offering_id} user_id={assignment.user_id} code={assignment.code}/></Fullscreen>
+                  <Fullscreen open={fullscreenOpen == assignment.assignment_id} onClose={() => setFullscreenOpen(-1)} className="w-1/4 h-1/2"><LoadFormulaPopup loadFormula={(year: AcademicYear & {custom_formula: string}) => {setFullscreenOpen(-1); handleFormulaSubmit(assignment, year.custom_formula ?? "")}} offering_id={assignment.offering_id} user_id={assignment.user_id} code={assignment.code}/></Fullscreen>
                 </td>
               </tr>
             ))}

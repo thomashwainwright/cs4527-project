@@ -1,6 +1,5 @@
 export type Staff = {
   user_id: number | undefined;
-  staff_id: number | undefined;
   role: string | undefined;
   name: string | undefined;
   email: string | undefined;
@@ -8,4 +7,5 @@ export type Staff = {
   contract_hours: string | undefined;
   password_hash: string | undefined;
   password: string | undefined;
+  active: boolean | undefined;
 };

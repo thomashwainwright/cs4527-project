@@ -144,7 +144,8 @@ app.get("/api/assignments/module_id/:module_id/year_id/:year_id", async (req, re
              JOIN module_offerings
                 ON staff_assignments.offering_id = module_offerings.offering_id
              WHERE module_offerings.module_id = $1
-             AND module_offerings.year_id = $2`,
+             AND module_offerings.year_id = $2
+             AND users.active = TRUE`,
             [Number(req.params.module_id), Number(req.params.year_id)])
 
         res.json(result.rows)
@@ -157,7 +158,7 @@ app.get("/api/assignments/module_id/:module_id/year_id/:year_id", async (req, re
 
 app.get("/api/staff", async (req, res) => {
     try {
-        const result = await pool.query(`SELECT * FROM users`)
+        const result = await pool.query(`SELECT * FROM users WHERE active = TRUE`)
         res.json(result.rows)
     } catch (error) {
         console.error("SS Error fetching staff:", error)
@@ -168,7 +169,7 @@ app.get("/api/staff", async (req, res) => {
 
 app.get("/api/staff/user_id/:user_id", async (req, res) => {
     try {
-        const result = await pool.query(`SELECT * FROM users WHERE user_id = $1`, [Number(req.params.user_id)])
+        const result = await pool.query(`SELECT * FROM users WHERE user_id = $1 AND active = TRUE`, [Number(req.params.user_id)])
         
         if (result.rows.length === 0) {
             return res.status(404).json({message: "Staff member not found"})
@@ -182,7 +183,7 @@ app.get("/api/staff/user_id/:user_id", async (req, res) => {
 
 app.get("/api/staff/email/:email", async (req, res) => {
     try {
-        const result = await pool.query(`SELECT * FROM users WHERE email = $1`, [req.params.email])
+        const result = await pool.query(`SELECT * FROM users WHERE email = $1 AND active = TRUE`, [req.params.email])
         if (result.rows.length === 0) {
             return res.status(404).json({message: "Staff member not found"})
         }
@@ -289,8 +290,8 @@ app.get("/api/staff/not_assigned_to/:offering_id", async (req, res) => {
         `
             SELECT *
             FROM users u
-            WHERE u.staff_id IS NOT NULL
-            AND NOT EXISTS (
+            WHERE role = 'teaching' AND active = TRUE AND 
+            NOT EXISTS (
                 SELECT 1
                 FROM staff_assignments sa
                 WHERE sa.user_id = u.user_id
@@ -527,36 +528,54 @@ app.post("/api/staff/commit", async (req, res) => {
     try {
         await client.query("BEGIN")
 
-        if (staff.pw_changed) {
-            await client.query(
-                `UPDATE users
-                SET name = $1, email = $2, password_hash = $3,
-                    contract_type = $4, contract_hours = $5
-                WHERE user_id = $6`,
-                [
-                    staff.name,
-                    staff.email,
-                    await bcrypt.hash(staff.password, 10),
-                    staff.contract_type,
-                    staff.contract_hours,
-                    staff.user_id
-                ]
-            );
+        if (staff.password_hash){
+            if (staff.pw_changed) {
+                await client.query(
+                    `UPDATE users
+                    SET name = $1, email = $2, password_hash = $3,
+                        contract_type = $4, contract_hours = $5
+                    WHERE user_id = $6`,
+                    [
+                        staff.name,
+                        staff.email,
+                        await bcrypt.hash(staff.password, 10),
+                        staff.contract_type,
+                        staff.contract_hours,
+                        staff.user_id
+                    ]
+                );
+            } else {
+                await client.query(
+                    `UPDATE users
+                    SET name = $1, email = $2,
+                        contract_type = $3, contract_hours = $4
+                    WHERE user_id = $5`,
+                    [
+                        staff.name,
+                        staff.email,
+                        staff.contract_type,
+                        staff.contract_hours,
+                        staff.user_id
+                    ]
+                );
+            }
         } else {
+            // new user
             await client.query(
-                `UPDATE users
-                SET name = $1, email = $2,
-                    contract_type = $3, contract_hours = $4
-                WHERE user_id = $5`,
+                `INSERT INTO users (name, email, contract_type, contract_hours, role, password_hash)
+                VALUES ($1, $2, $3, $4, $5, $6)`,
                 [
                     staff.name,
                     staff.email,
                     staff.contract_type,
                     staff.contract_hours,
-                    staff.user_id
+                    staff.role,
+                    await bcrypt.hash(staff.password, 10)
                 ]
             );
         }
+
+        
 
         await client.query("COMMIT");
         res.json({message: "Success."});
@@ -569,6 +588,30 @@ app.post("/api/staff/commit", async (req, res) => {
     }
 });
 
+app.post("/api/staff/delete", async (req, res) => {
+    const {staff} = req.body;
+    const client = await pool.connect();
+
+    try {
+        await client.query("BEGIN")
+
+        await client.query(
+            `       UPDATE users
+                    SET active = false
+                    WHERE user_id = $1`,
+            [staff.user_id]
+        );
+
+        await client.query("COMMIT");
+        res.json({message: "Success."});
+
+    } catch (error) {
+        await client.query("ROLLBACK");
+        console.log("Error committing saved changes to modules: ", error);
+    } finally {
+        client.release()
+    }
+});
 
 
 app.listen(3000, () => {

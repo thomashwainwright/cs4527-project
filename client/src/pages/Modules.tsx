@@ -267,7 +267,7 @@ export function Modules() {
           <button className={"border border-gray-200 rounded-md px-4 py-2 cursor-pointer text-gray text-xl text-gray-700 hover:bg-gray-200"} onClick={saveData} title="Save changes to modules.">Save</button>
           <button className={"border border-gray-200 rounded-md px-4 py-2 cursor-pointer text-gray text-xl " + (editModules ? "bg-blue-600 text-white hover:bg-blue-400" : "text-gray-700 hover:bg-gray-200")} onClick={() => setEditModules(!editModules)} title="Edit all modules available to all academic years.">Edit all modules</button>
         </div>
-        <Fullscreen open={assignModuleWindow} onClose={()=>{setAssignModuleWindow(false)}}><AddModule onAdd={(d: Module[] | undefined) => onModuleOfferingAdd(d)} /></Fullscreen>
+        <Fullscreen open={assignModuleWindow} onClose={()=>{setAssignModuleWindow(false)}} className="w-1/4 h-1/2"><AddModule onAdd={(d: Module[] | undefined) => onModuleOfferingAdd(d)} /></Fullscreen>
       </div>
       <div className="flex-1 min-h-0 overflow-auto">
         
