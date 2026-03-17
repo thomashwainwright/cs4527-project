@@ -9,7 +9,7 @@ export default function NavButton({
 }) {
   const location = useLocation().pathname.toString()
   const locationIncludesRoute = location.includes(route)
-  console.log(location)
+
   return (
     <NavLink
       className={

@@ -25,14 +25,30 @@ export function Staff() {
 
   function getFilteredData() {
     return data.filter((staff: Staff) => {
-      return staff.name.toLowerCase().includes(filter.search.toLowerCase());
+      return staff.name?.toLowerCase().includes(filter.search.toLowerCase());
     });
+  }
+
+  function addUser() {
+    const newUser: Staff = {
+      user_id: undefined,
+      staff_id: undefined,
+      role: undefined,
+      name: undefined,
+      email: undefined,
+      contract_type: undefined,
+      contract_hours: undefined,
+      password_hash: undefined,
+      password: undefined
+    }
+    setData(prev => [...prev, newUser])
+    navigate("new-user/account_details")
   }
 
   return (
     <div className="flex flex-col h-dvh p-12">
       <PageTitle>Staff</PageTitle>
-      <div className="flex flex-row mb-10 items-center gap-4 text-xl">
+      <div className="flex flex-row mb-4 items-center gap-4 text-xl">
         <div className="ml-auto flex flex-row gap-4 items-center">
           <input
             className="border border-gray-300 rounded-md p-2 hover:border-black w-120"
@@ -46,7 +62,9 @@ export function Staff() {
           />
         </div>
       </div>
-
+      <div className="flex flex-row mb-4 items-center gap-4 text-xl">
+        <button className={"border border-gray-200 rounded-md px-4 py-2 cursor-pointer text-gray text-xl text-gray-700 hover:bg-gray-200 ml-auto"} onClick={addUser} title="Add staff member.">Add</button>
+      </div>
       <div className="flex-1 min-h-0 overflow-auto">
         <table className="min-w-full text-xl ">
           <thead>

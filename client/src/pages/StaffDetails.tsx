@@ -1,18 +1,20 @@
 import { fetchStaffAssignments, fetchStaffByEmail } from "@/api/staff";
 import type { Staff } from "@/types/staff_type";
-import NavButton from "@/ui_components/NavButton";
 import PageTitle from "../ui_components/PageTitle";
 import { useEffect, useState } from "react";
 import { Outlet, useParams } from "react-router-dom";
 import { useAcademicYear } from "@/context/useAcademicYear";
 import evaluateFormula from "@/lib/formula";
 import type { CombinedAssignmentType } from "@/types/combined_assignment_type";
+import StaffNavButton from "@/ui_components/StaffNavButton";
 
 
 export default function StaffDetails() {
   const params = useParams();
   const email = params.email as string;
+  const new_user = (email == "new-user")
   const { selectedYear } = useAcademicYear();
+
 
   // TODO: temp
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -24,11 +26,14 @@ export default function StaffDetails() {
   );
 
   useEffect(() => {
+    if (new_user) return
+
     fetchStaffByEmail(email).then((staff_data: Staff) => {
       console.log("Fetched staff by email");
       setStaff(staff_data);
 
-      if (!staff_data || !selectedYear) return;
+      if (!staff_data || !selectedYear || !staff_data.user_id) return;
+
       const default_formula = (tab: string) => (tab == "teaching" ? "credits * (alpha * delta + beta * students) * share + coordinator" : (tab == "supervision_marking" ? "credits * students" : "0"))
 
       fetchStaffAssignments(
@@ -47,22 +52,26 @@ export default function StaffDetails() {
               hours: evaluateFormula(item, formula)
             })
           })
-          
         );
       });
     });
-  }, [email, selectedYear]);
+  }, [email, new_user, selectedYear]);
 
   return (
     <div className="p-12">
       <PageTitle>{email}</PageTitle>
       <div className="w-full flex flex-row gap-16 mt-10 mb-10 text-2xl">
-        <NavButton route={`/staff/${email}`}>Overview</NavButton>
-        <NavButton route={`/staff/${email}/teaching`}>Teaching</NavButton>
-        <NavButton route={`/staff/${email}/supervision_marking`}>
-          Supervision/Marking
-        </NavButton>
-        <NavButton route={`/staff/${email}/admin`}>Admin</NavButton>
+        {!new_user && <>
+          <StaffNavButton route={`/staff/${email}`}>Overview</StaffNavButton>
+          <StaffNavButton route={`/staff/${email}/teaching`}>Teaching</StaffNavButton>
+          <StaffNavButton route={`/staff/${email}/supervision_marking`}>
+            Supervision/Marking
+          </StaffNavButton>
+          <StaffNavButton route={`/staff/${email}/admin`}>Admin</StaffNavButton>
+        </>}
+        <div className="ml-auto">        
+          <StaffNavButton route={`/staff/${email}/account_details`}>Account Details</StaffNavButton>
+        </div>
       </div>
 
       <Outlet context={{data, setData}}/>

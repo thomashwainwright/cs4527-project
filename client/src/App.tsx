@@ -11,6 +11,7 @@ import StaffDetails from "./pages/StaffDetails";
 import StaffOverview from "./pages/StaffOverview";
 import { AcademicYearProvider } from "./context/AcademicYearProvider";
 import HoursTab from "./pages/StaffHoursTab";
+import AccountDetails from "./pages/StaffAccountDetails";
 
 // layout for pages with navigation bar
 function NavLayout() {
@@ -47,6 +48,7 @@ function App() {
                   element={<HoursTab tab="supervision_marking" include={["credits", "students", "delta"]}/>}
                 />
                 <Route path="admin" element={<HoursTab tab="admin" include={["credits", "students"]}/>} />
+                <Route path="account_details" element={<AccountDetails />} />
               </Route>
             </Route>
           </Route>
@@ -59,7 +61,7 @@ function App() {
                 Page not found{" "}
                 <NavLink
                   to="/"
-                  className="bg-gray-200 hover:bg-gray-300 px-4 py-2 rounded"
+                  className="bg-gray-200 hover:bg-gray-300 px-6 py-4 rounded-xl mt-4"
                 >
                   Redirect
                 </NavLink>

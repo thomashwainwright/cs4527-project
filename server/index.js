@@ -157,17 +157,7 @@ app.get("/api/assignments/module_id/:module_id/year_id/:year_id", async (req, re
 
 app.get("/api/staff", async (req, res) => {
     try {
-        const result = await pool.query(`SELECT 
-    u.user_id,
-    u.staff_id,
-    u.role,
-    u.name,
-    u.email,
-    s.contract_type,
-    s.contract_hours
-FROM users u
-INNER JOIN staff s 
-    ON u.staff_id = s.staff_id;`)
+        const result = await pool.query(`SELECT * FROM users`)
         res.json(result.rows)
     } catch (error) {
         console.error("SS Error fetching staff:", error)
@@ -528,6 +518,58 @@ app.post("/api/staff_assignments/commit-formula", async (req, res) => {
         client.release()
     }
 });
+
+
+app.post("/api/staff/commit", async (req, res) => {
+    const {staff} = req.body;
+    const client = await pool.connect();
+
+    try {
+        await client.query("BEGIN")
+
+        if (staff.pw_changed) {
+            await client.query(
+                `UPDATE users
+                SET name = $1, email = $2, password_hash = $3,
+                    contract_type = $4, contract_hours = $5
+                WHERE user_id = $6`,
+                [
+                    staff.name,
+                    staff.email,
+                    await bcrypt.hash(staff.password, 10),
+                    staff.contract_type,
+                    staff.contract_hours,
+                    staff.user_id
+                ]
+            );
+        } else {
+            await client.query(
+                `UPDATE users
+                SET name = $1, email = $2,
+                    contract_type = $3, contract_hours = $4
+                WHERE user_id = $5`,
+                [
+                    staff.name,
+                    staff.email,
+                    staff.contract_type,
+                    staff.contract_hours,
+                    staff.user_id
+                ]
+            );
+        }
+
+        await client.query("COMMIT");
+        res.json({message: "Success."});
+
+    } catch (error) {
+        await client.query("ROLLBACK");
+        console.log("Error committing saved changes to modules: ", error);
+    } finally {
+        client.release()
+    }
+});
+
+
 
 app.listen(3000, () => {
     console.log("Server running on http://localhost:3000")

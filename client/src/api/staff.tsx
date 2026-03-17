@@ -1,4 +1,6 @@
+import { isAxiosError } from "axios";
 import api from "./axios";
+import type { Staff } from "@/types/staff_type";
 
 export const fetchStaff = async () => {
   try {
@@ -44,3 +46,22 @@ export const fetchStaffAssignments = async (
     throw error;
   }
 };
+
+export const saveStaff =  async (
+  staff: Staff & {pw_changed: boolean} 
+) => {
+  try {
+    const response = await api.post("/api/staff/commit", {
+      staff: staff
+    });
+
+    return response.data;
+  } catch (error: unknown) {
+    if (isAxiosError(error)) {
+      console.error(error.response?.data?.message);
+    } else {
+      console.error("Error committing module offering changes:", error);
+      throw error;
+    }
+  }
+}

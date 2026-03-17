@@ -41,7 +41,8 @@ export default function ModuleDetails() {
     group_proj: { alpha: 0, beta: 0.8 }
   };
 
-  const handleRowClick = (user_id: number) => {
+  const handleRowClick = (user_id: number | undefined) => {
+    if (!user_id) return
     fetchStaffByUserId(user_id).then((staff) => {
       navigate(`/staff/${staff.email}`);
     });
@@ -152,6 +153,8 @@ export default function ModuleDetails() {
         delta: 0.00,
         share: 0.00,
         coordinator: 0,
+        password_hash: s.password_hash,
+        password: undefined
        }));
 
       return [...arr, ...newEntries];
@@ -393,7 +396,7 @@ export default function ModuleDetails() {
                 <tbody>
                   {moduleAssignments &&
                     moduleAssignments.map((assignment: AssignmentRow) => (
-                      <tr
+                      assignment.user_id && <tr
                         key={assignment.assignment_id}
                         className={"clickable-row cursor-pointer " + (assignment.new ? "bg-green-200 hover:bg-green-100" : (assignment.del ? "bg-red-200 hover:bg-red-100" : (assignment.edit ? "bg-amber-200 hover:bg-amber-100" : "hover:bg-gray-100")))} 
                         onClick={(e) => {
