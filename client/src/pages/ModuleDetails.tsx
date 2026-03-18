@@ -196,7 +196,6 @@ export default function ModuleDetails() {
           <PageTitle>
             {moduleDetails.code}
             {moduleDetails.name ? `: ${moduleDetails.name}` : ""}
-            {"  " + moduleDetails.offering_id}
           </PageTitle>
           {/* Module details page content*/}
           {!moduleNotFound ? <div className="flex mt-10 gap-4 flex-col md:flex-row text-2xl">
@@ -224,7 +223,7 @@ export default function ModuleDetails() {
                 <p className="pt-2 pb-2">Module Type: </p>
                 <input
                   className="border border-gray-300 rounded-md p-2 ml-auto bg-gray-50"
-                  value={moduleDetails.module_type[0].toUpperCase() + moduleDetails.module_type.slice(1)}
+                  value={moduleDetails.module_type[0].toUpperCase() + moduleDetails.module_type.slice(1).split("_").join("/")}
                   disabled
                 />
               </div>
@@ -238,7 +237,7 @@ export default function ModuleDetails() {
                 />
               </div>
               <p className="mt-4 flex flex-row">
-                Credits:{" "}
+                <p className="pt-2 pb-2">Credits: </p>
                 <input
                   type="number"
                   className="border border-gray-300 rounded-md p-2 ml-auto"
@@ -251,8 +250,8 @@ export default function ModuleDetails() {
                   }}
                 />
               </p>
-              <p className="mt-4 flex flex-row mb-8">
-                Estimated Number of Students:{" "}
+              {moduleDetails.module_type == "teaching" && <p className="mt-4 flex flex-row mb-8">
+                <p className="pt-2 pb-2">Estimated Number of Students:</p>
                 <input
                   type="number"
                   className="border border-gray-300 rounded-md p-2 ml-auto"
@@ -264,13 +263,13 @@ export default function ModuleDetails() {
                     });
                   }}
                 />
-              </p>
+              </p>}
 
               {/* {<b className="flex my-8">Calculation Parameters</b>*} */}
               
               {moduleDetails.module_type == "teaching" ? <div className="ring-2 rounded-[1px] ring-gray-200 ring-offset-12">
                 <p className="flex flex-row">
-                  Alpha/Beta Preset:{" "}
+                  <p className="pt-2 pb-2">Alpha/Beta Preset:</p>
                   <select
                     name="module_type"
                     className="border border-gray-300 rounded-md p-2  hover:border-black w-75 ml-auto"
@@ -300,7 +299,7 @@ export default function ModuleDetails() {
                 </p>
 
                 <p className="mt-4 flex flex-row">
-                  Alpha:{" "}
+                  <p className="pt-2 pb-2">Alpha:</p>
                   <input
                     type="number"
                     className="border border-gray-300 rounded-md p-2 ml-auto"
@@ -316,7 +315,7 @@ export default function ModuleDetails() {
                 </p>
 
                 <p className="mt-4 flex flex-row">
-                  Beta:{" "}
+                  <p className="pt-2 pb-2">Beta:</p>
                   <input
                     type="number"
                     className="border border-gray-300 rounded-md p-2 ml-auto"
@@ -332,8 +331,8 @@ export default function ModuleDetails() {
                 </p>
               </div> :
                 <>
-                  <p className="mt-8 flex flex-row">
-                      Crit:{" "}
+                  <p className="mt-4 flex flex-row">
+                      <p className="pt-2 pb-2">Crit:</p>
                       <input
                         type="number"
                         className="border border-gray-300 rounded-md p-2 ml-auto"
@@ -347,22 +346,8 @@ export default function ModuleDetails() {
 
                       ></input>
                   </p>
-                  
-                  <p className="mt-4 flex flex-row">
-                      h:{" "}
-                      <input
-                        type="number"
-                        className="border border-gray-300 rounded-md p-2 ml-auto"
-                        value={moduleDetails.h ?? ""}
-                        onChange={(e) => {
-                          setModuleDetails({
-                            ...moduleDetails,
-                            h: parseFloat(e.target.value),
-                          });
-                        }}
-                      ></input>
-                    </p>
-                  </>}
+                </>
+              }
 
               <div className="flex ml-auto mt-8">
                 <button className={"border border-gray-200 rounded-md px-4 py-2 cursor-pointer text-gray text-gray-700 hover:bg-gray-200"} title="Save changes to modules." onClick={saveOfferingData}>Save</button>
@@ -370,7 +355,7 @@ export default function ModuleDetails() {
               </div>
             </div>
             {/* Staff assignments table */}
-            <div className="lg:w-1/2 pr-16">
+            {moduleDetails.module_type == "teaching" && <div className="lg:w-1/2 pr-16">
               {" "}
               <div className="flex flex-row">
                 <b>Assignments</b>
@@ -457,7 +442,7 @@ export default function ModuleDetails() {
                     ))}
                 </tbody>
               </table>
-            </div>
+            </div>}
           </div> 
             : 
           <div className="flex items-center justify-center text-4xl mt-24">Error: module not assigned to {selectedYear?.label}</div>}

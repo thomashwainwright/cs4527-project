@@ -29,14 +29,16 @@ export default function AccountDetails() {
   const [staff, setStaff] = useState<Staff & {pw_changed: boolean}>(empty_staff);
   const [confirmPopup, setConfirmPopup] = useState<boolean>(false);
   const [saveConfirmation, setSaveConfirmation] = useState<string>("");
+  const [refreshKey, setRefreshKey] = useState<number>(0);
+
 
   useEffect(() => {
     if (new_user) return;
-
+    console.log("awa")
     fetchStaffByEmail(email).then((staff_data: Staff & {pw_changed: boolean} ) => {
       setStaff(staff_data)
     })
-  }, [new_user, email])
+  }, [new_user, email, refreshKey])
 
   function defaultHours(value: string) : string {
     switch (value) {
@@ -77,9 +79,9 @@ export default function AccountDetails() {
 
   function deleteStaffData(): void {
     setConfirmPopup(false)
-    console.log("del")
-    deleteStaff(staff);
+    deleteStaff(staff).then(() => setRefreshKey(refreshKey + 1))
     navigate("/staff")
+    
   }
 
   return <div className="flex mt-10 gap-4 flex-col md:flex-row text-2xl">

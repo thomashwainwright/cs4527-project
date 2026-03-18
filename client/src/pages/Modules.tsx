@@ -363,14 +363,14 @@ export function Modules() {
                     {!editModules && <td
                       className={
                         "px-4 py-2 border " +
-                        (module.allocation == 1
+                        (module.module_type == "teaching" && (module.allocation == 1
                           ? "bg-green-200"
-                          : module.allocation == 0
+                          : ((module.allocation == 0)
                             ? "bg-red-200"
-                            : "bg-orange-200")
+                            : "bg-amber-200")))
                       }
                     >
-                      {module.allocation}
+                      {module.module_type == "teaching" ? module.allocation : "n/a"}
                     </td>}
                                      
                     <td className="group-hover:bg-white bg-white" contentEditable={false}>

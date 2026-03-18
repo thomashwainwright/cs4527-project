@@ -45,7 +45,7 @@ function App() {
                 <Route path="teaching" element={<HoursTab tab="teaching" include={["alpha", "beta", "delta", "share", "credits", "students", "coordinator"]}/>} />
                 <Route
                   path="supervision_marking"
-                  element={<HoursTab tab="supervision_marking" include={["credits", "students", "delta"]}/>}
+                  element={<HoursTab tab="supervision_marking" include={["credits", "students", "h"]}/>}
                 />
                 <Route path="admin" element={<HoursTab tab="admin" include={["credits", "students"]}/>} />
                 <Route path="account_details" element={<AccountDetails />} />
