@@ -45,9 +45,9 @@ function App() {
                 <Route path="teaching" element={<HoursTab tab="teaching" include={["alpha", "beta", "delta", "share", "credits", "students", "coordinator"]}/>} />
                 <Route
                   path="supervision_marking"
-                  element={<HoursTab tab="supervision_marking" include={["credits", "students", "h"]}/>}
+                  element={<HoursTab tab="supervision_marking" include={["credits", "students_groups", "h"]}/>}
                 />
-                <Route path="admin" element={<HoursTab tab="admin" include={["credits", "students"]}/>} />
+                <Route path="admin" element={<HoursTab tab="admin" include={["credits", "students_groups"]}/>} />
                 <Route path="account_details" element={<AccountDetails />} />
               </Route>
             </Route>

@@ -17,7 +17,6 @@ export default function StaffDetails() {
 
 
   // TODO: temp
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [staff, setStaff] = useState<Staff | null>(null);
   //
 
@@ -44,7 +43,6 @@ export default function StaffDetails() {
         setData(assignments);
         setData((prev) =>
           prev.map((item) => {
-            console.log(item.custom_formula)
             const formula = item.custom_formula != null ? item.custom_formula : default_formula(item.module_type) // todo
             return ({
               ...item,
@@ -59,7 +57,7 @@ export default function StaffDetails() {
 
   return (
     <div className="p-12">
-      <PageTitle>{email}</PageTitle>
+      <PageTitle>{email == "new-user" ? "New user" : email}</PageTitle>
       <div className="w-full flex flex-row gap-16 mt-10 mb-10 text-2xl">
         {!new_user && <>
           <StaffNavButton route={`/staff/${email}`}>Overview</StaffNavButton>

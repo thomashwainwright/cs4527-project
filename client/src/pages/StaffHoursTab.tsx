@@ -67,6 +67,7 @@ export default function HoursTab({tab, include}: {tab: string, include: string[]
     { key: "share", label: "Share", render: (a: CombinedAssignmentType) => a.share },
     { key: "credits", label: "Credits", render: (a: CombinedAssignmentType) => a.credits },
     { key: "students", label: "Students", render: (a: CombinedAssignmentType) => a.estimated_number_students },
+    { key: "students_groups", label: "Students/Number of Groups", render: (a: CombinedAssignmentType) => a.estimated_number_students },
     { key: "coordinator", label: "Coordinator", render: (a: CombinedAssignmentType) => a.coordinator ? "Yes (15)" : "No (0)" },
     { key: "hours", label: "Hours", render: (a: CombinedAssignmentType) => a.hours },
     { key: "crit", label: "Crit", render: (a: CombinedAssignmentType) => a.crit },

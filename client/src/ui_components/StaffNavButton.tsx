@@ -7,7 +7,6 @@ export default function NavButton({
   route: string;
   children: React.ReactNode;
 }) {
-  console.log(route)
   return (
     <NavLink
       className={({ isActive }) =>

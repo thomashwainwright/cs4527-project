@@ -34,7 +34,6 @@ export default function AccountDetails() {
 
   useEffect(() => {
     if (new_user) return;
-    console.log("awa")
     fetchStaffByEmail(email).then((staff_data: Staff & {pw_changed: boolean} ) => {
       setStaff(staff_data)
     })

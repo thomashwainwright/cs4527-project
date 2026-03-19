@@ -40,7 +40,6 @@ export function Staff() {
                 )},
               0
             )/Number(s.contract_hours)))
-            console.log(module_data)
           return { ...s, allocation: Number(allocation.toFixed(2)) };
        }))
       });
