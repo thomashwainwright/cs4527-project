@@ -194,6 +194,31 @@ app.get("/api/staff/email/:email", async (req, res) => {
     }
 })
 
+app.get("/api/assignments/year_id/:year_id", async (req, res) => {
+    try {
+        const result = await pool.query(
+                `
+            SELECT 
+                sa.*,
+                m.*,
+                mo.*
+            FROM staff_assignments sa
+            JOIN module_offerings mo
+                ON sa.offering_id = mo.offering_id
+            JOIN modules m
+                ON mo.module_id = m.module_id
+            WHERE mo.year_id = $1
+            `,
+        [Number(req.params.year_id)]
+        );
+
+        res.json(result.rows)
+    } catch (error) {
+        console.error("SS Error staff assignments by year:", error)
+        res.status(500).json({message: "Error staff assignments by year"})
+    }
+})
+
 app.get("/api/assignments/user_id/:user_id/year_id/:year_id", async (req, res) => {
     try {
         const result = await pool.query(

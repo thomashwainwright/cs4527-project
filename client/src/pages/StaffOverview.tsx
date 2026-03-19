@@ -1,6 +1,7 @@
 import { default_formula } from "@/lib/default_formula";
 import evaluateFormula from "@/lib/formula";
 import type { CombinedAssignmentType } from "@/types/combined_assignment_type";
+import type { Staff } from "@/types/staff_type";
 import { useOutletContext } from "react-router";
 
 type Totals = {
@@ -10,11 +11,12 @@ type Totals = {
 }
 
 export default function StaffOverview() {
-  const { data } = useOutletContext<{
+  const { data, staff } = useOutletContext<{
     data: CombinedAssignmentType[];
     setData: React.Dispatch<React.SetStateAction<CombinedAssignmentType[]>>;
+    staff: Staff & {allocation: number};
+    setStaff: React.Dispatch<React.SetStateAction<Staff>>;
   }>();
-  console.log(data)
 
   const totals = data.reduce(
     (acc: Totals, item) => {
@@ -37,6 +39,8 @@ export default function StaffOverview() {
     },
     { teaching: 0, supervision_marking: 0, admin: 0 }
   );
+
+  const total = [totals.admin, totals.teaching, totals.supervision_marking].some(v => v === "ERROR") ? "ERROR" : (Number(totals.admin) + Number(totals.teaching) + Number(totals.supervision_marking));
 
   return <div className="p-12">
     <table className="text-2xl">
@@ -66,7 +70,22 @@ export default function StaffOverview() {
         <tr className="hover:bg-gray-100">
           <td className="px-4 py-2 "><b>Total</b></td>
           <td className={"px-4 py-2 " + (totals.admin == "ERROR" ? "bg-red-200" : "")}>{data.filter(item => item.module_id).length}</td>
-          <td className={"px-4 py-2 " + (totals.admin == "ERROR" ? "bg-red-200" : "")}>{[totals.admin, totals.teaching, totals.supervision_marking].some(v => v === "ERROR") ? "ERROR" : (Number(totals.admin) + Number(totals.teaching) + Number(totals.supervision_marking))}</td>
+          <td className={"px-4 py-2 " + (totals.admin == "ERROR" ? "bg-red-200" : "")}>{total}</td>
+        </tr>
+        <tr className="hover:bg-gray-100">
+          <td className="px-4 py-2 "><b>Total Permitted</b></td>
+          <td />
+          <td className={"px-4 py-2 " + (totals.admin == "ERROR" ? "bg-red-200" : "")}>{staff && staff.contract_hours}</td>
+        </tr>
+        <tr className="hover:bg-gray-100">
+          <td className="px-4 py-2 "><b>Total Remaining</b></td>
+          <td />
+          <td className={"px-4 py-2 " + (totals.admin == "ERROR" ? "bg-red-200" : "")}>{total == "ERROR" ? "ERROR" : staff && ((Number(staff.contract_hours)) - total).toFixed(2)}</td>
+        </tr>
+        <tr className="hover:bg-gray-100">
+          <td className="px-4 py-2 "><b>Allocation</b></td>
+          <td />
+          <td className={"px-4 py-2 " + (totals.admin == "ERROR" ? "bg-red-200" : "")}>{total == "ERROR" ? "ERROR" :  (staff && staff.contract_hours) ? ((100*total)/Number(staff.contract_hours)).toFixed(1) : "No specified time permitted. "}%</td>
         </tr>
       </tbody>
     </table>

@@ -79,8 +79,7 @@ export default function AccountDetails() {
 
   function deleteStaffData(): void {
     setConfirmPopup(false)
-    deleteStaff(staff).then(() => setRefreshKey(refreshKey + 1))
-    navigate("/staff")
+    deleteStaff(staff).then(() => {setRefreshKey(refreshKey + 1);     navigate("/staff")})
     
   }
 

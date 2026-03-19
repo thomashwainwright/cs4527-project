@@ -13,9 +13,6 @@ export default function LoadFormulaPopup({offering_id, user_id, code, loadFormul
         })
     }, [offering_id, user_id]);
 
-    // const loadFormula = (year: AcademicYear & {custom_formula: string}) => {
-    //     if (!year.custom_formula) return
-    // }
 
     return <div className="p-4"> 
         <div className="text-2xl mb-4">Load formula from other year for {code}</div> 
@@ -31,6 +28,7 @@ export default function LoadFormulaPopup({offering_id, user_id, code, loadFormul
                     <td className="p-2">{year.label}</td>
                     <td className="p-2">{year.custom_formula ?? "None"}</td>
                 </tr>)}
+                {academicYears?.length == 0 && <div>No data</div>}
             </tbody>
             
         </table>

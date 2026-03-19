@@ -329,7 +329,7 @@ export default function ModuleDetails() {
                     disabled={calculationParameterPreset != "custom"}
                   ></input>
                 </p>
-              </div> :
+              </div> : (moduleDetails.module_type == "admin" && 
                 <>
                   <p className="mt-4 flex flex-row">
                       <p className="pt-2 pb-2">Crit:</p>
@@ -346,7 +346,7 @@ export default function ModuleDetails() {
 
                       ></input>
                   </p>
-                </>
+                </>)
               }
 
               <div className="flex ml-auto mt-8">

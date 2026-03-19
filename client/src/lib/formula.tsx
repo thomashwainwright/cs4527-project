@@ -11,6 +11,7 @@ export default function evaluateFormula(assignment: Assignment & Module & Module
         credits: assignment.credits,
         students: assignment.estimated_number_students,
         coordinator: assignment.coordinator ?? 0,
+        h: assignment.h ?? 0,
     }
 
     let replacedText = text;

@@ -74,7 +74,7 @@ export default function StaffDetails() {
         </div>
       </div>
 
-      <Outlet context={{data, setData}}/>
+      <Outlet context={{data, setData, staff, setStaff}}/>
     </div>
   );
 }

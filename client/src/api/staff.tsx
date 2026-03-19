@@ -47,6 +47,21 @@ export const fetchStaffAssignments = async (
   }
 };
 
+// /api/assignments/year_id/:year_id
+export const fetchAllStaffAssignments = async (
+  year_id: number,
+) => {
+  try {
+    const response = await api.get(
+      `/api/assignments/year_id/${year_id}`,
+    ); 
+    return response.data;
+  } catch (error) {
+    console.error("Error fetching staff:", error);
+    throw error;
+  }
+};
+
 export const saveStaff =  async (
   staff: Staff & {pw_changed: boolean} 
 ) => {
