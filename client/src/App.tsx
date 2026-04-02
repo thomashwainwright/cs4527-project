@@ -27,7 +27,6 @@ function NavLayout() {
 
 // main app component
 function App() {
-
   return (
     <div className="flex flex-row h-dvh overflow-hidden">
       <AcademicYearProvider>
@@ -42,12 +41,41 @@ function App() {
               <Route path="staff" element={<Staff />} />
               <Route path="staff/:email" element={<StaffDetails />}>
                 <Route index element={<StaffOverview />} />
-                <Route path="teaching" element={<HoursTab tab="teaching" include={["alpha", "beta", "delta", "share", "credits", "students", "coordinator"]}/>} />
+                <Route
+                  path="teaching"
+                  element={
+                    <HoursTab
+                      tab="teaching"
+                      include={[
+                        "alpha",
+                        "beta",
+                        "delta",
+                        "share",
+                        "credits",
+                        "students",
+                        "coordinator",
+                      ]}
+                    />
+                  }
+                />
                 <Route
                   path="supervision_marking"
-                  element={<HoursTab tab="supervision_marking" include={["credits", "students_groups", "h"]}/>}
+                  element={
+                    <HoursTab
+                      tab="supervision_marking"
+                      include={["credits", "students_groups", "h"]}
+                    />
+                  }
                 />
-                <Route path="admin" element={<HoursTab tab="admin" include={["credits", "students_groups"]}/>} />
+                <Route
+                  path="admin"
+                  element={
+                    <HoursTab
+                      tab="admin"
+                      include={["credits", "students_groups"]}
+                    />
+                  }
+                />
                 <Route path="account_details" element={<AccountDetails />} />
               </Route>
             </Route>

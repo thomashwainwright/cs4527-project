@@ -48,13 +48,9 @@ export const fetchStaffAssignments = async (
 };
 
 // /api/assignments/year_id/:year_id
-export const fetchAllStaffAssignments = async (
-  year_id: number,
-) => {
+export const fetchAllStaffAssignments = async (year_id: number) => {
   try {
-    const response = await api.get(
-      `/api/assignments/year_id/${year_id}`,
-    ); 
+    const response = await api.get(`/api/assignments/year_id/${year_id}`);
     return response.data;
   } catch (error) {
     console.error("Error fetching staff:", error);
@@ -62,32 +58,28 @@ export const fetchAllStaffAssignments = async (
   }
 };
 
-export const saveStaff =  async (
-  staff: Staff & {pw_changed: boolean} 
-) => {
+export const saveStaff = async (staff: Staff & { pw_changed: boolean }) => {
   try {
     const response = await api.post("/api/staff/commit", {
-      staff: staff
+      staff: staff,
     });
 
     return response.data;
   } catch (error: unknown) {
     if (isAxiosError(error)) {
       console.error(error.response?.data);
-      throw error
+      throw error;
     } else {
       console.error("Error committing module offering changes:", error);
       throw error;
     }
   }
-}
+};
 
-export const deleteStaff =  async (
-  staff: Staff & {pw_changed: boolean} 
-) => {
+export const deleteStaff = async (staff: Staff & { pw_changed: boolean }) => {
   try {
     const response = await api.post("/api/staff/delete", {
-      staff: staff
+      staff: staff,
     });
 
     return response.data;
@@ -99,4 +91,4 @@ export const deleteStaff =  async (
       throw error;
     }
   }
-}
+};

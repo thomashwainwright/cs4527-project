@@ -5,7 +5,6 @@ import type { AcademicYear } from "@/types/academic_year_type";
 import type { AssignmentRow } from "@/types/assignment_row";
 import type { CombinedAssignmentType } from "@/types/combined_assignment_type";
 
-
 export const fetchModules = async () => {
   try {
     const response = await api.get("/api/modules");
@@ -28,7 +27,9 @@ export const fetchModulesWithOfferings = async (year_id: number) => {
 
 export const fetchModuleDetails = async (code: string, year_id: number) => {
   try {
-    const response = await api.get(`/api/module_offerings/${code}/year_id/${year_id}`);
+    const response = await api.get(
+      `/api/module_offerings/${code}/year_id/${year_id}`,
+    );
     return response.data;
   } catch (error) {
     console.error("Error fetching module details:", error);
@@ -59,10 +60,9 @@ export const fetchModuleAssignments = async (
   }
 };
 
-
 export const fetchOtherYearsFormula = async (
   offering_id: number,
-  user_id: number
+  user_id: number,
 ) => {
   try {
     // app.get("/api/assignments/module_id/:module_id/year_id/:year_id", async (req, res) => {
@@ -83,9 +83,7 @@ export const fetchOtherYearsFormula = async (
   }
 };
 
-export const fetchModulesNotAssignedTo = async (
-  year: AcademicYear
-) => {
+export const fetchModulesNotAssignedTo = async (year: AcademicYear) => {
   try {
     // app.get("/api/assignments/module_id/:module_id/year_id/:year_id", async (req, res) => {
 
@@ -105,9 +103,7 @@ export const fetchModulesNotAssignedTo = async (
   }
 };
 
-export const fetchAvailableStaff = async (
-  offering_id: number
-) => {
+export const fetchAvailableStaff = async (offering_id: number) => {
   try {
     // app.get("/api/assignments/module_id/:module_id/year_id/:year_id", async (req, res) => {
 
@@ -129,7 +125,7 @@ export const fetchAvailableStaff = async (
 
 // POSTs
 
-export const commitModuleChanges =  async (
+export const commitModuleChanges = async (
   deletedData: CombinedModuleType[] | undefined,
   editedData: CombinedModuleType[] | undefined,
   newData: CombinedModuleType[] | undefined,
@@ -153,20 +149,18 @@ export const commitModuleChanges =  async (
   }
 };
 
-export const commitModuleOfferingChanges =  async (
+export const commitModuleOfferingChanges = async (
   deletedData: CombinedModuleType[] | undefined,
   editedData: CombinedModuleType[] | undefined,
   newData: CombinedModuleType[] | undefined,
-  year_id: number
+  year_id: number,
 ) => {
-
-
   try {
     const response = await api.post("/api/module_offerings/commit", {
       deleted: deletedData,
       edited: editedData,
       created: newData,
-      year_id: year_id
+      year_id: year_id,
     });
 
     return response.data;
@@ -179,15 +173,15 @@ export const commitModuleOfferingChanges =  async (
       throw error;
     }
   }
-}
+};
 
-export const commitModuleOfferingDetailChanges =  async (
+export const commitModuleOfferingDetailChanges = async (
   offering_id: number | undefined,
-  estimated_number_students: number | undefined, 
-  alpha: number | undefined, 
-  beta: number | undefined, 
-  crit: number | undefined, 
-  credits: number | undefined, 
+  estimated_number_students: number | undefined,
+  alpha: number | undefined,
+  beta: number | undefined,
+  crit: number | undefined,
+  credits: number | undefined,
   h: number | undefined,
 ) => {
   try {
@@ -212,7 +206,7 @@ export const commitModuleOfferingDetailChanges =  async (
   }
 };
 
-export const commitAssignmentData =  async (
+export const commitAssignmentData = async (
   deletedData: AssignmentRow[] | undefined,
   editedData: AssignmentRow[] | undefined,
   newData: AssignmentRow[] | undefined,
@@ -234,13 +228,11 @@ export const commitAssignmentData =  async (
       throw error;
     }
   }
-}
+};
 
-export const commitFormulaChanges =  async (
+export const commitFormulaChanges = async (
   editedData: CombinedAssignmentType[] | undefined,
 ) => {
-
-
   try {
     const response = await api.post("/api/staff_assignments/commit-formula", {
       edited: editedData,
@@ -256,4 +248,4 @@ export const commitFormulaChanges =  async (
       throw error;
     }
   }
-}
+};

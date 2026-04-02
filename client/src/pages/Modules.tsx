@@ -3,19 +3,21 @@ import { useNavigate } from "react-router-dom";
 import type { Module } from "../types/module_type";
 import PageTitle from "../ui_components/PageTitle";
 import { useAcademicYear } from "@/context/useAcademicYear";
-import { commitModuleChanges, commitModuleOfferingChanges, fetchModules, fetchModulesWithOfferings } from "@/api/modules";
-import deleteIcon from "../assets/icons/delete-icon.svg"
+import {
+  commitModuleChanges,
+  commitModuleOfferingChanges,
+  fetchModules,
+  fetchModulesWithOfferings,
+} from "@/api/modules";
+import deleteIcon from "../assets/icons/delete-icon.svg";
 import Fullscreen from "@/ui_components/Fullscreen";
 import type { CombinedModuleType } from "@/types/combined_module_type";
 import AddModule from "@/fullscreen_popups/AddModule";
 import OkDialog from "@/fullscreen_popups/OkDialog";
 
-
 export function Modules() {
   const navigate = useNavigate();
-  const [data, setData] = useState<
-    (CombinedModuleType)[] | null
-  >();
+  const [data, setData] = useState<CombinedModuleType[] | null>();
   const [filter, setFilter] = useState({
     teaching: true,
     admin: true,
@@ -24,9 +26,8 @@ export function Modules() {
   });
   const [editModules, setEditModules] = useState<boolean>(false);
   const [assignModuleWindow, setAssignModuleWindow] = useState<boolean>(false); // window to assign module to academic year => creates offering
-  const[refreshKey, setRefreshKey] = useState<number>(0);
+  const [refreshKey, setRefreshKey] = useState<number>(0);
   const [saveConfirmation, setSaveConfirmation] = useState<string>("");
-
 
   const { selectedYear } = useAcademicYear();
 
@@ -50,38 +51,35 @@ export function Modules() {
 
     // If in editing mode, fetch all modules. Else, fetch only with offerings in current context academic year.
     if (editModules) {
-      fetchModules().then(
-        (modules: (CombinedModuleType)[]) => {
-          console.log("Fetched modules with offerings");
-          setData(modules);
-          setData(prev =>
-            prev?.map((item, index) => ({
-              ...item,
-              unique_id: index
-            }))
-          );
-        },
-      );
+      fetchModules().then((modules: CombinedModuleType[]) => {
+        console.log("Fetched modules with offerings");
+        setData(modules);
+        setData((prev) =>
+          prev?.map((item, index) => ({
+            ...item,
+            unique_id: index,
+          })),
+        );
+      });
     } else {
       fetchModulesWithOfferings(selectedYear?.year_id).then(
-        (modules: (CombinedModuleType)[]) => {
+        (modules: CombinedModuleType[]) => {
           console.log("Fetched modules with offerings");
           setData(modules);
-          setData(prev =>
+          setData((prev) =>
             prev?.map((item, index) => ({
               ...item,
-              unique_id: index
-            }))
+              unique_id: index,
+            })),
           );
         },
       );
     }
-
   }, [selectedYear, editModules, refreshKey]);
 
   function getFilteredData() {
     return (
-      data && 
+      data &&
       data.filter((item: Module) => {
         let type_filter = false;
         if (filter.teaching && item.module_type == "teaching") {
@@ -92,7 +90,10 @@ export function Modules() {
           type_filter = true;
         }
 
-        if (filter.supervision_marking && item.module_type == "supervision_marking") {
+        if (
+          filter.supervision_marking &&
+          item.module_type == "supervision_marking"
+        ) {
           type_filter = true;
         }
 
@@ -106,22 +107,28 @@ export function Modules() {
   }
 
   function markDel(module: CombinedModuleType, value: boolean) {
-    setData(prev =>
-      prev?.filter(item => !(item.unique_id === module.unique_id && typeof item.new === "number")).map(item =>
-        item.unique_id === module.unique_id
-          ? { ...item, del: value }
-          : item
-      )
+    setData((prev) =>
+      prev
+        ?.filter(
+          (item) =>
+            !(
+              item.unique_id === module.unique_id &&
+              typeof item.new === "number"
+            ),
+        )
+        .map((item) =>
+          item.unique_id === module.unique_id ? { ...item, del: value } : item,
+        ),
     );
   }
 
   function addModule() {
-    setData(prev => {
+    setData((prev) => {
       const arr = prev ?? [];
 
       const maxId = arr.reduce(
         (max, item) => Math.max(max, item.unique_id ?? 0),
-        0
+        0,
       );
 
       const new_entry: CombinedModuleType = {
@@ -131,33 +138,38 @@ export function Modules() {
         del: false,
         new: Date.now(),
         unique_id: maxId + 1,
-        edit: false
+        edit: false,
       };
 
       return [...arr, new_entry];
     });
   }
 
-  function updateStateData(row: HTMLTableRowElement, module: CombinedModuleType) {
-    const newCode = row.cells[0].textContent
-    const newName = row.cells[1].textContent
+  function updateStateData(
+    row: HTMLTableRowElement,
+    module: CombinedModuleType,
+  ) {
+    const newCode = row.cells[0].textContent;
+    const newName = row.cells[1].textContent;
 
-    const changed = newCode != module.code || newName != module.name // detect if input has resulted in any change, no point changing if not.
-    if (!changed) return // also stops edit: true showing amber bg on unchanged (in reality) rows.
+    const changed = newCode != module.code || newName != module.name; // detect if input has resulted in any change, no point changing if not.
+    if (!changed) return; // also stops edit: true showing amber bg on unchanged (in reality) rows.
 
-    setData(prev =>
-      prev?.map(item =>
+    setData((prev) =>
+      prev?.map((item) =>
         item.unique_id === module.unique_id
           ? { ...item, edit: true, code: newCode, name: newName }
-          : item
-      )
+          : item,
+      ),
     );
   }
 
   function saveData() {
-    const deletedData = data?.filter(item => item.del) // only update table with data that has been modified.
-    const editedData = data?.filter(item => item.edit && item.new == undefined && !item.del)
-    const newData = data?.filter(item => item.new)
+    const deletedData = data?.filter((item) => item.del); // only update table with data that has been modified.
+    const editedData = data?.filter(
+      (item) => item.edit && item.new == undefined && !item.del,
+    );
+    const newData = data?.filter((item) => item.new);
 
     // console.log(editedData)
     // console.log(newData)
@@ -166,37 +178,51 @@ export function Modules() {
     if (editModules) {
       // editModules => data is module, to update the "modules" table.
       let err = false;
-      ([...newData ?? [], ...editedData ?? []])?.forEach(item => {
+      [...(newData ?? []), ...(editedData ?? [])]?.forEach((item) => {
         if (item.code == "") {
           err = true;
           setSaveConfirmation("Missing required field: Code");
           return;
         }
-      })
-      if (!err) commitModuleChanges(deletedData, editedData, newData).then(() => setRefreshKey(refreshKey + 1)).then(() => {
-      setSaveConfirmation("Saved changes.")}).catch(() => {
-        setSaveConfirmation("Error saving changes.")})
+      });
+      if (!err)
+        commitModuleChanges(deletedData, editedData, newData)
+          .then(() => setRefreshKey(refreshKey + 1))
+          .then(() => {
+            setSaveConfirmation("Saved changes.");
+          })
+          .catch(() => {
+            setSaveConfirmation("Error saving changes.");
+          });
     } else {
       // !editModules => data is module offering, to update "module_offerings" table. This represents assignments of a module to a specific year.
       if (!selectedYear) return;
-      commitModuleOfferingChanges(deletedData, editedData, newData, selectedYear?.year_id).then(() => setRefreshKey(refreshKey + 1)).then(() => {
-      setSaveConfirmation("Saved changes.")}).catch(() => {
-        setSaveConfirmation("Error saving changes.")})
+      commitModuleOfferingChanges(
+        deletedData,
+        editedData,
+        newData,
+        selectedYear?.year_id,
+      )
+        .then(() => setRefreshKey(refreshKey + 1))
+        .then(() => {
+          setSaveConfirmation("Saved changes.");
+        })
+        .catch(() => {
+          setSaveConfirmation("Error saving changes.");
+        });
     }
-
   }
 
   function onModuleOfferingAdd(modules: Module[] | undefined) {
     if (!modules) return;
-    
+
     setAssignModuleWindow(false);
 
-    let maxId = data ? data.reduce(
-      (max, item) => Math.max(max, item.unique_id ?? 0),
-      0
-    ) : -1;
+    let maxId = data
+      ? data.reduce((max, item) => Math.max(max, item.unique_id ?? 0), 0)
+      : -1;
 
-    const converted_modules: CombinedModuleType[] = modules.map(module => {
+    const converted_modules: CombinedModuleType[] = modules.map((module) => {
       maxId++;
       return {
         module_id: module.module_id,
@@ -207,11 +233,11 @@ export function Modules() {
         edit: false,
         new: Date.now(),
         unique_id: maxId,
-        allocation: 0
-      }
-    })
+        allocation: 0,
+      };
+    });
 
-    setData(prev => [...(prev || []), ...converted_modules]);
+    setData((prev) => [...(prev || []), ...converted_modules]);
   }
 
   return (
@@ -267,19 +293,72 @@ export function Modules() {
         </div>
       </div>
       <div className="flex flex-row gap-4 mb-4 items-center">
-        <p className="text-xl">{editModules ? <>Showing all modules</> : <>Showing active modules for <b>{selectedYear?.label}</b></>}</p>
+        <p className="text-xl">
+          {editModules ? (
+            <>Showing all modules</>
+          ) : (
+            <>
+              Showing active modules for <b>{selectedYear?.label}</b>
+            </>
+          )}
+        </p>
         <div className="flex ml-auto gap-2">
-          <button className={"border border-gray-200 rounded-md px-4 py-2 cursor-pointer text-gray text-xl text-gray-700 hover:bg-gray-200"} onClick={() => {return editModules ? addModule() : setAssignModuleWindow(true)}} title="Add module.">Add</button>
-          
-          <button className={"border border-gray-200 rounded-md px-4 py-2 cursor-pointer text-gray text-xl text-gray-700 hover:bg-gray-200"} onClick={saveData} title="Save changes to modules.">Save</button>
-          <Fullscreen open={saveConfirmation != ""} onClose={() => setSaveConfirmation("")}><OkDialog onOk={() => setSaveConfirmation("")}>{saveConfirmation}</OkDialog></Fullscreen>
-          
-          <button className={"border border-gray-200 rounded-md px-4 py-2 cursor-pointer text-gray text-xl " + (editModules ? "bg-blue-600 text-white hover:bg-blue-400" : "text-gray-700 hover:bg-gray-200")} onClick={() => setEditModules(!editModules)} title="Edit all modules available to all academic years.">Edit all modules</button>
+          <button
+            className={
+              "border border-gray-200 rounded-md px-4 py-2 cursor-pointer text-gray text-xl text-gray-700 hover:bg-gray-200"
+            }
+            onClick={() => {
+              return editModules ? addModule() : setAssignModuleWindow(true);
+            }}
+            title="Add module."
+          >
+            Add
+          </button>
+
+          <button
+            className={
+              "border border-gray-200 rounded-md px-4 py-2 cursor-pointer text-gray text-xl text-gray-700 hover:bg-gray-200"
+            }
+            onClick={saveData}
+            title="Save changes to modules."
+          >
+            Save
+          </button>
+          <Fullscreen
+            open={saveConfirmation != ""}
+            onClose={() => setSaveConfirmation("")}
+          >
+            <OkDialog onOk={() => setSaveConfirmation("")}>
+              {saveConfirmation}
+            </OkDialog>
+          </Fullscreen>
+
+          <button
+            className={
+              "border border-gray-200 rounded-md px-4 py-2 cursor-pointer text-gray text-xl " +
+              (editModules
+                ? "bg-blue-600 text-white hover:bg-blue-400"
+                : "text-gray-700 hover:bg-gray-200")
+            }
+            onClick={() => setEditModules(!editModules)}
+            title="Edit all modules available to all academic years."
+          >
+            Edit all modules
+          </button>
         </div>
-        <Fullscreen open={assignModuleWindow} onClose={()=>{setAssignModuleWindow(false)}} className="w-1/4 h-1/2"><AddModule onAdd={(d: Module[] | undefined) => onModuleOfferingAdd(d)} /></Fullscreen>
+        <Fullscreen
+          open={assignModuleWindow}
+          onClose={() => {
+            setAssignModuleWindow(false);
+          }}
+          className="w-1/4 h-1/2"
+        >
+          <AddModule
+            onAdd={(d: Module[] | undefined) => onModuleOfferingAdd(d)}
+          />
+        </Fullscreen>
       </div>
       <div className="flex-1 min-h-0 overflow-auto">
-        
         <table className="min-w-full text-xl">
           <thead className="bg-white">
             <tr>
@@ -297,88 +376,122 @@ export function Modules() {
                 if (a.new && b.new) {
                   return b.new - a.new; // newest first
                 }
-                if (a.new) return -1;   // a has new → goes first
-                if (b.new) return 1;    // b has new → goes first
+                if (a.new) return -1; // a has new → goes first
+                if (b.new) return 1; // b has new → goes first
                 return a.code.localeCompare(b.code); // normal items sorted by code
               })
-              .map(
-                (module: CombinedModuleType, index) => (
-                  <tr
-                    key={index}
-                    className={"clickable-row cursor-pointer group " + (module.new && !module.del ? "bg-green-200 hover:bg-green-100 " : "") + (module.del ? "bg-red-200 hover:bg-red-100 " : "") + (module.edit ? "bg-amber-200 hover:bg-amber-100 " : "") + (!module.new && !module.del && !module.edit ? "hover:bg-gray-100" : "")}
-                    onClick={(e) => {
-                      if (module.new) {
-                        e.stopPropagation();
-                      } else if (!editModules) {
-                        handleRowClick(module.code);
-                      }
-                    }}
-                    suppressContentEditableWarning
-                    onKeyDown={(e) => {
-                      if (e.key == "Enter") {
-                        console.log("Enter submit");
-                        e.preventDefault();
-                        e.currentTarget?.blur();
-                        const row = e.currentTarget as HTMLTableRowElement
+              .map((module: CombinedModuleType, index) => (
+                <tr
+                  key={index}
+                  className={
+                    "clickable-row cursor-pointer group " +
+                    (module.new && !module.del
+                      ? "bg-green-200 hover:bg-green-100 "
+                      : "") +
+                    (module.del ? "bg-red-200 hover:bg-red-100 " : "") +
+                    (module.edit ? "bg-amber-200 hover:bg-amber-100 " : "") +
+                    (!module.new && !module.del && !module.edit
+                      ? "hover:bg-gray-100"
+                      : "")
+                  }
+                  onClick={(e) => {
+                    if (module.new) {
+                      e.stopPropagation();
+                    } else if (!editModules) {
+                      handleRowClick(module.code);
+                    }
+                  }}
+                  suppressContentEditableWarning
+                  onKeyDown={(e) => {
+                    if (e.key == "Enter") {
+                      console.log("Enter submit");
+                      e.preventDefault();
+                      e.currentTarget?.blur();
+                      const row = e.currentTarget as HTMLTableRowElement;
 
-                        updateStateData(row, module);
-                      }
-                    }}
-                    onBlur={(e) => {
-                      const row = e.currentTarget as HTMLTableRowElement
-                      updateStateData(row, module)}
-                    }  
+                      updateStateData(row, module);
+                    }
+                  }}
+                  onBlur={(e) => {
+                    const row = e.currentTarget as HTMLTableRowElement;
+                    updateStateData(row, module);
+                  }}
+                >
+                  <td
+                    className="px-4 py-2 border"
+                    tabIndex={0}
+                    contentEditable={editModules}
                   >
-                    <td className="px-4 py-2 border" tabIndex={0} contentEditable={editModules}>
-                      {module.code}
-                    </td>
-                    <td className="px-4 py-2 border" tabIndex={0} contentEditable={editModules}>
-                      {module.name}
-                    </td>
-                    <td className="px-4 py-2 border" tabIndex={0}>
-                      <select
-                        name="module_type"
-                        className={!editModules ? "appearance-none" : "w-full"}
-                        value={module.module_type}
-                        onChange={(e) => {
-                          const value = e.currentTarget.value;
-                          setData(prev =>
-                            prev?.map(item =>
-                              item.unique_id === module.unique_id
-                                ? { ...item, module_type: value, edit: true }
-                                : item
-                            )
-                          );
-                        }}
-                        disabled={!editModules}
-                      >
-                        <option value="teaching">Teaching</option>
-                        <option value="admin">Admin</option>
-                        <option value="supervision_marking">
-                          Supervision/marking
-                        </option>
-                      </select>
-                    </td>
+                    {module.code}
+                  </td>
+                  <td
+                    className="px-4 py-2 border"
+                    tabIndex={0}
+                    contentEditable={editModules}
+                  >
+                    {module.name}
+                  </td>
+                  <td className="px-4 py-2 border" tabIndex={0}>
+                    <select
+                      name="module_type"
+                      className={!editModules ? "appearance-none" : "w-full"}
+                      value={module.module_type}
+                      onChange={(e) => {
+                        const value = e.currentTarget.value;
+                        setData((prev) =>
+                          prev?.map((item) =>
+                            item.unique_id === module.unique_id
+                              ? { ...item, module_type: value, edit: true }
+                              : item,
+                          ),
+                        );
+                      }}
+                      disabled={!editModules}
+                    >
+                      <option value="teaching">Teaching</option>
+                      <option value="admin">Admin</option>
+                      <option value="supervision_marking">
+                        Supervision/marking
+                      </option>
+                    </select>
+                  </td>
 
-                    {!editModules && <td
+                  {!editModules && (
+                    <td
                       className={
                         "px-4 py-2 border " +
-                        (module.module_type == "teaching" && (module.allocation == 1
-                          ? "bg-green-200"
-                          : ((module.allocation == 0)
-                            ? "bg-red-200"
-                            : "bg-amber-200")))
+                        (module.module_type == "teaching" &&
+                          (module.allocation == 1
+                            ? "bg-green-200"
+                            : module.allocation == 0
+                              ? "bg-red-200"
+                              : "bg-amber-200"))
                       }
                     >
-                      {module.module_type == "teaching" ? module.allocation : "n/a"}
-                    </td>}
-                                     
-                    <td className="group-hover:bg-white bg-white" contentEditable={false}>
-                      <button aria-label="Delete" title="Delete module" className="hover:bg-gray-200 ml-2 rounded-lg" onClick={(e) => {e.stopPropagation(); markDel(module, !module.del)}}><img alt="" src={deleteIcon} className="w-6 m-2"/></button>
+                      {module.module_type == "teaching"
+                        ? module.allocation
+                        : "n/a"}
                     </td>
-                  </tr>
-                ),
-              )}
+                  )}
+
+                  <td
+                    className="group-hover:bg-white bg-white"
+                    contentEditable={false}
+                  >
+                    <button
+                      aria-label="Delete"
+                      title="Delete module"
+                      className="hover:bg-gray-200 ml-2 rounded-lg"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        markDel(module, !module.del);
+                      }}
+                    >
+                      <img alt="" src={deleteIcon} className="w-6 m-2" />
+                    </button>
+                  </td>
+                </tr>
+              ))}
           </tbody>
         </table>
       </div>
