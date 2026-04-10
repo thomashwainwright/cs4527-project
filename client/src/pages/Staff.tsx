@@ -97,6 +97,7 @@ export function Staff() {
         </div>
       </div>
       <div className="flex flex-row mb-4 items-center gap-4 text-xl">
+        Showing {getFilteredData().length} results.
         <button
           className={
             "border border-gray-200 rounded-md px-4 py-2 cursor-pointer text-gray text-xl text-gray-700 hover:bg-gray-200 ml-auto"

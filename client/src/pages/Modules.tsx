@@ -295,10 +295,11 @@ export function Modules() {
       <div className="flex flex-row gap-4 mb-4 items-center">
         <p className="text-xl">
           {editModules ? (
-            <>Showing all modules</>
+            <>Showing {getFilteredData()?.length} modules </>
           ) : (
             <>
-              Showing active modules for <b>{selectedYear?.label}</b>
+              Showing {getFilteredData()?.length} active modules for{" "}
+              <b>{selectedYear?.label}</b>
             </>
           )}
         </p>
