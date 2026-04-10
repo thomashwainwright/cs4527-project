@@ -1,3 +1,5 @@
+import type { Dispatch, SetStateAction } from "react";
+
 export type Staff = {
   user_id: number | undefined;
   role: string | undefined;
@@ -8,4 +10,11 @@ export type Staff = {
   password_hash: string | undefined;
   password: string | undefined;
   active: boolean | undefined;
+  allocation: number | undefined;
+};
+
+export type StaffContextType = {
+  staffData: Staff[] | null;
+  setStaffData: Dispatch<SetStateAction<Staff[]>>;
+  incrementRefreshKey: () => void;
 };

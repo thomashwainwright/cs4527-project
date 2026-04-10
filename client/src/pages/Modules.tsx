@@ -14,6 +14,7 @@ import Fullscreen from "@/ui_components/Fullscreen";
 import type { CombinedModuleType } from "@/types/combined_module_type";
 import AddModule from "@/fullscreen_popups/AddModule";
 import OkDialog from "@/fullscreen_popups/OkDialog";
+import { useStaff } from "@/context/useStaff";
 
 export function Modules() {
   const navigate = useNavigate();
@@ -28,6 +29,7 @@ export function Modules() {
   const [assignModuleWindow, setAssignModuleWindow] = useState<boolean>(false); // window to assign module to academic year => creates offering
   const [refreshKey, setRefreshKey] = useState<number>(0);
   const [saveConfirmation, setSaveConfirmation] = useState<string>("");
+  const { incrementRefreshKey } = useStaff();
 
   const { selectedYear } = useAcademicYear();
 
@@ -190,6 +192,7 @@ export function Modules() {
           .then(() => setRefreshKey(refreshKey + 1))
           .then(() => {
             setSaveConfirmation("Saved changes.");
+            incrementRefreshKey();
           })
           .catch(() => {
             setSaveConfirmation("Error saving changes.");
@@ -206,6 +209,7 @@ export function Modules() {
         .then(() => setRefreshKey(refreshKey + 1))
         .then(() => {
           setSaveConfirmation("Saved changes.");
+          incrementRefreshKey();
         })
         .catch(() => {
           setSaveConfirmation("Error saving changes.");

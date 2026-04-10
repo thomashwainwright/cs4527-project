@@ -9,6 +9,7 @@ import type { CombinedAssignmentType } from "@/types/combined_assignment_type";
 import { default_formula } from "@/lib/default_formula";
 import { commitFormulaChanges } from "@/api/modules";
 import OkDialog from "@/fullscreen_popups/OkDialog";
+import { useStaff } from "@/context/useStaff";
 
 export default function HoursTab({
   tab,
@@ -32,6 +33,7 @@ export default function HoursTab({
   const [fullscreenOpen, setFullscreenOpen] = useState<number>(-1);
   const [totalHours, setTotalHours] = useState<number>(0);
   const [saveConfirmation, setSaveConfirmation] = useState<string>("");
+  const { incrementRefreshKey } = useStaff();
 
   useEffect(() => {
     const total = data
@@ -136,7 +138,10 @@ export default function HoursTab({
       return;
     }
     commitFormulaChanges(editedData)
-      .then(() => setSaveConfirmation("Saved changes."))
+      .then(() => {
+        setSaveConfirmation("Saved changes.");
+        incrementRefreshKey();
+      })
       .catch(() => setSaveConfirmation("Error saving changes."));
   }
 

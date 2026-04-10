@@ -18,6 +18,7 @@ import AssignModule from "@/fullscreen_popups/AssignModule";
 import type { AssignmentRow } from "@/types/assignment_row";
 import deleteIcon from "../assets/icons/delete-icon.svg";
 import OkDialog from "@/fullscreen_popups/OkDialog";
+import { useStaff } from "@/context/useStaff";
 
 export default function ModuleDetails() {
   const code = useParams().code as string;
@@ -34,6 +35,7 @@ export default function ModuleDetails() {
   const [refreshKey, setRefreshKey] = useState<number>(0);
   const [moduleNotFound, setModuleNotFound] = useState<boolean>(false);
   const [saveConfirmation, setSaveConfirmation] = useState<string>("");
+  const { incrementRefreshKey } = useStaff();
 
   const navigate = useNavigate();
   const { selectedYear } = useAcademicYear();
@@ -109,6 +111,7 @@ export default function ModuleDetails() {
     )
       .then(() => {
         setSaveConfirmation("Saved changes.");
+        incrementRefreshKey();
       })
       .catch(() => {
         setSaveConfirmation("Error saving changes.");
@@ -146,7 +149,10 @@ export default function ModuleDetails() {
 
     commitAssignmentData(deletedData, editedData, newData)
       .then(() => setRefreshKey(refreshKey + 1))
-      .then(() => setSaveConfirmation("Saved changes."))
+      .then(() => {
+        setSaveConfirmation("Saved changes.");
+        incrementRefreshKey();
+      })
       .catch(() => setSaveConfirmation("Error saving changes."));
   }
 
@@ -184,6 +190,7 @@ export default function ModuleDetails() {
         password_hash: s.password_hash,
         password: undefined,
         active: true,
+        allocation: 0,
       }));
 
       return [...arr, ...newEntries];
@@ -294,7 +301,7 @@ export default function ModuleDetails() {
                     }}
                   />
                 </p>
-                {moduleDetails.module_type == "teaching" && (
+                {
                   <p className="mt-4 flex flex-row mb-8">
                     <p className="pt-2 pb-2">Estimated Number of Students:</p>
                     <input
@@ -309,7 +316,7 @@ export default function ModuleDetails() {
                       }}
                     />
                   </p>
-                )}
+                }
 
                 {/* {<b className="flex my-8">Calculation Parameters</b>*} */}
 

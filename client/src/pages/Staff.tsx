@@ -1,63 +1,66 @@
-import { fetchAllStaffAssignments, fetchStaff } from "../api/staff";
+// import { fetchAllStaffAssignments, fetchStaff } from "../api/staff";
 import PageTitle from "../ui_components/PageTitle";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import type { Staff } from "../types/staff_type";
-import { useAcademicYear } from "@/context/useAcademicYear";
-import type { CombinedAssignmentType } from "@/types/combined_assignment_type";
-import evaluateFormula from "@/lib/formula";
-import { default_formula } from "@/lib/default_formula";
+// import { useAcademicYear } from "@/context/useAcademicYear";
+// import type { CombinedAssignmentType } from "@/types/combined_assignment_type";
+// import evaluateFormula from "@/lib/formula";
+// import { default_formula } from "@/lib/default_formula";
+import { useStaff } from "@/context/useStaff";
 
 export function Staff() {
   const navigate = useNavigate();
-  const { selectedYear } = useAcademicYear();
+  // const { selectedYear } = useAcademicYear();
 
   const handleRowClick = (email: string) => {
     navigate(`/staff/${email}`);
   };
 
-  const [data, setData] = useState<(Staff & { allocation: number })[]>([]);
+  // const [data, setData] = useState<(Staff & { allocation: number })[]>([]);
   const [filter, setFilter] = useState({
     search: "",
   });
 
-  useEffect(() => {
-    fetchStaff().then((staff: Staff[]) => {
-      console.log("Fetched staff data.");
-      if (!selectedYear) return;
-      fetchAllStaffAssignments(selectedYear.year_id).then(
-        (module_data: CombinedAssignmentType[]) => {
-          setData(
-            staff.map((s) => {
-              const allocation = Number(
-                100 *
-                  Number(
-                    module_data
-                      .filter((m) => m.user_id === s.user_id)
-                      .reduce((sum: number, m: CombinedAssignmentType) => {
-                        return (
-                          sum +
-                          Number(
-                            evaluateFormula(
-                              m,
-                              m.custom_formula ??
-                                default_formula(m.module_type),
-                            ),
-                          )
-                        );
-                      }, 0) / Number(s.contract_hours),
-                  ),
-              );
-              return { ...s, allocation: Number(allocation.toFixed(2)) };
-            }),
-          );
-        },
-      );
-    });
-  }, [selectedYear]);
+  const { staffData, setStaffData } = useStaff();
+
+  // useEffect(() => {
+  //   fetchStaff().then((staff: Staff[]) => {
+  //     console.log("Fetched staff data.");
+  //     if (!selectedYear) return;
+  //     fetchAllStaffAssignments(selectedYear.year_id).then(
+  //       (module_data: CombinedAssignmentType[]) => {
+  //         setData(
+  //           staff.map((s) => {
+  //             const allocation = Number(
+  //               100 *
+  //                 Number(
+  //                   module_data
+  //                     .filter((m) => m.user_id === s.user_id)
+  //                     .reduce((sum: number, m: CombinedAssignmentType) => {
+  //                       return (
+  //                         sum +
+  //                         Number(
+  //                           evaluateFormula(
+  //                             m,
+  //                             m.custom_formula ??
+  //                               default_formula(m.module_type),
+  //                           ),
+  //                         )
+  //                       );
+  //                     }, 0) / Number(s.contract_hours),
+  //                 ),
+  //             );
+  //             return { ...s, allocation: Number(allocation.toFixed(2)) };
+  //           }),
+  //         );
+  //       },
+  //     );
+  //   });
+  // }, [selectedYear]);
 
   function getFilteredData() {
-    return data.filter((staff: Staff & { allocation: number }) => {
+    return staffData?.filter((staff: Staff) => {
       return staff.name?.toLowerCase().includes(filter.search.toLowerCase());
     });
   }
@@ -75,7 +78,7 @@ export function Staff() {
       active: true,
       allocation: -1,
     };
-    setData((prev) => [...prev, newUser]);
+    setStaffData((prev) => [...prev, newUser]);
     navigate("new-user/account_details");
   }
 
@@ -97,7 +100,7 @@ export function Staff() {
         </div>
       </div>
       <div className="flex flex-row mb-4 items-center gap-4 text-xl">
-        Showing {getFilteredData().length} results.
+        Showing {getFilteredData()?.length} results.
         <button
           className={
             "border border-gray-200 rounded-md px-4 py-2 cursor-pointer text-gray text-xl text-gray-700 hover:bg-gray-200 ml-auto"
@@ -121,8 +124,8 @@ export function Staff() {
           </thead>
 
           <tbody>
-            {getFilteredData().map(
-              (staff: Staff & { allocation: number }) =>
+            {getFilteredData()?.map(
+              (staff: Staff) =>
                 staff.active && (
                   <tr
                     key={staff.user_id}
