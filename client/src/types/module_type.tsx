@@ -3,5 +3,5 @@ export type Module = {
   code: string;
   name: string;
   module_type: string;
+  individual: boolean;
 };
-

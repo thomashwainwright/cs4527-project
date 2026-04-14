@@ -51,6 +51,13 @@ export default function ModuleDetails() {
     group_proj: { alpha: 0, beta: 0.8 },
   };
 
+  const reverseCalculationParameterMap = Object.fromEntries(
+    Object.entries(calculationParameterMap).map(([key, val]) => [
+      `${val.alpha}_${val.beta}`,
+      key,
+    ]),
+  );
+
   const handleRowClick = (user_id: number | undefined) => {
     if (!user_id) return;
     fetchStaffByUserId(user_id).then((staff) => {
@@ -98,6 +105,16 @@ export default function ModuleDetails() {
       });
   }, [code, selectedYear, editAssignments, refreshKey]);
 
+  useEffect(() => {
+    if (!moduleDetails) return;
+
+    setCalculationParameterPreset(
+      reverseCalculationParameterMap[
+        `${Number(moduleDetails?.alpha)}_${Number(moduleDetails?.beta)}`
+      ] ?? "Custom",
+    );
+  }, [moduleDetails, reverseCalculationParameterMap]);
+
   function saveOfferingData() {
     // save data to db
     commitModuleOfferingDetailChanges(
@@ -143,9 +160,9 @@ export default function ModuleDetails() {
     );
     const newData = moduleAssignments?.filter((item) => item.new);
 
-    console.log(editedData);
-    console.log(newData);
-    console.log(deletedData);
+    // console.log(editedData);
+    // console.log(newData);
+    // console.log(deletedData);
 
     commitAssignmentData(deletedData, editedData, newData)
       .then(() => setRefreshKey(refreshKey + 1))
@@ -201,17 +218,36 @@ export default function ModuleDetails() {
     row: HTMLTableRowElement,
     assignment: AssignmentRow,
   ) {
-    const newDelta = Number(row.cells[1].textContent); // todo validate type
-    const newShare = Number(row.cells[2].textContent);
+    const newDelta = !moduleDetails?.individual
+      ? Number(row.cells[1].textContent)
+      : -1; // todo validate type
+
+    const newShare = !moduleDetails?.individual
+      ? Number(row.cells[2].textContent)
+      : -1;
+
+    const newStudents = moduleDetails?.individual
+      ? Number(row.cells[1].textContent)
+      : -1;
 
     const changed =
-      newDelta != assignment.delta || newShare != assignment.share; // detect if input has resulted in any change, no point changing if not.
+      newDelta != assignment.delta ||
+      newShare != assignment.share ||
+      newStudents != assignment.students; // detect if input has resulted in any change, no point changing if not.
     if (!changed) return; // also stops edit: true showing amber bg on unchanged (in reality) rows.
+
+    console.log(newStudents);
 
     setModuleAssignments((prev) =>
       prev?.map((item) =>
         item.unique_id === assignment.unique_id
-          ? { ...item, edit: true, delta: newDelta, share: newShare }
+          ? {
+              ...item,
+              edit: true,
+              delta: newDelta,
+              share: newShare,
+              students: newStudents,
+            }
           : item,
       ),
     );
@@ -280,6 +316,15 @@ export default function ModuleDetails() {
                 </div>
 
                 <div className="mt-4 flex flex-row">
+                  <p className="pt-2 pb-2">Individually Assigned Module: </p>
+                  <input
+                    className="border border-gray-300 rounded-md p-2 ml-auto bg-gray-50"
+                    value={moduleDetails.individual ? "Yes" : "No"}
+                    disabled
+                  />
+                </div>
+
+                <div className="mt-4 flex flex-row">
                   <p className="pt-2 pb-2">Academic Year: </p>
                   <input
                     className="border border-gray-300 rounded-md p-2 ml-auto bg-gray-50"
@@ -301,22 +346,21 @@ export default function ModuleDetails() {
                     }}
                   />
                 </p>
-                {
-                  <p className="mt-4 flex flex-row mb-8">
-                    <p className="pt-2 pb-2">Estimated Number of Students:</p>
-                    <input
-                      type="number"
-                      className="border border-gray-300 rounded-md p-2 ml-auto"
-                      value={moduleDetails.estimated_number_students ?? ""}
-                      onChange={(e) => {
-                        setModuleDetails({
-                          ...moduleDetails,
-                          estimated_number_students: parseInt(e.target.value),
-                        });
-                      }}
-                    />
-                  </p>
-                }
+
+                <p className="mt-4 flex flex-row mb-8">
+                  <p className="pt-2 pb-2">Estimated Number of Students:</p>
+                  <input
+                    type="number"
+                    className="border border-gray-300 rounded-md p-2 ml-auto"
+                    value={moduleDetails.estimated_number_students ?? ""}
+                    onChange={(e) => {
+                      setModuleDetails({
+                        ...moduleDetails,
+                        estimated_number_students: parseInt(e.target.value),
+                      });
+                    }}
+                  />
+                </p>
 
                 {/* {<b className="flex my-8">Calculation Parameters</b>*} */}
 
@@ -327,15 +371,18 @@ export default function ModuleDetails() {
                       <select
                         name="module_type"
                         className="border border-gray-300 rounded-md p-2  hover:border-black w-75 ml-auto"
+                        value={calculationParameterPreset}
+                        onClick={() => console.log(calculationParameterPreset)}
                         onChange={(e) => {
-                          console.log(e.target.value);
-                          setCalculationParameterPreset(e.target.value);
+                          // setCalculationParameterPreset(e.target.value);
                           const map = calculationParameterMap[e.target.value];
-                          setModuleDetails({
-                            ...moduleDetails,
-                            alpha: map.alpha,
-                            beta: map.beta,
-                          });
+                          if (e.target.value != "Custom") {
+                            setModuleDetails({
+                              ...moduleDetails,
+                              alpha: map.alpha,
+                              beta: map.beta,
+                            });
+                          }
                         }}
                       >
                         <option value="">Select preset</option>
@@ -426,7 +473,7 @@ export default function ModuleDetails() {
                 </div>
               </div>
               {/* Staff assignments table */}
-              {moduleDetails.module_type == "teaching" && (
+              {
                 <div className="lg:w-1/2 pr-16">
                   {" "}
                   <div className="flex flex-row">
@@ -483,10 +530,20 @@ export default function ModuleDetails() {
                   <table className="min-w-full mt-8 text-xl">
                     <thead>
                       <tr>
-                        <th className="px-4 py-2 border">Staff Member</th>
-                        <th className="px-4 py-2 border">Delta</th>
-                        <th className="px-4 py-2 border">Share</th>
-                        <th className="px-4 py-2 border">Coordinator</th>
+                        <th className="px-4 py-2 border">Staff Member</th>{" "}
+                        {/*TODO: Change to allocatable module*/}
+                        {!moduleDetails.individual && (
+                          <th className="px-4 py-2 border">Delta</th>
+                        )}
+                        {!moduleDetails.individual && (
+                          <th className="px-4 py-2 border">Share</th>
+                        )}
+                        {moduleDetails.individual && (
+                          <th className="px-4 py-2 border">Students</th>
+                        )}
+                        {!moduleDetails.individual && (
+                          <th className="px-4 py-2 border">Coordinator</th>
+                        )}
                       </tr>
                     </thead>
 
@@ -535,51 +592,66 @@ export default function ModuleDetails() {
                                 <td className="px-4 py-2 border">
                                   {assignment.name}
                                 </td>
-                                <td
-                                  className="px-4 py-2 border"
-                                  contentEditable={editAssignments}
-                                  suppressContentEditableWarning
-                                >
-                                  {assignment.delta}
-                                </td>
-                                <td
-                                  className="px-4 py-2 border"
-                                  contentEditable={editAssignments}
-                                  suppressContentEditableWarning
-                                >
-                                  {assignment.share}
-                                </td>
-                                <td className="px-4 py-2 border">
-                                  {/* {assignment.coordinator ? "Yes" : "No"} */}
-                                  <select
-                                    name="coordinator"
-                                    className={
-                                      !editAssignments
-                                        ? "appearance-none"
-                                        : "w-full"
-                                    }
-                                    value={assignment.coordinator}
-                                    onChange={(e) => {
-                                      const value = e.currentTarget.value;
-                                      setModuleAssignments((prev) =>
-                                        prev?.map((item) =>
-                                          item.unique_id ===
-                                          assignment.unique_id
-                                            ? {
-                                                ...item,
-                                                coordinator: Number(value),
-                                                edit: true,
-                                              }
-                                            : item,
-                                        ),
-                                      );
-                                    }}
-                                    disabled={!editAssignments}
+                                {!moduleDetails.individual && (
+                                  <td
+                                    className="px-4 py-2 border"
+                                    contentEditable={editAssignments}
+                                    suppressContentEditableWarning
                                   >
-                                    <option value="15">Yes (15)</option>
-                                    <option value="0">No (0)</option>
-                                  </select>
-                                </td>
+                                    {assignment.delta}
+                                  </td>
+                                )}
+                                {!moduleDetails.individual && (
+                                  <td
+                                    className="px-4 py-2 border"
+                                    contentEditable={editAssignments}
+                                    suppressContentEditableWarning
+                                  >
+                                    {assignment.share}
+                                  </td>
+                                )}
+                                {moduleDetails.individual && (
+                                  <td
+                                    className="px-4 py-2 border"
+                                    contentEditable={editAssignments}
+                                    suppressContentEditableWarning
+                                  >
+                                    {assignment.students}
+                                  </td>
+                                )}
+                                {!moduleDetails.individual && (
+                                  <td className="px-4 py-2 border">
+                                    {/* {assignment.coordinator ? "Yes" : "No"} */}
+                                    <select
+                                      name="coordinator"
+                                      className={
+                                        !editAssignments
+                                          ? "appearance-none"
+                                          : "w-full"
+                                      }
+                                      value={assignment.coordinator}
+                                      onChange={(e) => {
+                                        const value = e.currentTarget.value;
+                                        setModuleAssignments((prev) =>
+                                          prev?.map((item) =>
+                                            item.unique_id ===
+                                            assignment.unique_id
+                                              ? {
+                                                  ...item,
+                                                  coordinator: Number(value),
+                                                  edit: true,
+                                                }
+                                              : item,
+                                          ),
+                                        );
+                                      }}
+                                      disabled={!editAssignments}
+                                    >
+                                      <option value="15">Yes (15)</option>
+                                      <option value="0">No (0)</option>
+                                    </select>
+                                  </td>
+                                )}
                                 {editAssignments ? (
                                   <td
                                     className="group-hover:bg-white bg-white"
@@ -610,7 +682,7 @@ export default function ModuleDetails() {
                     </tbody>
                   </table>
                 </div>
-              )}
+              }
             </div>
           ) : (
             <div className="flex items-center justify-center text-4xl mt-24">

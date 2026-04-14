@@ -7,7 +7,6 @@ import {
   commitModuleChanges,
   commitModuleOfferingChanges,
   fetchModules,
-  fetchModulesWithOfferings,
 } from "@/api/modules";
 import deleteIcon from "../assets/icons/delete-icon.svg";
 import Fullscreen from "@/ui_components/Fullscreen";
@@ -15,6 +14,7 @@ import type { CombinedModuleType } from "@/types/combined_module_type";
 import AddModule from "@/fullscreen_popups/AddModule";
 import OkDialog from "@/fullscreen_popups/OkDialog";
 import { useStaff } from "@/context/useStaff";
+import { useModules } from "@/context/useModules";
 
 export function Modules() {
   const navigate = useNavigate();
@@ -30,6 +30,8 @@ export function Modules() {
   const [refreshKey, setRefreshKey] = useState<number>(0);
   const [saveConfirmation, setSaveConfirmation] = useState<string>("");
   const { incrementRefreshKey } = useStaff();
+
+  const { incrementModuleRefreshKey, moduleData } = useModules();
 
   const { selectedYear } = useAcademicYear();
 
@@ -47,42 +49,49 @@ export function Modules() {
   };
 
   useEffect(() => {
-    if (!selectedYear) {
-      return;
-    }
+    // if (!selectedYear) {
+    //   return;
+    // }
 
     // If in editing mode, fetch all modules. Else, fetch only with offerings in current context academic year.
     if (editModules) {
       fetchModules().then((modules: CombinedModuleType[]) => {
         console.log("Fetched modules with offerings");
-        setData(modules);
-        setData((prev) =>
-          prev?.map((item, index) => ({
+
+        setData(
+          modules.map((item, index) => ({
             ...item,
             unique_id: index,
           })),
         );
       });
     } else {
-      fetchModulesWithOfferings(selectedYear?.year_id).then(
-        (modules: CombinedModuleType[]) => {
-          console.log("Fetched modules with offerings");
-          setData(modules);
-          setData((prev) =>
-            prev?.map((item, index) => ({
-              ...item,
-              unique_id: index,
-            })),
-          );
-        },
-      );
+      incrementModuleRefreshKey();
+
+      // fetchModulesWithOfferings(selectedYear?.year_id).then(
+      //   (modules: CombinedModuleType[]) => {
+      //     console.log("Fetched modules with offerings");
+      //     setData(modules);
+      //     setData((prev) =>
+      //       prev?.map((item, index) => ({
+      //         ...item,
+      //         unique_id: index,
+      //       })),
+      //     );
+      //     console.log("fetch");
+      //     setModuleData(modules);
+      //   },
+      // );
     }
-  }, [selectedYear, editModules, refreshKey]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [editModules]);
 
   function getFilteredData() {
+    const temp_data = editModules ? data : moduleData;
+
     return (
-      data &&
-      data.filter((item: Module) => {
+      temp_data &&
+      temp_data.filter((item: Module) => {
         let type_filter = false;
         if (filter.teaching && item.module_type == "teaching") {
           type_filter = true;
@@ -141,6 +150,7 @@ export function Modules() {
         new: Date.now(),
         unique_id: maxId + 1,
         edit: false,
+        individual: false,
       };
 
       return [...arr, new_entry];
@@ -238,6 +248,7 @@ export function Modules() {
         new: Date.now(),
         unique_id: maxId,
         allocation: 0,
+        individual: false,
       };
     });
 
@@ -465,7 +476,7 @@ export function Modules() {
                     <td
                       className={
                         "px-4 py-2 border " +
-                        (module.module_type == "teaching" &&
+                        (!module.individual &&
                           (module.allocation == 1
                             ? "bg-green-200"
                             : module.allocation == 0
@@ -473,9 +484,7 @@ export function Modules() {
                               : "bg-amber-200"))
                       }
                     >
-                      {module.module_type == "teaching"
-                        ? module.allocation
-                        : "n/a"}
+                      {!module.individual ? module.allocation : "n/a"}
                     </td>
                   )}
 
