@@ -11,6 +11,9 @@ export type Staff = {
   password: string | undefined;
   active: boolean | undefined;
   allocation: number | undefined;
+  allocation_admin: number;
+  allocation_supervision_marking: number;
+  allocation_teaching: number;
 };
 
 export type StaffContextType = {

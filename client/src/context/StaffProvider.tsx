@@ -41,7 +41,85 @@ export function StaffProvider({ children }: { children: ReactNode }) {
                       }, 0) / Number(s.contract_hours),
                   ),
               );
-              return { ...s, allocation: Number(allocation.toFixed(2)) };
+
+              const allocation_teaching = Number(
+                100 *
+                  Number(
+                    module_data
+                      .filter(
+                        (m) =>
+                          m.user_id === s.user_id &&
+                          m.module_type == "teaching",
+                      )
+                      .reduce((sum: number, m: CombinedAssignmentType) => {
+                        return (
+                          sum +
+                          Number(
+                            evaluateFormula(
+                              m,
+                              m.custom_formula ??
+                                default_formula(m.module_type),
+                            ),
+                          )
+                        );
+                      }, 0) / Number(s.contract_hours),
+                  ),
+              );
+
+              const allocation_supervision_marking = Number(
+                100 *
+                  Number(
+                    module_data
+                      .filter(
+                        (m) =>
+                          m.user_id === s.user_id &&
+                          m.module_type == "supervision_marking",
+                      )
+                      .reduce((sum: number, m: CombinedAssignmentType) => {
+                        return (
+                          sum +
+                          Number(
+                            evaluateFormula(
+                              m,
+                              m.custom_formula ??
+                                default_formula(m.module_type),
+                            ),
+                          )
+                        );
+                      }, 0) / Number(s.contract_hours),
+                  ),
+              );
+
+              const allocation_admin = Number(
+                100 *
+                  Number(
+                    module_data
+                      .filter(
+                        (m) =>
+                          m.user_id === s.user_id && m.module_type == "admin",
+                      )
+                      .reduce((sum: number, m: CombinedAssignmentType) => {
+                        return (
+                          sum +
+                          Number(
+                            evaluateFormula(
+                              m,
+                              m.custom_formula ??
+                                default_formula(m.module_type),
+                            ),
+                          )
+                        );
+                      }, 0) / Number(s.contract_hours),
+                  ),
+              );
+
+              return {
+                ...s,
+                allocation: Number(allocation.toFixed(2)),
+                allocation_admin: allocation_admin,
+                allocation_supervision_marking: allocation_supervision_marking,
+                allocation_teaching: allocation_teaching,
+              };
             }),
           );
         },
