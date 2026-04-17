@@ -43,23 +43,24 @@ export function Dashboard() {
 
     for (const staffMember of staffData) {
       if (
-        staffMember.allocation != undefined &&
-        Math.abs(staffMember.allocation - 100) > problemTolerance &&
-        staffMember.role == "teaching"
+        staffMember.allocation != undefined && // if not yet loaded, skip
+        Math.abs(staffMember.allocation - 100) > problemTolerance && // is the allocation within tolerance%?
+        staffMember.role == "teaching" // only applies to teaching roles, not admin
       ) {
         const currentProblem: Problem = {
-          type: "Staff",
+          type: "Staff", // type of problem
           subject: staffMember.name ?? "unknown",
+          // work out the problem description
           description:
             staffMember.allocation == 0
               ? "No allocation"
               : staffMember.allocation > 100
                 ? "Over-allocated"
                 : "Under-allocated",
-          url: `staff/${staffMember.email}`,
+          url: `staff/${staffMember.email}`, // navigate here upon click
         };
 
-        problemList.push(currentProblem);
+        problemList.push(currentProblem); // add to problems list
       }
     }
 

@@ -372,7 +372,6 @@ export default function ModuleDetails() {
                         name="module_type"
                         className="border border-gray-300 rounded-md p-2  hover:border-black w-75 ml-auto"
                         value={calculationParameterPreset}
-                        onClick={() => console.log(calculationParameterPreset)}
                         onChange={(e) => {
                           // setCalculationParameterPreset(e.target.value);
                           const map = calculationParameterMap[e.target.value];
