@@ -1,6 +1,7 @@
 import type { Assignment } from "@/types/assignment_type";
 import type { ModuleOffering } from "@/types/module_offering_type";
 import type { Module } from "@/types/module_type";
+import { evaluate } from "mathjs";
 
 export default function evaluateFormula(
   assignment: Assignment & Module & ModuleOffering,
@@ -29,8 +30,15 @@ export default function evaluateFormula(
   //replacedText = replacedText.replace(/x/gi, "*"); // Replace  "x" with "*" for multiplication.
 
   try {
-    return Math.round(Function(`return (${replacedText})`)() * 100) / 100;
+    const result = evaluate(text, replacements);
+    return Math.round(result * 100) / 100;
   } catch {
     return "ERROR";
   }
 }
+
+// try {
+//   return Math.round(Function(`return (${replacedText})`)() * 100) / 100;
+// } catch {
+//   return "ERROR";
+// }

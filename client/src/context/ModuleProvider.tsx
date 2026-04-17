@@ -27,7 +27,6 @@ export function ModuleProvider({ children }: { children: ReactNode }) {
             unique_id: index,
           }));
         });
-        console.log("fetch");
       },
     );
   }, [selectedYear]);
