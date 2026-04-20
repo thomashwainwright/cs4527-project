@@ -15,18 +15,25 @@ export default function Login() {
   return (
     <div className="w-full min-h-screen bg-gray-800 flex items-center justify-center p-8">
       <div className="w-full max-w-75 min-h-25 aspect-3/4 bg-white rounded-2xl p-8 flex flex-col items-center justify-center gap-8">
-        <p className="text-3xl cursor-default">Sign in</p>
+        <h1 className="text-3xl cursor-default">Sign in</h1>
 
         <form className="flex flex-col w-full h-full" onSubmit={handleSubmit}>
-          <label className="text-xs"> Email </label>
+          <label className="text-xs" htmlFor="email">
+            Email
+          </label>
           <input
+            id="email"
             className="border border-gray-300 rounded-md p-2 text-sm hover:border-black"
             required
             type="email"
             onChange={(e) => setEmail(e.target.value)}
           />
-          <label className="text-xs"> Password </label>
+          <label className="text-xs" htmlFor="password">
+            {" "}
+            Password{" "}
+          </label>
           <input
+            id="password"
             className="border border-gray-300 rounded-md p-2 text-sm hover:border-black"
             required
             type="password"

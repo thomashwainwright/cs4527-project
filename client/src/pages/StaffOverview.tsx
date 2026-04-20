@@ -152,7 +152,7 @@ export default function StaffOverview() {
                   "px-4 py-2 " + (totals.admin == "ERROR" ? "bg-red-200" : "")
                 }
               >
-                {total}
+                {total == "ERROR" ? total : total.toFixed(2)}
               </td>
             </tr>
             <tr className="hover:bg-gray-100">
