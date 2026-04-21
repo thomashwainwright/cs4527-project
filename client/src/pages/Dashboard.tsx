@@ -138,10 +138,10 @@ export function Dashboard() {
   }
 
   return (
-    <div className="flex flex-col h-screen p-12 text-xl min-h-0">
+    <div className="flex flex-col h-screen md:p-12 text-xl min-h-0 w-full">
       <PageTitle>Dashboard</PageTitle>
-      <div className="flex-1 flex flex-row min-h-0">
-        <div className="w-1/2 min-h-0 flex flex-col">
+      <div className="flex-1 flex flex-col-reverse md:flex-row min-h-0 overflow-y-auto gap-8">
+        <div className="md:w-1/2 min-h-full flex flex-col">
           <div>
             {/* Basic Stats */}
             Total Staff Allocation: {getStaffAllocation().toFixed(1)}% <br />
@@ -195,7 +195,7 @@ export function Dashboard() {
             </div>
           </div>
         </div>
-        <div className="flex items-center justify-center w-1/2">
+        <div className="flex flex-1 items-center justify-center w-auto">
           <DoughnutChart
             data={getWorkloadByType()}
             title={"Workload by type"}

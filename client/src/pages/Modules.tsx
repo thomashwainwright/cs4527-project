@@ -18,6 +18,8 @@ import { useModules } from "@/context/useModules";
 
 export function Modules() {
   const navigate = useNavigate();
+
+  const { incrementModuleRefreshKey, moduleData, setModuleData } = useModules();
   const [data, setData] = useState<CombinedModuleType[] | null>();
   const [filter, setFilter] = useState({
     teaching: true,
@@ -29,9 +31,8 @@ export function Modules() {
   const [assignModuleWindow, setAssignModuleWindow] = useState<boolean>(false); // window to assign module to academic year => creates offering
   const [refreshKey, setRefreshKey] = useState<number>(0);
   const [saveConfirmation, setSaveConfirmation] = useState<string>("");
-  const { incrementRefreshKey } = useStaff();
 
-  const { incrementModuleRefreshKey, moduleData } = useModules();
+  const { incrementRefreshKey } = useStaff();
 
   const { selectedYear } = useAcademicYear();
 
@@ -118,9 +119,12 @@ export function Modules() {
   }
 
   function markDel(module: CombinedModuleType, value: boolean) {
-    setData((prev) =>
-      prev
-        ?.filter(
+    console.log("marking del");
+    setModuleData((prev) => {
+      if (!prev) return null;
+
+      return prev
+        .filter(
           (item) =>
             !(
               item.unique_id === module.unique_id &&
@@ -129,12 +133,12 @@ export function Modules() {
         )
         .map((item) =>
           item.unique_id === module.unique_id ? { ...item, del: value } : item,
-        ),
-    );
+        );
+    });
   }
 
   function addModule() {
-    setData((prev) => {
+    setModuleData((prev) => {
       const arr = prev ?? [];
 
       const maxId = arr.reduce(
@@ -167,21 +171,31 @@ export function Modules() {
     const changed = newCode != module.code || newName != module.name; // detect if input has resulted in any change, no point changing if not.
     if (!changed) return; // also stops edit: true showing amber bg on unchanged (in reality) rows.
 
-    setData((prev) =>
-      prev?.map((item) =>
-        item.unique_id === module.unique_id
-          ? { ...item, edit: true, code: newCode, name: newName }
-          : item,
-      ),
-    );
+    if (editModules) {
+      setData((prev) =>
+        prev?.map((item) =>
+          item.unique_id === module.unique_id
+            ? { ...item, edit: true, code: newCode, name: newName }
+            : item,
+        ),
+      );
+    } else {
+      setModuleData((prev) =>
+        prev?.map((item) =>
+          item.unique_id === module.unique_id
+            ? { ...item, edit: true, code: newCode, name: newName }
+            : item,
+        ),
+      );
+    }
   }
 
   function saveData() {
-    const deletedData = data?.filter((item) => item.del); // only update table with data that has been modified.
-    const editedData = data?.filter(
+    const deletedData = moduleData?.filter((item) => item.del); // only update table with data that has been modified.
+    const editedData = moduleData?.filter(
       (item) => item.edit && item.new == undefined && !item.del,
     );
-    const newData = data?.filter((item) => item.new);
+    const newData = moduleData?.filter((item) => item.new);
 
     // console.log(editedData)
     // console.log(newData)
@@ -203,6 +217,7 @@ export function Modules() {
           .then(() => {
             setSaveConfirmation("Saved changes.");
             incrementRefreshKey();
+            incrementModuleRefreshKey();
           })
           .catch(() => {
             setSaveConfirmation("Error saving changes.");
@@ -219,7 +234,11 @@ export function Modules() {
         .then(() => setRefreshKey(refreshKey + 1))
         .then(() => {
           setSaveConfirmation("Saved changes.");
+
           incrementRefreshKey();
+          incrementModuleRefreshKey();
+
+          console.log("dd");
         })
         .catch(() => {
           setSaveConfirmation("Error saving changes.");
@@ -259,7 +278,8 @@ export function Modules() {
     <div className="flex flex-col h-dvh p-12">
       <PageTitle>{editModules ? "All" : "Active"} Modules</PageTitle>
 
-      <div className="flex flex-row mb-4 items-center gap-4 text-xl">
+      {/* filters  */}
+      <div className="flex flex-col md:flex-row mb-4 items-center gap-4 text-xl">
         <p>Module Type</p>
 
         <div className="border border-gray-300 rounded-md px-4 py-2 flex flex-row gap-8">
@@ -296,7 +316,7 @@ export function Modules() {
         </div>
         <div className="ml-auto flex flex-row gap-4 items-center">
           <input
-            className="border border-gray-300 rounded-md p-2 hover:border-black w-120"
+            className="border border-gray-300 rounded-md p-2 hover:border-black flex-1"
             placeholder="Search"
             onChange={(e) => {
               setFilter((previous) => ({
@@ -374,8 +394,8 @@ export function Modules() {
           />
         </Fullscreen>
       </div>
-      <div className="flex-1 min-h-0 overflow-auto">
-        <table className="min-w-full text-xl">
+      <div className="flex-1 min-h-50 min-w-0 overflow-auto">
+        <table className="w-full min-w-fit text-xl">
           <thead className="bg-white">
             <tr>
               <th className="px-4 py-2 border">Code</th>

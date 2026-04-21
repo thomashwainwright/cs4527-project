@@ -7,10 +7,13 @@ import { useAcademicYear } from "./useAcademicYear";
 
 export function ModuleProvider({ children }: { children: ReactNode }) {
   const [moduleData, setModuleData] = useState<CombinedModuleType[] | null>([]);
-  const [refreshKey, setRefreshKey] = useState<number>(0);
+  const [moduleRefreshKey, setRefreshKey] = useState<number>(0);
   const { selectedYear } = useAcademicYear();
 
-  const incrementModuleRefreshKey = () => setRefreshKey(refreshKey + 1);
+  const incrementModuleRefreshKey = () => {
+    console.log("inc");
+    setRefreshKey(moduleRefreshKey + 1);
+  };
 
   useEffect(() => {
     if (!selectedYear) return;
@@ -29,11 +32,16 @@ export function ModuleProvider({ children }: { children: ReactNode }) {
         });
       },
     );
-  }, [selectedYear]);
+  }, [selectedYear, moduleRefreshKey]);
 
   return (
     <ModuleContext.Provider
-      value={{ moduleData, setModuleData, incrementModuleRefreshKey }}
+      value={{
+        moduleData,
+        setModuleData,
+        incrementModuleRefreshKey,
+        moduleRefreshKey,
+      }}
     >
       {children}
     </ModuleContext.Provider>

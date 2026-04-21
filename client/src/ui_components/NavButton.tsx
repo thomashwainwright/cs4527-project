@@ -13,7 +13,7 @@ export default function NavButton({
   return (
     <NavLink
       className={
-        "p-2 sm:px-6 sm:py-4 rounded flex items-center " +
+        "p-5 md:px-6 md:py-4 rounded flex justify-center md:justify-start items-center " +
         ((locationIncludesRoute && route != "/") ||
         (route == "/" && location == "/")
           ? "bg-blue-600 text-white "

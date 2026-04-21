@@ -14,36 +14,36 @@ export default function NavBar() {
   };
 
   return (
-    <nav className="flex flex-col gap-4 p-8 w-32 sm:w-auto text-3xl h-screen">
+    <nav className="flex flex-row md:flex-col gap-4 p-8 md:w-auto md:max-w-90 md:min-w-80 text-3xl w-screen md:h-screen overflow-y-auto">
       {/* Title */}
-      <h1 className="hidden sm:block text-xl sm:text-5xl pb-16 pl-6 pt-4 font-bold cursor-default select-none">
+      <h1 className="hidden sm:block max-w-25 text-xl md:text-5xl md:pb-16 md:pl-6 md:pt-4 font-bold cursor-default select-none">
         Workload Manager
       </h1>
 
       {/* Page routing */}
       <NavButton route="/">
-        <img src={DashboardIcon} className="w-8 h-8 sm:mr-2" />
-        <p className="hidden sm:block">Dashboard</p>
+        <img src={DashboardIcon} className="w-8 h-8 md:mr-2" />
+        <p className="hidden md:block">Dashboard</p>
       </NavButton>
       <NavButton route="/modules">
-        <img src={ModuleIcon} className="w-8 h-8 sm:mr-2" />
-        <p className="hidden sm:block">Modules</p>
+        <img src={ModuleIcon} className="w-8 h-8 md:mr-2" />
+        <p className="hidden md:block">Modules</p>
       </NavButton>
       <NavButton route="/staff">
-        <img src={StaffIcon} className="w-8 h-8 sm:mr-2" />
-        <p className="hidden sm:block">Staff</p>
+        <img src={StaffIcon} className="w-8 h-8 md:mr-2" />
+        <p className="hidden md:block">Staff</p>
       </NavButton>
 
       {/* User / log out section */}
       <div className="mt-auto flex flex-row items-center gap-4">
-        <div className="hidden sm:block">
-          <p className="text-lg text-gray-500">Logged in as</p>
-          <p className="text-lg font-bold">{userEmail}</p>{" "}
+        <div className="md:block">
+          <p className="text-base md:text-lg text-gray-500">Logged in as</p>
+          <p className="text-base md:text-lg font-bold">{userEmail}</p>{" "}
           {/* TODO: Implement real user system from db */}
         </div>
         <form className="ml-auto" onSubmit={handleLogout} method="POST">
           <button
-            className="text-lg hover:underline mt-auto ml-auto cursor-pointer"
+            className="text-base md:text-lg hover:underline mt-auto ml-auto cursor-pointer"
             type="submit"
           >
             Log Out

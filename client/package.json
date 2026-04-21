@@ -11,6 +11,7 @@
     "test": "vitest",
     "test:watch": "vitest --watch",
     "test:ui": "vitest --ui",
+    "test-all": "vitest run",
     "coverage": "vitest run --coverage"
   },
   "dependencies": {

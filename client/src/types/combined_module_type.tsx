@@ -13,4 +13,5 @@ export type ModuleContextType = {
   moduleData: CombinedModuleType[] | null;
   setModuleData: Dispatch<SetStateAction<CombinedModuleType[] | null>>;
   incrementModuleRefreshKey: () => void;
+  moduleRefreshKey: number;
 };
