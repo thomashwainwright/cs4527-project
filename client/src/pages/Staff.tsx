@@ -77,6 +77,10 @@ export function Staff() {
       password: undefined,
       active: true,
       allocation: -1,
+
+      allocation_admin: 0,
+      allocation_supervision_marking: 0,
+      allocation_teaching: 0,
     };
     setStaffData((prev) => [...prev, newUser]);
     navigate("new-user/account_details");

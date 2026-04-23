@@ -21,6 +21,7 @@ function NavLayout() {
     <>
       <NavBar />
       <div className="w-full min-h-0 flex-1 md:pr-48">
+        {/* div CSS classes applied to all pages in app */}
         <Outlet />
       </div>
     </>
@@ -31,14 +32,18 @@ function NavLayout() {
 function App() {
   return (
     <div className="flex flex-col md:flex-row h-dvh overflow-hidden min-h-0">
+      {/* provide academic year, staff and module context to entire application*/}
       <AcademicYearProvider>
         <StaffProvider>
           <ModuleProvider>
+            {/* define page routes */}
             <Routes>
               <Route path="login" element={<Login />} />
-
+              {/* protect routes that require user authentication */}
               <Route element={<ProtectedRoute />}>
+                {/* add navigation bar to every page */}
                 <Route element={<NavLayout />}>
+                  {/* Place dashboard at index (/)}*/}
                   <Route index element={<Dashboard />} />
                   <Route path="modules" element={<Modules />} />
                   <Route path="modules/:code" element={<ModuleDetails />} />

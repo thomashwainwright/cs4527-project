@@ -19,27 +19,29 @@ const pool = new Pool({
   port: 5432,
 });
 
+// check account email + password combination, used for api login route.
 const checkAccount = async (email, password_plaintext) => {
   const res = await pool.query("SELECT * FROM users WHERE email = $1", [email]);
   if (res.rows.length === 0) return false;
   const db_hash = res.rows[0].password_hash;
 
-  const valid = await bcrypt.compare(password_plaintext, db_hash);
+  const valid = await bcrypt.compare(password_plaintext, db_hash); // compare password with hash to ensure valid
   return valid;
 };
 
 app.post("/api/login", async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password } = req.body; // get args
 
   if (await checkAccount(email, password)) {
     const token = jwt.sign({ email: email }, "secret_key", { expiresIn: "1h" });
     res.cookie("token", token, { httpOnly: true, secure: false }); // secure = true in production
     res.json({ message: "Login successful", token: token, email: email });
   } else {
-    res.status(401).json({ message: "Invalid credentials" });
+    res.status(401).json({ message: "Invalid credentials" }); // if invalid credentials, response 401 (unauthorised error)
   }
 });
 
+// check-auth route used for checking session token
 app.get("/api/check-auth", (req, res) => {
   const token = req.cookies.token;
   if (!token) {
@@ -53,11 +55,13 @@ app.get("/api/check-auth", (req, res) => {
   }
 });
 
+// logout user -> remove session token
 app.get("/api/logout", (req, res) => {
   res.clearCookie("token");
   res.json({ message: "Logout successful" });
 });
 
+// get all modules from database.
 app.get("/api/modules", async (req, res) => {
   try {
     const result = await pool.query("SELECT * FROM modules");
@@ -84,6 +88,7 @@ app.get("/api/modules", async (req, res) => {
 //     }
 // })
 
+// get offerings from database by year id
 app.get("/api/module_offerings/:year_id", async (req, res) => {
   try {
     const result = await pool.query(
@@ -109,6 +114,7 @@ app.get("/api/module_offerings/:year_id", async (req, res) => {
   }
 });
 
+// get offerings by code AND year (should return 1)
 app.get("/api/module_offerings/:code/year_id/:year_id", async (req, res) => {
   try {
     const result = await pool.query(
@@ -133,6 +139,7 @@ app.get("/api/module_offerings/:code/year_id/:year_id", async (req, res) => {
   }
 });
 
+// get offerings by module id and year id (should return 1 offering)
 app.get(
   "/api/assignments/module_id/:module_id/year_id/:year_id",
   async (req, res) => {
@@ -162,6 +169,7 @@ app.get(
   },
 );
 
+// select all active (not deleted) staff
 app.get("/api/staff", async (req, res) => {
   try {
     const result = await pool.query(`SELECT * FROM users WHERE active = TRUE`);
@@ -172,6 +180,7 @@ app.get("/api/staff", async (req, res) => {
   }
 });
 
+// select specific staff member with user_id passed.
 app.get("/api/staff/user_id/:user_id", async (req, res) => {
   try {
     const result = await pool.query(
@@ -191,6 +200,7 @@ app.get("/api/staff/user_id/:user_id", async (req, res) => {
   }
 });
 
+// select specific staff by email address
 app.get("/api/staff/email/:email", async (req, res) => {
   try {
     const result = await pool.query(
@@ -207,6 +217,7 @@ app.get("/api/staff/email/:email", async (req, res) => {
   }
 });
 
+// select staff assignments by year id (all staff)
 app.get("/api/assignments/year_id/:year_id", async (req, res) => {
   try {
     const result = await pool.query(
@@ -232,6 +243,7 @@ app.get("/api/assignments/year_id/:year_id", async (req, res) => {
   }
 });
 
+// get assignments of offerings for a specific year for a specific user
 app.get(
   "/api/assignments/user_id/:user_id/year_id/:year_id",
   async (req, res) => {
@@ -261,6 +273,7 @@ app.get(
   },
 );
 
+// get list of all academic years in system
 app.get("/api/academic_years", async (req, res) => {
   try {
     const result = await pool.query(
@@ -278,6 +291,7 @@ app.get("/api/academic_years", async (req, res) => {
 
 //   `/api/formula/by_offering_id/${offering_id.toString()}`,
 
+// get defined custom formula for an offering id on specific user (assignment)
 app.get(
   "/api/formula/by_offering_id/:offering_id/user_id/:user_id",
   async (req, res) => {
@@ -305,6 +319,7 @@ app.get(
   },
 );
 
+// select modules not assigned to a user in a specific year
 app.get("/api/modules/not_assigned_to/:year_id", async (req, res) => {
   try {
     const result = await pool.query(
@@ -332,6 +347,7 @@ app.get("/api/modules/not_assigned_to/:year_id", async (req, res) => {
   }
 });
 
+// select staff not assigned to a specific module offering (year specific)
 //       `/api/staff/not_assigned_to/${offering_id.toString()}`,
 app.get("/api/staff/not_assigned_to/:offering_id", async (req, res) => {
   try {
@@ -361,6 +377,7 @@ app.get("/api/staff/not_assigned_to/:offering_id", async (req, res) => {
   }
 });
 
+// POST commit edited deleted, edited and created module data.
 app.post("/api/modules/commit", async (req, res) => {
   const { deleted, edited, created } = req.body;
   const client = await pool.connect();
@@ -415,6 +432,7 @@ app.post("/api/modules/commit", async (req, res) => {
   }
 });
 
+// POST commit deleted, edited and created offerings for modules on specified year.
 app.post("/api/module_offerings/commit", async (req, res) => {
   const { deleted, edited, created, year_id } = req.body;
   const client = await pool.connect();
@@ -455,6 +473,7 @@ app.post("/api/module_offerings/commit", async (req, res) => {
   }
 });
 
+//  update existing module offering (with specified id) with specified values
 app.post("/api/module_offerings/commit-details", async (req, res) => {
   const {
     offering_id,
@@ -495,8 +514,8 @@ app.post("/api/module_offerings/commit-details", async (req, res) => {
   }
 });
 
+// POST commit changes to: deleted, edited and created assignments.
 //     const response = await api.post("/api/staff_assignments/commit", {
-
 app.post("/api/staff_assignments/commit", async (req, res) => {
   const { deleted, edited, created } = req.body;
   const client = await pool.connect();
@@ -565,6 +584,7 @@ app.post("/api/staff_assignments/commit", async (req, res) => {
   }
 });
 
+// POST commit staff assignment formula changes.
 app.post("/api/staff_assignments/commit-formula", async (req, res) => {
   const { deleted, edited, created } = req.body;
   const client = await pool.connect();
@@ -595,6 +615,7 @@ app.post("/api/staff_assignments/commit-formula", async (req, res) => {
   }
 });
 
+// POST update user account details including hashing password.
 app.post("/api/staff/commit", async (req, res) => {
   const { staff } = req.body;
   const client = await pool.connect();
@@ -604,6 +625,7 @@ app.post("/api/staff/commit", async (req, res) => {
 
     if (staff.password_hash) {
       if (staff.pw_changed) {
+        // only update password if been changed, since this field/value is empty if not changed.
         await client.query(
           `UPDATE users
                     SET name = $1, email = $2, password_hash = $3,
@@ -612,7 +634,7 @@ app.post("/api/staff/commit", async (req, res) => {
           [
             staff.name,
             staff.email,
-            await bcrypt.hash(staff.password, 10),
+            await bcrypt.hash(staff.password, 10), // hash with 10 salt rounds.
             staff.contract_type,
             staff.contract_hours,
             staff.user_id,
@@ -644,7 +666,7 @@ app.post("/api/staff/commit", async (req, res) => {
           staff.contract_type,
           staff.contract_hours,
           staff.role,
-          await bcrypt.hash(staff.password, 10),
+          await bcrypt.hash(staff.password, 10), // insert hashed + salted password (new user always requires new password)
         ],
       );
     }
@@ -660,6 +682,7 @@ app.post("/api/staff/commit", async (req, res) => {
   }
 });
 
+// delete users with specified id.
 app.post("/api/staff/delete", async (req, res) => {
   const { staff } = req.body;
   const client = await pool.connect();

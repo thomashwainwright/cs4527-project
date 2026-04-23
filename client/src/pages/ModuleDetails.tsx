@@ -208,6 +208,9 @@ export default function ModuleDetails() {
         password: undefined,
         active: true,
         allocation: 0,
+        allocation_admin: 0,
+        allocation_supervision_marking: 0,
+        allocation_teaching: 0,
       }));
 
       return [...arr, ...newEntries];

@@ -12,22 +12,25 @@ export function StaffProvider({ children }: { children: ReactNode }) {
   const [refreshKey, setRefreshKey] = useState<number>(0);
   const { selectedYear } = useAcademicYear();
 
-  const incrementRefreshKey = () => setRefreshKey(refreshKey + 1);
+  const incrementRefreshKey = () => setRefreshKey(refreshKey + 1); // refresh staff data using this function.
 
   useEffect(() => {
+    // fetch staff data to be used for context.
     fetchStaff().then((staff: Staff[]) => {
-      console.log("Fetched staff data.");
       if (!selectedYear) return;
+      // get all staff assignments to calculate total allocation.
       fetchAllStaffAssignments(selectedYear.year_id).then(
         (module_data: CombinedAssignmentType[]) => {
           setStaffData(
             staff.map((s) => {
+              // calculate total allocation for each staff member
               const allocation = Number(
                 100 *
                   Number(
                     module_data
                       .filter((m) => m.user_id === s.user_id)
                       .reduce((sum: number, m: CombinedAssignmentType) => {
+                        // evaluate formula for assignment
                         return (
                           sum +
                           Number(
@@ -42,6 +45,7 @@ export function StaffProvider({ children }: { children: ReactNode }) {
                   ),
               );
 
+              // calculate teaching allocation for each staff member
               const allocation_teaching = Number(
                 100 *
                   Number(
@@ -66,6 +70,7 @@ export function StaffProvider({ children }: { children: ReactNode }) {
                   ),
               );
 
+              // calculate supervision and marking allocation for each staff member
               const allocation_supervision_marking = Number(
                 100 *
                   Number(
@@ -90,6 +95,7 @@ export function StaffProvider({ children }: { children: ReactNode }) {
                   ),
               );
 
+              // calculate administration allocation for each staff member
               const allocation_admin = Number(
                 100 *
                   Number(
@@ -113,6 +119,7 @@ export function StaffProvider({ children }: { children: ReactNode }) {
                   ),
               );
 
+              // add all these allocation data to staff object.
               return {
                 ...s,
                 allocation: Number(allocation.toFixed(2)),

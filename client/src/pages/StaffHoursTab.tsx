@@ -206,14 +206,14 @@ export default function HoursTab({
                           e.currentTarget?.blur();
                           handleFormulaSubmit(
                             assignment,
-                            e.currentTarget.textContent,
+                            e.currentTarget.textContent as string,
                           );
                         }
                       }}
                       onBlur={(e: React.FocusEvent<HTMLTableCellElement>) => {
                         handleFormulaSubmit(
                           assignment,
-                          e.currentTarget.textContent,
+                          e.currentTarget.textContent as string,
                         );
                       }}
                     >

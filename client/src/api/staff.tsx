@@ -1,3 +1,5 @@
+// Class interacts with API for staff data.
+
 import { isAxiosError } from "axios";
 import api from "./axios";
 import type { Staff } from "@/types/staff_type";

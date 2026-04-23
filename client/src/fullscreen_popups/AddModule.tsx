@@ -8,7 +8,7 @@ type ModuleRow = Module & { selected: boolean };
 export default function AddModule({
   onAdd,
 }: {
-  onAdd: (data: Module[] | undefined) => void;
+  onAdd: (data: Module[] | undefined) => void; // passing onAdd function arg gets called when add button is pressed.
 }) {
   const { selectedYear } = useAcademicYear();
   const [data, setData] = useState<ModuleRow[]>();

@@ -22,6 +22,10 @@ export default function AccountDetails() {
     password: undefined,
     pw_changed: false,
     active: true,
+    allocation: 0,
+    allocation_admin: 0,
+    allocation_supervision_marking: 0,
+    allocation_teaching: 0,
   };
 
   const [staff, setStaff] = useState<Staff & { pw_changed: boolean }>(

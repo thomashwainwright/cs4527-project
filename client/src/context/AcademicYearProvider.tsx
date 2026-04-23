@@ -8,6 +8,7 @@ export const AcademicYearProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     if (selectedYear) {
+      // use storage to remember selected academic year for reloads.
       localStorage.setItem("academicYearId", selectedYear.year_id.toString());
       localStorage.setItem("academicYearLabel", selectedYear.label);
     }

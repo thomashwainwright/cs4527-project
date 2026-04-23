@@ -1,3 +1,5 @@
+// Class interacts with API for academic year data.
+
 import api from "./axios";
 
 export const fetchAcademicYears = async () => {

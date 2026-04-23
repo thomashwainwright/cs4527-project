@@ -10,14 +10,15 @@ export function ModuleProvider({ children }: { children: ReactNode }) {
   const [moduleRefreshKey, setRefreshKey] = useState<number>(0);
   const { selectedYear } = useAcademicYear();
 
+  // used to refresh module data.
   const incrementModuleRefreshKey = () => {
-    console.log("inc");
     setRefreshKey(moduleRefreshKey + 1);
   };
 
   useEffect(() => {
     if (!selectedYear) return;
 
+    // get module offerings to be made accessible through this context provider.
     fetchModulesWithOfferings(selectedYear.year_id).then(
       (modules: CombinedModuleType[]) => {
         console.log("Fetched modules with offerings");

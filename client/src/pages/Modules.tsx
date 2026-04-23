@@ -172,21 +172,35 @@ export function Modules() {
     if (!changed) return; // also stops edit: true showing amber bg on unchanged (in reality) rows.
 
     if (editModules) {
-      setData((prev) =>
-        prev?.map((item) =>
+      setData((prev) => {
+        if (!prev) return prev; // handles null + undefined safely
+
+        return prev.map((item) =>
           item.unique_id === module.unique_id
-            ? { ...item, edit: true, code: newCode, name: newName }
+            ? {
+                ...item,
+                edit: true,
+                code: newCode ?? item.code, // ✅ never null
+                name: newName ?? item.name, // ✅ never null
+              }
             : item,
-        ),
-      );
+        );
+      });
     } else {
-      setModuleData((prev) =>
-        prev?.map((item) =>
+      setModuleData((prev) => {
+        if (!prev) return prev;
+
+        return prev.map((item) =>
           item.unique_id === module.unique_id
-            ? { ...item, edit: true, code: newCode, name: newName }
+            ? {
+                ...item,
+                edit: true,
+                code: newCode ?? "",
+                name: newName ?? "",
+              }
             : item,
-        ),
-      );
+        );
+      });
     }
   }
 

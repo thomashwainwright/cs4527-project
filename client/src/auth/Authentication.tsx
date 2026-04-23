@@ -6,11 +6,12 @@ import { AuthContext } from "./authContext";
 import api from "../api/axios";
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  // Define states accessible by using context.
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [userEmail, setUserEmail] = useState(null);
 
-  const navigate = useNavigate();
+  const navigate = useNavigate(); // for changing page url route.
 
   useEffect(() => {
     // Check if user is already authenticated (e.g., by checking cookies)
@@ -18,6 +19,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     api
       .get("/api/check-auth")
       .then((response) => {
+        // successful check (not necessarily authenticated)
         console.log("Authentication status:", response.data.isAuthenticated);
         setIsAuthenticated(response.data.isAuthenticated);
         setUserEmail(response.data.email);
@@ -31,13 +33,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       });
   }, []);
 
+  // used when clicking login button on login page, authenticate details with server.
   const login = async (email: string, password_hash: string) => {
     try {
       const res = await api.post("/api/login", {
         email: email,
         password: password_hash,
       });
-      navigate("/");
+      navigate("/"); // if login success, navigate to app dashboard.
       setIsAuthenticated(true);
       setUserEmail(res.data.email);
     } catch (error) {
@@ -45,9 +48,10 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  // when navbar's logout button is pressed, do this
   const logout = async () => {
     try {
-      await api.get("/api/logout", {});
+      await api.get("/api/logout", {}); // deletes session token data.
       setIsAuthenticated(false);
       navigate("/login");
     } catch (error) {
@@ -55,6 +59,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  // make values accessible to other components.
   return (
     <AuthContext.Provider
       value={{ isAuthenticated, isLoading, login, logout, userEmail }}

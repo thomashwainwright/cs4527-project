@@ -1,3 +1,5 @@
+// Class interacts with API for module data.
+
 import { isAxiosError } from "axios";
 import api from "./axios";
 import type { CombinedModuleType } from "@/types/combined_module_type";

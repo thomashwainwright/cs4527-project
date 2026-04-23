@@ -7,7 +7,9 @@ import { StrictMode } from "react";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
+    {/* Use react router */}
     <BrowserRouter>
+      {/*Use authentication provider context defined*/}
       <AuthProvider>
         <App />
       </AuthProvider>
