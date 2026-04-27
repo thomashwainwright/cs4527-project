@@ -1,15 +1,20 @@
 import { deleteStaff, fetchStaffByEmail, saveStaff } from "@/api/staff";
+import { useStaff } from "@/context/useStaff";
 import Confirm from "@/fullscreen_popups/Confirm";
 import OkDialog from "@/fullscreen_popups/OkDialog";
 import type { Staff } from "@/types/staff_type";
 import Fullscreen from "@/ui_components/Fullscreen";
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate } from "react-router";
+import { useLocation, useNavigate, useOutletContext } from "react-router";
 
 export default function AccountDetails() {
   const email = useLocation().pathname.split("/")[2];
   const new_user = email == "new-user";
   const navigate = useNavigate();
+
+  const { incrementDetailsRefreshKey } = useOutletContext<{
+    incrementDetailsRefreshKey: () => void;
+  }>();
 
   const empty_staff: Staff & { pw_changed: boolean } = {
     name: "",
@@ -34,6 +39,8 @@ export default function AccountDetails() {
   const [confirmPopup, setConfirmPopup] = useState<boolean>(false);
   const [saveConfirmation, setSaveConfirmation] = useState<string>("");
   const [refreshKey, setRefreshKey] = useState<number>(0);
+
+  const { incrementRefreshKey } = useStaff();
 
   useEffect(() => {
     if (new_user) return;
@@ -81,6 +88,8 @@ export default function AccountDetails() {
       .then(() => {
         navigate(`/staff/${staff.email}/account_details`);
         setSaveConfirmation("Changes saved.");
+        incrementRefreshKey();
+        incrementDetailsRefreshKey();
       })
       .catch(() => {
         setSaveConfirmation("Error saving changes.");

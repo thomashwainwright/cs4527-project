@@ -7,6 +7,7 @@ export default function Login() {
 
   const { login } = useAuth();
 
+  // handle form submit
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     await login(email, password);
@@ -14,10 +15,12 @@ export default function Login() {
 
   return (
     <div className="w-full min-h-screen bg-gray-800 flex items-center justify-center p-8">
+      {/* login card */}
       <div className="w-full max-w-75 min-h-25 aspect-3/4 bg-white rounded-2xl p-8 flex flex-col items-center justify-center gap-8">
         <h1 className="text-3xl cursor-default">Sign in</h1>
 
         <form className="flex flex-col w-full h-full" onSubmit={handleSubmit}>
+          {/* email input */}
           <label className="text-xs" htmlFor="email">
             Email
           </label>
@@ -28,9 +31,10 @@ export default function Login() {
             type="email"
             onChange={(e) => setEmail(e.target.value)}
           />
+
+          {/* password input */}
           <label className="text-xs" htmlFor="password">
-            {" "}
-            Password{" "}
+            Password
           </label>
           <input
             id="password"
@@ -39,6 +43,8 @@ export default function Login() {
             type="password"
             onChange={(e) => setPassword(e.target.value)}
           />
+
+          {/* submit button */}
           <button
             className="bg-blue-500 text-white rounded-md p-2 mt-auto hover:bg-blue-800 cursor-pointer"
             type="submit"

@@ -8,6 +8,7 @@ export const ModuleContext = createContext<ModuleContextType | undefined>(
 export const useModules = () => {
   const context = useContext(ModuleContext);
   if (!context) {
+    // if app not wrapped in provider, error.
     throw new Error("useStaff must be used within StaffProvider");
   }
   return context;

@@ -11,17 +11,21 @@ export default function Confirm({
 }) {
   return (
     <>
+      {/* content passed into the confirm (e.g. message) */}
       <div>{children}</div>
+
+      {/* action buttons */}
       <div className="flex items-center justify-center gap-12 mt-4">
         <button
           className="border border-gray-200 rounded-md px-4 py-2 cursor-pointer text-gray text-xl text-gray-700 hover:bg-gray-200"
-          onClick={onYes}
+          onClick={onYes} // confirm action
         >
           Yes
         </button>
+
         <button
           className="border border-gray-200 rounded-md px-4 py-2 cursor-pointer text-gray text-xl text-gray-700 hover:bg-gray-200"
-          onClick={onNo}
+          onClick={onNo} // cancel action
         >
           No
         </button>

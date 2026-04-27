@@ -2,7 +2,7 @@ import { default_formula } from "@/lib/default_formula";
 import evaluateFormula from "@/lib/formula";
 import type { CombinedAssignmentType } from "@/types/combined_assignment_type";
 import type { Staff } from "@/types/staff_type";
-import DoughnutChart from "@/ui_components/DoughutChart";
+import DoughnutChart from "@/ui_components/DoughnutChart";
 import type { ChartData } from "chart.js";
 import { useOutletContext } from "react-router";
 

@@ -16,6 +16,7 @@ export default function LoadFormulaPopup({
   const [academicYears, setAcademicYears] =
     useState<(AcademicYear & { custom_formula: string })[]>();
 
+  // fetch formulas from other years
   useEffect(() => {
     if (!offering_id || !user_id) return;
 
@@ -26,10 +27,13 @@ export default function LoadFormulaPopup({
 
   return (
     <div className="p-4">
+      {/* title */}
       <div className="text-2xl mb-4">
         Load formula from other year for {code}
       </div>
-      <table className="">
+
+      {/* list of years */}
+      <table>
         <thead>
           <tr>
             <td className="p-2">
@@ -40,17 +44,25 @@ export default function LoadFormulaPopup({
             </td>
           </tr>
         </thead>
+
         <tbody>
+          {/* clickable rows to load a formula */}
           {academicYears?.map((year) => (
             <tr
-              onClick={() => loadFormula(year)}
+              onClick={() => loadFormula(year)} // select this year
               className="hover:bg-gray-200 hover:cursor-pointer"
             >
               <td className="p-2">{year.label}</td>
               <td className="p-2">{year.custom_formula ?? "None"}</td>
             </tr>
           ))}
-          {academicYears?.length == 0 && <div>No data</div>}
+
+          {/* fallback if no data */}
+          {academicYears?.length == 0 && (
+            <tr>
+              <td>No data</td>
+            </tr>
+          )}
         </tbody>
       </table>
     </div>

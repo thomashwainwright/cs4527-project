@@ -4,7 +4,7 @@ import type { Problem } from "@/types/problem_type";
 import { useState, type ChangeEvent } from "react";
 import { useModules } from "@/context/useModules";
 import { useNavigate } from "react-router-dom";
-import DoughnutChart from "@/ui_components/DoughutChart";
+import DoughnutChart from "@/ui_components/DoughnutChart";
 import type { ChartData } from "chart.js";
 
 export function Dashboard() {
@@ -14,6 +14,7 @@ export function Dashboard() {
 
   const [problemTolerance, setProblemTolerance] = useState<number>(5);
 
+  // avg staff allocation
   function getStaffAllocation() {
     const totalAllocation = staffData?.filter(
       (member) => member.role == "teaching",
@@ -25,9 +26,12 @@ export function Dashboard() {
     return totalAllocation;
   }
 
+  // avg module allocation (excluding individual modules)
   function getModuleAllocation() {
     if (!moduleData) return 0;
+
     const nonIndividualData = moduleData.filter((module) => !module.individual);
+
     const totalAllocation = nonIndividualData.reduce(
       (sum, module) => sum + Number(module.allocation) || 0,
       0,
@@ -36,34 +40,36 @@ export function Dashboard() {
     return (100 * totalAllocation) / nonIndividualData.length;
   }
 
+  // build list of problems based on tolerance
   function getProblems() {
     const problemList: Problem[] = [];
 
     if (!staffData || !moduleData) return;
 
+    // check staff
     for (const staffMember of staffData) {
       if (
-        staffMember.allocation != undefined && // if not yet loaded, skip
-        Math.abs(staffMember.allocation - 100) > problemTolerance && // is the allocation within tolerance%?
-        staffMember.role == "teaching" // only applies to teaching roles, not admin
+        staffMember.allocation != undefined &&
+        Math.abs(staffMember.allocation - 100) > problemTolerance &&
+        staffMember.role == "teaching"
       ) {
         const currentProblem: Problem = {
-          type: "Staff", // type of problem
+          type: "Staff",
           subject: staffMember.name ?? "unknown",
-          // work out the problem description
           description:
             staffMember.allocation == 0
               ? "No allocation"
               : staffMember.allocation > 100
                 ? "Over-allocated"
                 : "Under-allocated",
-          url: `staff/${staffMember.email}`, // navigate here upon click
+          url: `staff/${staffMember.email}`,
         };
 
-        problemList.push(currentProblem); // add to problems list
+        problemList.push(currentProblem);
       }
     }
 
+    // check modules
     for (const module of moduleData) {
       if (
         module.allocation != undefined &&
@@ -89,10 +95,12 @@ export function Dashboard() {
     return problemList;
   }
 
+  // go to clicked problem
   function navigateProblem(problem: Problem): void {
     navigate(problem.url);
   }
 
+  // build doughnut chart data
   function getWorkloadByType() {
     if (!staffData || staffData.length === 0) {
       return {
@@ -110,6 +118,7 @@ export function Dashboard() {
     let supervisionMarking = 0;
     let admin = 0;
 
+    // sum workload by type
     staffData.forEach((member) => {
       teaching += member.allocation_teaching || 0;
       supervisionMarking += member.allocation_supervision_marking || 0;
@@ -124,11 +133,7 @@ export function Dashboard() {
         {
           label: "Time Allocation (hours)",
           data: chartData,
-          backgroundColor: [
-            "#60A5FA", // blue
-            "#34D399", // green
-            "#F87171", // red
-          ],
+          backgroundColor: ["#60A5FA", "#34D399", "#F87171"],
           borderWidth: 1,
         },
       ],
@@ -140,18 +145,24 @@ export function Dashboard() {
   return (
     <div className="flex flex-col h-screen md:p-12 text-xl min-h-0 w-full">
       <PageTitle>Dashboard</PageTitle>
+
       <div className="flex-1 flex flex-col-reverse md:flex-row min-h-0 overflow-y-auto gap-8">
+        {/* left side */}
         <div className="md:w-1/2 min-h-full flex flex-col">
           <div>
-            {/* Basic Stats */}
+            {/* basic stats */}
             Total Staff Allocation: {getStaffAllocation().toFixed(1)}% <br />
             Non-Individual Module Allocation: {getModuleAllocation().toFixed(1)}
             %
           </div>
+
           <div className="flex flex-col gap-4 flex-1 min-h-0">
+            {/* problems header + tolerance input */}
             <div className="flex gap-4 items-center h-16">
               <strong>Problems</strong>
+
               <p className="ml-auto">Tolerance</p>
+
               <div className="flex items-center gap-1">
                 <input
                   className="border border-gray-500 rounded p-2 w-20"
@@ -165,18 +176,17 @@ export function Dashboard() {
               </div>
             </div>
 
+            {/* problems table */}
             <div className="flex-1 min-h-0 overflow-auto">
               <table className="text-xl">
                 <thead>
                   <tr>
                     <th className="px-4 py-2 border">Type</th>
-                    {/* Staff/module */}
-                    <th className="px-4 py-2 border">Subject</th>{" "}
-                    {/* Subject staff/module name */}
-                    <th className="px-4 py-2 border">Description</th>{" "}
-                    {/* Over/underallocated? */}
+                    <th className="px-4 py-2 border">Subject</th>
+                    <th className="px-4 py-2 border">Description</th>
                   </tr>
                 </thead>
+
                 <tbody>
                   {getProblems()?.map((problem: Problem) => (
                     <tr
@@ -195,6 +205,8 @@ export function Dashboard() {
             </div>
           </div>
         </div>
+
+        {/* right side chart */}
         <div className="flex flex-1 items-center justify-center w-auto">
           <DoughnutChart
             data={getWorkloadByType()}

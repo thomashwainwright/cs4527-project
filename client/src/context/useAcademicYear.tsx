@@ -8,6 +8,8 @@ export const AcademicYearContext = createContext<
 export const useAcademicYear = () => {
   const context = useContext(AcademicYearContext);
   if (!context) {
+    // if app not wrapped in provider, error.
+
     throw new Error("useAcademicYear must be used within AcademicYearProvider");
   }
   return context;

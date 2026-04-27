@@ -20,6 +20,8 @@ export default function StaffDetails() {
 
   const [data, setData] = useState<CombinedAssignmentType[]>([]);
 
+  const [refreshKey, setRefreshKey] = useState<number>(0);
+
   useEffect(() => {
     if (new_user) return;
 
@@ -56,7 +58,9 @@ export default function StaffDetails() {
         },
       );
     });
-  }, [email, new_user, selectedYear]);
+  }, [email, new_user, selectedYear, refreshKey]);
+
+  const incrementDetailsRefreshKey = () => setRefreshKey(refreshKey + 1);
 
   return (
     <div className="p-12">
@@ -83,7 +87,9 @@ export default function StaffDetails() {
         </div>
       </div>
 
-      <Outlet context={{ data, setData, staff, setStaff }} />
+      <Outlet
+        context={{ data, setData, staff, setStaff, incrementDetailsRefreshKey }}
+      />
     </div>
   );
 }

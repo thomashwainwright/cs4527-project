@@ -49,7 +49,7 @@ describe("Login component", () => {
 
     form.onsubmit = preventDefault;
 
-    await user.click(screen.getByRole("button"));
+    await user.click(screen.getByRole("button", { name: /sign in/i }));
 
     expect(loginMock).toHaveBeenCalled();
   });
