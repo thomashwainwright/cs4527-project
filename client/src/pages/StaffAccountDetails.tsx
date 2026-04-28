@@ -5,7 +5,7 @@ import OkDialog from "@/fullscreen_popups/OkDialog";
 import type { Staff } from "@/types/staff_type";
 import Fullscreen from "@/ui_components/Fullscreen";
 import { useEffect, useState } from "react";
-import { useLocation, useNavigate, useOutletContext } from "react-router";
+import { useLocation, useNavigate, useOutletContext } from "react-router-dom";
 
 export default function AccountDetails() {
   const email = useLocation().pathname.split("/")[2];
@@ -86,7 +86,7 @@ export default function AccountDetails() {
 
     saveStaff(staff)
       .then(() => {
-        navigate(`/staff/${staff.email}/account_details`);
+        navigate(`/staff/${staff.email}/account_details`, { replace: true });
         setSaveConfirmation("Changes saved.");
         incrementRefreshKey();
         incrementDetailsRefreshKey();
