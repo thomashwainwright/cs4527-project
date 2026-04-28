@@ -53,7 +53,6 @@ export function Modules() {
     // if (!selectedYear) {
     //   return;
     // }
-
     // If in editing mode, fetch all modules. Else, fetch only with offerings in current context academic year.
     if (editModules) {
       fetchModules().then((modules: CombinedModuleType[]) => {
@@ -67,8 +66,7 @@ export function Modules() {
         );
       });
     } else {
-      incrementModuleRefreshKey();
-
+      // incrementModuleRefreshKey();
       // fetchModulesWithOfferings(selectedYear?.year_id).then(
       //   (modules: CombinedModuleType[]) => {
       //     console.log("Fetched modules with offerings");
@@ -85,7 +83,7 @@ export function Modules() {
       // );
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [editModules]);
+  }, [editModules, refreshKey]);
 
   function getFilteredData() {
     const temp_data = editModules ? data : moduleData;
@@ -120,25 +118,47 @@ export function Modules() {
 
   function markDel(module: CombinedModuleType, value: boolean) {
     console.log("marking del");
-    setModuleData((prev) => {
-      if (!prev) return null;
+    if (editModules) {
+      setData((prev) => {
+        if (!prev) return null;
 
-      return prev
-        .filter(
-          (item) =>
-            !(
-              item.unique_id === module.unique_id &&
-              typeof item.new === "number"
-            ),
-        )
-        .map((item) =>
-          item.unique_id === module.unique_id ? { ...item, del: value } : item,
-        );
-    });
+        return prev
+          .filter(
+            (item) =>
+              !(
+                item.unique_id === module.unique_id &&
+                typeof item.new === "number"
+              ),
+          )
+          .map((item) =>
+            item.unique_id === module.unique_id
+              ? { ...item, del: value }
+              : item,
+          );
+      });
+    } else {
+      setModuleData((prev) => {
+        if (!prev) return null;
+
+        return prev
+          .filter(
+            (item) =>
+              !(
+                item.unique_id === module.unique_id &&
+                typeof item.new === "number"
+              ),
+          )
+          .map((item) =>
+            item.unique_id === module.unique_id
+              ? { ...item, del: value }
+              : item,
+          );
+      });
+    }
   }
 
   function addModule() {
-    setModuleData((prev) => {
+    setData((prev) => {
       const arr = prev ?? [];
 
       const maxId = arr.reduce(
@@ -180,8 +200,8 @@ export function Modules() {
             ? {
                 ...item,
                 edit: true,
-                code: newCode ?? item.code, // ✅ never null
-                name: newName ?? item.name, // ✅ never null
+                code: newCode ?? item.code,
+                name: newName ?? item.name,
               }
             : item,
         );
@@ -205,17 +225,12 @@ export function Modules() {
   }
 
   function saveData() {
-    const deletedData = moduleData?.filter((item) => item.del); // only update table with data that has been modified.
-    const editedData = moduleData?.filter(
-      (item) => item.edit && item.new == undefined && !item.del,
-    );
-    const newData = moduleData?.filter((item) => item.new);
-
-    // console.log(editedData)
-    // console.log(newData)
-    // console.log(deletedData)
-
     if (editModules) {
+      const deletedData = data?.filter((item) => item.del); // only update table with data that has been modified.
+      const editedData = data?.filter(
+        (item) => item.edit && item.new == undefined && !item.del,
+      );
+      const newData = data?.filter((item) => item.new);
       // editModules => data is module, to update the "modules" table.
       let err = false;
       [...(newData ?? []), ...(editedData ?? [])]?.forEach((item) => {
@@ -237,6 +252,11 @@ export function Modules() {
             setSaveConfirmation("Error saving changes.");
           });
     } else {
+      const deletedData = moduleData?.filter((item) => item.del); // only update table with data that has been modified.
+      const editedData = moduleData?.filter(
+        (item) => item.edit && item.new == undefined && !item.del,
+      );
+      const newData = moduleData?.filter((item) => item.new);
       // !editModules => data is module offering, to update "module_offerings" table. This represents assignments of a module to a specific year.
       if (!selectedYear) return;
       commitModuleOfferingChanges(
@@ -248,11 +268,8 @@ export function Modules() {
         .then(() => setRefreshKey(refreshKey + 1))
         .then(() => {
           setSaveConfirmation("Saved changes.");
-
           incrementRefreshKey();
           incrementModuleRefreshKey();
-
-          console.log("dd");
         })
         .catch(() => {
           setSaveConfirmation("Error saving changes.");
@@ -285,7 +302,7 @@ export function Modules() {
       };
     });
 
-    setData((prev) => [...(prev || []), ...converted_modules]);
+    setModuleData((prev) => [...(prev || []), ...converted_modules]);
   }
 
   return (

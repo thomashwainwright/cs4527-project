@@ -100,6 +100,7 @@ export default function AccountDetails() {
     setConfirmPopup(false);
     deleteStaff(staff).then(() => {
       setRefreshKey(refreshKey + 1);
+      incrementRefreshKey();
       navigate("/staff");
     });
   }
@@ -204,12 +205,15 @@ export default function AccountDetails() {
           >
             Delete user
           </button>
-          <Fullscreen open={confirmPopup} className="w-1/7 h-1/8">
+          <Fullscreen open={confirmPopup} className="w-1/5 h-1/6">
             <Confirm
               onYes={deleteStaffData}
               onNo={() => setConfirmPopup(false)}
             >
               Are you sure you want to delete user: {staff.name}?
+              <br />
+              Module assignments for {staff.name} will remain active unless
+              manually deleted.
             </Confirm>
           </Fullscreen>
           <button

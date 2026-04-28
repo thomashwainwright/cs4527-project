@@ -5,19 +5,19 @@ const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 const bcrypt = require("bcryptjs");
 
-import { pool } from "./db";
+const { Pool } = require("pg");
 
 app.use(cookieParser());
 app.use(cors({ origin: "http://localhost:5173", credentials: true }));
 app.use(express.json());
 
-// const pool = new Pool({
-//   user: "postgres",
-//   host: "localhost",
-//   database: "workload_manager",
-//   password: "password",
-//   port: 5432,
-// });
+const pool = new Pool({
+  user: "postgres",
+  host: "localhost",
+  database: "workload_manager",
+  password: "password",
+  port: 5432,
+});
 
 // check account email + password combination, used for api login route.
 const checkAccount = async (email, password_plaintext) => {
@@ -156,8 +156,7 @@ app.get(
              JOIN module_offerings
                 ON staff_assignments.offering_id = module_offerings.offering_id
              WHERE module_offerings.module_id = $1
-             AND module_offerings.year_id = $2
-             AND users.active = TRUE`,
+             AND module_offerings.year_id = $2`,
         [Number(req.params.module_id), Number(req.params.year_id)],
       );
 
@@ -714,5 +713,5 @@ app.post("/api/staff/delete", async (req, res) => {
 
 // module.exports = pool;
 
-// module.exports = app;
-export default app;
+module.exports = app;
+// export default app;

@@ -9,7 +9,7 @@ import {
 } from "../api/modules";
 import PageTitle from "../ui_components/PageTitle";
 import type { Assignment } from "@/types/assignment_type";
-import { fetchStaffByUserId } from "@/api/staff";
+// import { fetchStaffByUserId } from "@/api/staff";
 import type { ModuleOffering } from "@/types/module_offering_type";
 import { useAcademicYear } from "@/context/useAcademicYear";
 import type { Staff } from "@/types/staff_type";
@@ -35,7 +35,11 @@ export default function ModuleDetails() {
   const [refreshKey, setRefreshKey] = useState<number>(0);
   const [moduleNotFound, setModuleNotFound] = useState<boolean>(false);
   const [saveConfirmation, setSaveConfirmation] = useState<string>("");
-  const { incrementRefreshKey } = useStaff();
+  const { staffData, incrementRefreshKey } = useStaff();
+  const [
+    fullscreenUserDoesNotExistDiolog,
+    setFullscreenUserDoesNotExistDiolog,
+  ] = useState<boolean>(false);
 
   const navigate = useNavigate();
   const { selectedYear } = useAcademicYear();
@@ -59,10 +63,18 @@ export default function ModuleDetails() {
   );
 
   const handleRowClick = (user_id: number | undefined) => {
-    if (!user_id) return;
-    fetchStaffByUserId(user_id).then((staff) => {
-      navigate(`/staff/${staff.email}`);
-    });
+    if (!user_id || !staffData) return;
+
+    // does staff/user exist?
+    const staffMember = staffData.find((s) => s.user_id === user_id);
+    if (staffMember) {
+      // fetchStaffByUserId(user_id).then((staff) => {
+      //   navigate(`/staff/${staff.email}`);
+      // });
+      navigate(`/staff/${staffMember.email}`);
+    } else {
+      setFullscreenUserDoesNotExistDiolog(true);
+    }
   };
 
   useEffect(() => {
@@ -529,6 +541,18 @@ export default function ModuleDetails() {
                       )}
                     </div>
                   </div>
+                  {
+                    <Fullscreen
+                      open={fullscreenUserDoesNotExistDiolog}
+                      onClose={() => setFullscreenUserDoesNotExistDiolog(false)}
+                    >
+                      <OkDialog
+                        onOk={() => setFullscreenUserDoesNotExistDiolog(false)}
+                      >
+                        That user no longer exists in the system.
+                      </OkDialog>
+                    </Fullscreen>
+                  }
                   <table className="min-w-full mt-8 text-xl">
                     <thead>
                       <tr>

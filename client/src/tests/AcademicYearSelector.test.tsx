@@ -10,7 +10,6 @@ const mockYears = [
   { year_id: 3, label: "2025/26" },
 ];
 
-// ✅ control this instead of reassigning import
 const useAcademicYearMock = vi.fn();
 const setSelectedYearMock = vi.fn();
 
