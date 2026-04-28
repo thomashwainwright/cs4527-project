@@ -12,7 +12,7 @@ export function StaffProvider({ children }: { children: ReactNode }) {
   const [refreshKey, setRefreshKey] = useState<number>(0);
   const { selectedYear } = useAcademicYear();
 
-  const incrementRefreshKey = () => setRefreshKey(refreshKey + 1); // refresh staff data using this function.
+  const incrementRefreshKey = () => setRefreshKey((prev) => prev + 1);
 
   useEffect(() => {
     // fetch staff data to be used for context.
