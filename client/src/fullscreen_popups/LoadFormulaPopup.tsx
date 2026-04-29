@@ -47,15 +47,21 @@ export default function LoadFormulaPopup({
 
         <tbody>
           {/* clickable rows to load a formula */}
-          {academicYears?.map((year) => (
-            <tr
-              onClick={() => loadFormula(year)} // select this year
-              className="hover:bg-gray-200 hover:cursor-pointer"
-            >
-              <td className="p-2">{year.label}</td>
-              <td className="p-2">{year.custom_formula ?? "None"}</td>
-            </tr>
-          ))}
+          {academicYears
+            ?.sort((a, b) => {
+              const getYear = (label: string) => Number(label.slice(-2)) || 0;
+
+              return getYear(b.label) - getYear(a.label);
+            })
+            .map((year) => (
+              <tr
+                onClick={() => loadFormula(year)} // select this year
+                className="hover:bg-gray-200 hover:cursor-pointer"
+              >
+                <td className="p-2">{year.label}</td>
+                <td className="p-2">{year.custom_formula ?? "None"}</td>
+              </tr>
+            ))}
 
           {/* fallback if no data */}
           {academicYears?.length == 0 && (
