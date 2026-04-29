@@ -173,7 +173,10 @@ export default function HoursTab({
                 .map((assignment: CombinedAssignmentType) => (
                   <tr
                     key={assignment.assignment_id}
-                    className="clickable-row hover:bg-gray-100 cursor-pointer group"
+                    className={
+                      "clickable-row hover:bg-gray-100 group " +
+                      (role != "teaching" ? "cursor-pointer" : "")
+                    }
                     onClick={() => handleRowClick(assignment.code)}
                   >
                     <td className="px-4 py-2 border">{assignment.code}</td>
@@ -265,7 +268,6 @@ export default function HoursTab({
                 ))
             }
             <tr>
-              {" "}
               {/* Display hours total TODO */}
               {Array.from({ length: numberOfColumns - 1 }).map((_, i) => (
                 <td key={i} />
