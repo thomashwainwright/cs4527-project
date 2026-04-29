@@ -40,7 +40,7 @@ function App() {
             <Routes>
               <Route path="login" element={<Login />} />
               {/* protect routes that require user authentication */}
-              <Route element={<ProtectedRoute />}>
+              <Route element={<ProtectedRoute allowed={["user"]} />}>
                 {/* add navigation bar to every page */}
                 <Route element={<NavLayout />}>
                   {/* Place dashboard at index (/)}*/}
@@ -48,6 +48,12 @@ function App() {
                   <Route path="modules" element={<Modules />} />
                   <Route path="modules/:code" element={<ModuleDetails />} />
                   <Route path="staff" element={<Staff />} />
+                </Route>
+              </Route>
+              <Route
+                element={<ProtectedRoute allowed={["user", "teaching"]} />}
+              >
+                <Route element={<NavLayout />}>
                   <Route path="staff/:email" element={<StaffDetails />}>
                     <Route index element={<StaffOverview />} />
                     <Route

@@ -6,7 +6,7 @@ import ModuleIcon from "../assets/icons/module-tab.svg";
 import StaffIcon from "../assets/icons/staff-tab.svg";
 
 export default function NavBar() {
-  const { logout, userEmail } = useAuth();
+  const { logout, userEmail, role } = useAuth();
 
   const handleLogout = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -21,18 +21,29 @@ export default function NavBar() {
       </h1>
 
       {/* Page routing */}
-      <NavButton route="/">
-        <img src={DashboardIcon} className="w-8 h-8 md:mr-2" />
-        <p className="hidden md:block">Dashboard</p>
-      </NavButton>
-      <NavButton route="/modules">
-        <img src={ModuleIcon} className="w-8 h-8 md:mr-2" />
-        <p className="hidden md:block">Modules</p>
-      </NavButton>
-      <NavButton route="/staff">
-        <img src={StaffIcon} className="w-8 h-8 md:mr-2" />
-        <p className="hidden md:block">Staff</p>
-      </NavButton>
+      {role == "user" && (
+        <>
+          <NavButton route="/">
+            <img src={DashboardIcon} className="w-8 h-8 md:mr-2" />
+            <p className="hidden md:block">Dashboard</p>
+          </NavButton>
+          <NavButton route="/modules">
+            <img src={ModuleIcon} className="w-8 h-8 md:mr-2" />
+            <p className="hidden md:block">Modules</p>
+          </NavButton>
+          <NavButton route="/staff">
+            <img src={StaffIcon} className="w-8 h-8 md:mr-2" />
+            <p className="hidden md:block">Staff</p>
+          </NavButton>
+        </>
+      )}
+
+      {role == "teaching" && (
+        <NavButton route={`/staff/${userEmail}`}>
+          <img src={StaffIcon} className="w-8 h-8 md:mr-2" />
+          <p className="hidden md:block">My Workload</p>
+        </NavButton>
+      )}
 
       {/* User / log out section */}
       <div className="mt-auto flex flex-row items-center gap-4">

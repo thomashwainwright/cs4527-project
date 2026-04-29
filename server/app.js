@@ -26,16 +26,27 @@ const checkAccount = async (email, password_plaintext) => {
   const db_hash = res.rows[0].password_hash;
 
   const valid = await bcrypt.compare(password_plaintext, db_hash); // compare password with hash to ensure valid
-  return valid;
+
+  return {
+    valid: valid,
+    role: res.rows[0].role,
+  };
 };
 
 app.post("/api/login", async (req, res) => {
   const { email, password } = req.body; // get args
-
-  if (await checkAccount(email, password)) {
-    const token = jwt.sign({ email: email }, "secret_key", { expiresIn: "1h" });
+  const { valid, role } = await checkAccount(email, password);
+  if (valid) {
+    const token = jwt.sign({ email: email, role: role }, "secret_key", {
+      expiresIn: "1h",
+    });
     res.cookie("token", token, { httpOnly: true, secure: false }); // secure = true in production
-    res.json({ message: "Login successful", token: token, email: email });
+    res.json({
+      message: "Login successful",
+      token: token,
+      email: email,
+      role: role,
+    });
   } else {
     res.status(401).json({ message: "Invalid credentials" }); // if invalid credentials, response 401 (unauthorised error)
   }
@@ -49,7 +60,11 @@ app.get("/api/check-auth", (req, res) => {
   }
   try {
     const decoded = jwt.verify(token, "secret_key");
-    res.json({ isAuthenticated: true, email: decoded.email });
+    res.json({
+      isAuthenticated: true,
+      email: decoded.email,
+      role: decoded.role,
+    });
   } catch (error) {
     res.json({ isAuthenticated: false });
   }

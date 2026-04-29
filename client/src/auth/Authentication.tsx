@@ -10,11 +10,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [userEmail, setUserEmail] = useState(null);
+  const [role, setRole] = useState(null);
 
   const navigate = useNavigate(); // for changing page url route.
 
   useEffect(() => {
-    // Check if user is already authenticated (e.g., by checking cookies)
+    // Check if user is already authenticated (i.e, by checking cookies)
     console.log("Checking authentication status...");
     api
       .get("/api/check-auth")
@@ -23,6 +24,8 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         console.log("Authentication status:", response.data.isAuthenticated);
         setIsAuthenticated(response.data.isAuthenticated);
         setUserEmail(response.data.email);
+        console.log(response.data.role);
+        setRole(response.data.role);
       })
       .catch((error) => {
         console.error("Error checking authentication status:", error);
@@ -40,9 +43,14 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         email: email,
         password: password_hash,
       });
-      navigate("/"); // if login success, navigate to app dashboard.
+      if (role == "user") {
+        navigate("/"); // if login success, navigate to app dashboard.
+      } else if (role == "teaching") {
+        navigate(`/staff/${userEmail}`);
+      }
       setIsAuthenticated(true);
       setUserEmail(res.data.email);
+      setRole(res.data.role);
     } catch (error) {
       console.error("Login failed:", error);
     }
@@ -62,7 +70,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   // make values accessible to other components.
   return (
     <AuthContext.Provider
-      value={{ isAuthenticated, isLoading, login, logout, userEmail }}
+      value={{ isAuthenticated, isLoading, login, logout, userEmail, role }}
     >
       {children}
     </AuthContext.Provider>

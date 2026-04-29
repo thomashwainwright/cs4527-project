@@ -7,6 +7,7 @@ import { useAcademicYear } from "@/context/useAcademicYear";
 import evaluateFormula from "@/lib/formula";
 import type { CombinedAssignmentType } from "@/types/combined_assignment_type";
 import StaffNavButton from "@/ui_components/StaffNavButton";
+import { useAuth } from "@/auth/useAuth";
 
 export default function StaffDetails() {
   const params = useParams();
@@ -17,6 +18,8 @@ export default function StaffDetails() {
   // TODO: temp
   const [staff, setStaff] = useState<Staff | null>(null);
   //
+
+  const { role } = useAuth();
 
   const [data, setData] = useState<CombinedAssignmentType[]>([]);
 
@@ -80,11 +83,13 @@ export default function StaffDetails() {
             </StaffNavButton>
           </>
         )}
-        <div className="ml-auto">
-          <StaffNavButton route={`/staff/${email}/account_details`}>
-            Account Details
-          </StaffNavButton>
-        </div>
+        {role == "user" && (
+          <div className="ml-auto">
+            <StaffNavButton route={`/staff/${email}/account_details`}>
+              Account Details
+            </StaffNavButton>
+          </div>
+        )}
       </div>
 
       <Outlet

@@ -10,6 +10,7 @@ import { default_formula } from "@/lib/default_formula";
 import { commitFormulaChanges } from "@/api/modules";
 import OkDialog from "@/fullscreen_popups/OkDialog";
 import { useStaff } from "@/context/useStaff";
+import { useAuth } from "@/auth/useAuth";
 
 export default function HoursTab({
   tab,
@@ -27,6 +28,7 @@ export default function HoursTab({
   const numberOfColumns =
     tab == "teaching" ? 9 : tab == "supervision_marking" ? 5 : 4;
   const handleRowClick = (code: string) => {
+    if (role == "teaching") return;
     navigate(`/modules/${code}`);
   };
 
@@ -34,6 +36,7 @@ export default function HoursTab({
   const [totalHours, setTotalHours] = useState<number>(0);
   const [saveConfirmation, setSaveConfirmation] = useState<string>("");
   const { incrementRefreshKey } = useStaff();
+  const { role } = useAuth();
 
   useEffect(() => {
     const total = data
@@ -191,9 +194,10 @@ export default function HoursTab({
                           ? "bg-red-200"
                           : "")
                       }
-                      contentEditable
+                      contentEditable={role != "teaching"}
                       suppressContentEditableWarning
                       onClick={(e) => {
+                        if (role == "teaching") return;
                         e.stopPropagation();
                         setFocused(assignment, true);
                       }}
@@ -221,40 +225,42 @@ export default function HoursTab({
                         ? assignment.custom_formula
                         : assignment.hours}
                     </td>
-                    <td className="group-hover:bg-white">
-                      <button
-                        aria-label="Restore from previous year"
-                        title="Restore from previous year"
-                        className="hover:bg-gray-200 ml-2 rounded-lg"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          if (assignment.assignment_id)
-                            setFullscreenOpen(assignment.assignment_id);
-                        }}
-                      >
-                        <img alt="" src={restoreIcon} className="w-10" />
-                      </button>
-                      <Fullscreen
-                        open={fullscreenOpen == assignment.assignment_id}
-                        onClose={() => setFullscreenOpen(-1)}
-                        className="w-1/4 h-1/2"
-                      >
-                        <LoadFormulaPopup
-                          loadFormula={(
-                            year: AcademicYear & { custom_formula: string },
-                          ) => {
-                            setFullscreenOpen(-1);
-                            handleFormulaSubmit(
-                              assignment,
-                              year.custom_formula ?? "",
-                            );
+                    {role != "teaching" && (
+                      <td className="group-hover:bg-white">
+                        <button
+                          aria-label="Restore from previous year"
+                          title="Restore from previous year"
+                          className="hover:bg-gray-200 ml-2 rounded-lg"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (assignment.assignment_id)
+                              setFullscreenOpen(assignment.assignment_id);
                           }}
-                          offering_id={assignment.offering_id}
-                          user_id={assignment.user_id}
-                          code={assignment.code}
-                        />
-                      </Fullscreen>
-                    </td>
+                        >
+                          <img alt="" src={restoreIcon} className="w-10" />
+                        </button>
+                        <Fullscreen
+                          open={fullscreenOpen == assignment.assignment_id}
+                          onClose={() => setFullscreenOpen(-1)}
+                          className="w-1/4 h-1/2"
+                        >
+                          <LoadFormulaPopup
+                            loadFormula={(
+                              year: AcademicYear & { custom_formula: string },
+                            ) => {
+                              setFullscreenOpen(-1);
+                              handleFormulaSubmit(
+                                assignment,
+                                year.custom_formula ?? "",
+                              );
+                            }}
+                            offering_id={assignment.offering_id}
+                            user_id={assignment.user_id}
+                            code={assignment.code}
+                          />
+                        </Fullscreen>
+                      </td>
+                    )}
                   </tr>
                 ))
             }
@@ -275,32 +281,34 @@ export default function HoursTab({
                 {totalHours >= 0 ? totalHours : "ERROR"}
               </td>
             </tr>
-            <tr>
-              {" "}
-              {/* Save formulas button */}
-              {Array.from({ length: numberOfColumns }).map((_, i) => (
-                <td key={i} />
-              ))}
-              <td className="flex pt-2">
-                <button
-                  className={
-                    "ml-auto border border-gray-200 rounded-md px-4 py-2 cursor-pointer text-gray text-xl text-gray-700 hover:bg-gray-200"
-                  }
-                  onClick={saveData}
-                  title="Save changes to modules."
-                >
-                  Save formulas
-                </button>
-                <Fullscreen
-                  open={saveConfirmation != ""}
-                  onClose={() => setSaveConfirmation("")}
-                >
-                  <OkDialog onOk={() => setSaveConfirmation("")}>
-                    {saveConfirmation}
-                  </OkDialog>
-                </Fullscreen>
-              </td>
-            </tr>
+            {!(role == "teaching") && (
+              <tr>
+                {" "}
+                {/* Save formulas button */}
+                {Array.from({ length: numberOfColumns }).map((_, i) => (
+                  <td key={i} />
+                ))}
+                <td className="flex pt-2">
+                  <button
+                    className={
+                      "ml-auto border border-gray-200 rounded-md px-4 py-2 cursor-pointer text-gray text-xl text-gray-700 hover:bg-gray-200"
+                    }
+                    onClick={saveData}
+                    title="Save changes to formulas."
+                  >
+                    Save formulas
+                  </button>
+                  <Fullscreen
+                    open={saveConfirmation != ""}
+                    onClose={() => setSaveConfirmation("")}
+                  >
+                    <OkDialog onOk={() => setSaveConfirmation("")}>
+                      {saveConfirmation}
+                    </OkDialog>
+                  </Fullscreen>
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
