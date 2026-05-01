@@ -1,3 +1,5 @@
+// Component displays and manages modules and module offerings, including filtering, editing, and saving changes.
+
 import { useEffect, useState, type ChangeEvent } from "react";
 import { useNavigate } from "react-router-dom";
 import type { Module } from "../types/module_type";
@@ -19,27 +21,35 @@ import { useModules } from "@/context/useModules";
 export function Modules() {
   const navigate = useNavigate();
 
+  // access shared module data and refresh controls
   const { incrementModuleRefreshKey, moduleData, setModuleData } = useModules();
+
+  // local state for module data when editing all modules
   const [data, setData] = useState<CombinedModuleType[] | null>();
+
+  // filter state for module types and search input
   const [filter, setFilter] = useState({
     teaching: true,
     admin: true,
     supervision_marking: true,
     search: "",
   });
+
+  // UI state controls
   const [editModules, setEditModules] = useState<boolean>(false);
   const [assignModuleWindow, setAssignModuleWindow] = useState<boolean>(false); // window to assign module to academic year => creates offering
   const [refreshKey, setRefreshKey] = useState<number>(0);
   const [saveConfirmation, setSaveConfirmation] = useState<string>("");
 
   const { incrementRefreshKey } = useStaff();
-
   const { selectedYear } = useAcademicYear();
 
+  // navigate to module details page when a row is clicked
   const handleRowClick = (code: string) => {
     navigate(`/modules/${code}`);
   };
 
+  // update filter state when checkboxes change
   const handleModuleTypeFilter = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, checked } = e.target;
 
@@ -49,6 +59,7 @@ export function Modules() {
     }));
   };
 
+  // fetch modules depending on edit mode
   useEffect(() => {
     // if (!selectedYear) {
     //   return;
@@ -85,6 +96,7 @@ export function Modules() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [editModules, refreshKey]);
 
+  // filter based on type and search input
   function getFilteredData() {
     const temp_data = editModules ? data : moduleData;
 
@@ -116,6 +128,7 @@ export function Modules() {
     );
   }
 
+  // mark or unmark a module as deleted to be applied when save button pressed
   function markDel(module: CombinedModuleType, value: boolean) {
     console.log("marking del");
     if (editModules) {
@@ -157,6 +170,7 @@ export function Modules() {
     }
   }
 
+  // add a new module entry (locally)
   function addModule() {
     setData((prev) => {
       const arr = prev ?? [];
@@ -181,6 +195,7 @@ export function Modules() {
     });
   }
 
+  // update state when table cell values are edited
   function updateStateData(
     row: HTMLTableRowElement,
     module: CombinedModuleType,
@@ -224,6 +239,7 @@ export function Modules() {
     }
   }
 
+  // save changes to backend depending on mode (modules or offerings)
   function saveData() {
     if (editModules) {
       const deletedData = data?.filter((item) => item.del); // only update table with data that has been modified.
@@ -277,6 +293,7 @@ export function Modules() {
     }
   }
 
+  // handle adding module offerings from popup selection
   function onModuleOfferingAdd(modules: Module[] | undefined) {
     if (!modules) return;
 
@@ -443,9 +460,9 @@ export function Modules() {
                 if (a.new && b.new) {
                   return b.new - a.new; // newest first
                 }
-                if (a.new) return -1; // a has new → goes first
-                if (b.new) return 1; // b has new → goes first
-                return a.code.localeCompare(b.code); // normal items sorted by code
+                if (a.new) return -1;
+                if (b.new) return 1;
+                return a.code.localeCompare(b.code); // items sorted by code
               })
               .map((module: CombinedModuleType, index) => (
                 <tr

@@ -20,9 +20,10 @@ describe("ProtectedRoute", () => {
     mockUseAuth.mockReturnValue({
       isLoading: true,
       isAuthenticated: false,
+      role: "user",
     });
 
-    const { container } = render(<ProtectedRoute />);
+    const { container } = render(<ProtectedRoute allowed={["user"]} />);
 
     expect(container).toBeEmptyDOMElement();
   });
@@ -31,9 +32,10 @@ describe("ProtectedRoute", () => {
     mockUseAuth.mockReturnValue({
       isLoading: false,
       isAuthenticated: true,
+      role: "user",
     });
 
-    render(<ProtectedRoute />);
+    render(<ProtectedRoute allowed={["user"]} />);
 
     expect(screen.getByTestId("outlet")).toBeInTheDocument();
   });
@@ -42,9 +44,10 @@ describe("ProtectedRoute", () => {
     mockUseAuth.mockReturnValue({
       isLoading: false,
       isAuthenticated: false,
+      role: "user",
     });
 
-    render(<ProtectedRoute />);
+    render(<ProtectedRoute allowed={["user"]} />);
 
     expect(screen.getByTestId("navigate")).toHaveTextContent("/login");
   });

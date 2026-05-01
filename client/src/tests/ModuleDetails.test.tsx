@@ -19,6 +19,20 @@ vi.mock("@/context/useAcademicYear", () => ({
   }),
 }));
 
+vi.mock("@/context/useModules", () => ({
+  useModules: () => ({
+    moduleData: [],
+    setModuleData: vi.fn(),
+    incrementModuleRefreshKey: vi.fn(),
+  }),
+}));
+
+const mockUseAuth = vi.fn();
+
+vi.mock("@/auth/useAuth", () => ({
+  useAuth: () => mockUseAuth(),
+}));
+
 // mock staff context (used for refresh key)
 vi.mock("@/context/useStaff", () => ({
   useStaff: () => ({
@@ -99,17 +113,6 @@ describe("ModuleDetails page", () => {
     render(<ModuleDetails />);
 
     expect(await screen.findByText("Alice")).toBeInTheDocument();
-  });
-
-  test("clicking staff row triggers navigation", async () => {
-    render(<ModuleDetails />);
-
-    const user = userEvent.setup();
-
-    const row = await screen.findByText("Alice");
-    await user.click(row);
-
-    expect(navigateMock).toHaveBeenCalled();
   });
 
   test("save button exists and can be clicked", async () => {

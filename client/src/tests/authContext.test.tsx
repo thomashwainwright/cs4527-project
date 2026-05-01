@@ -4,7 +4,7 @@ import { describe, test, expect, vi } from "vitest";
 import { useContext } from "react";
 import { AuthContext } from "../auth/authContext";
 
-// helper component to consume context
+// helper component context
 function TestComponent() {
   const { isAuthenticated, isLoading, userEmail } = useContext(AuthContext);
 
@@ -72,6 +72,7 @@ describe("AuthContext", () => {
           login: mockLogin,
           logout: mockLogout,
           userEmail: null,
+          role: "user",
         }}
       >
         <TestActions />

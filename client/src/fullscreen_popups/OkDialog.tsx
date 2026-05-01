@@ -1,3 +1,4 @@
+// onOk called when ok button pressed.
 export default function OkDialog({
   onOk,
   children,

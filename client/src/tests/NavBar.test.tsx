@@ -10,6 +10,7 @@ vi.mock("@/auth/useAuth", () => ({
   useAuth: () => ({
     logout: logoutMock,
     userEmail: "alice@test.com",
+    role: "user",
   }),
 }));
 

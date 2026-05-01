@@ -1,6 +1,7 @@
 import { createContext, useContext } from "react";
 import type { StaffContextType } from "@/types/staff_type";
 
+// create staff context
 export const StaffContext = createContext<StaffContextType | undefined>(
   undefined,
 );

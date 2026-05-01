@@ -7,7 +7,7 @@ import AccountDetails from "../pages/StaffAccountDetails";
 // mock navigation + route
 const navigateMock = vi.fn();
 
-vi.mock("react-router", () => ({
+vi.mock("react-router-dom", () => ({
   useNavigate: () => navigateMock,
   useLocation: () => ({
     pathname: "/staff/alice@test.com/account_details",

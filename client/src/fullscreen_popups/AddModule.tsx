@@ -28,7 +28,7 @@ export default function AddModule({
     value: boolean,
   ) => {
     e.preventDefault();
-
+    // set data selected value for item
     setData((prev) =>
       prev?.map((item) =>
         item.module_id === module_id ? { ...item, selected: value } : item,

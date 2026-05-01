@@ -1,3 +1,5 @@
+// Component displays staff details and loads assignment data, providing context for nested staff views.
+
 import { fetchStaffAssignments, fetchStaffByEmail } from "@/api/staff";
 import type { Staff } from "@/types/staff_type";
 import PageTitle from "../ui_components/PageTitle";
@@ -10,21 +12,22 @@ import StaffNavButton from "@/ui_components/StaffNavButton";
 import { useAuth } from "@/auth/useAuth";
 
 export default function StaffDetails() {
+  // extract email from route parameters and determine if creating a new user
   const params = useParams();
   const email = params.email as string;
   const new_user = email == "new-user";
+
   const { selectedYear } = useAcademicYear();
 
-  // TODO: temp
+  // state for staff details and assignment data
   const [staff, setStaff] = useState<Staff | null>(null);
-  //
+  const [data, setData] = useState<CombinedAssignmentType[]>([]);
 
   const { role } = useAuth();
 
-  const [data, setData] = useState<CombinedAssignmentType[]>([]);
-
   const [refreshKey, setRefreshKey] = useState<number>(0);
 
+  // fetch staff details and assignments when dependencies change
   useEffect(() => {
     if (new_user) return;
 
@@ -63,6 +66,7 @@ export default function StaffDetails() {
     });
   }, [email, new_user, selectedYear, refreshKey]);
 
+  // function passed to child components to trigger data refresh
   const incrementDetailsRefreshKey = () => setRefreshKey(refreshKey + 1);
 
   return (

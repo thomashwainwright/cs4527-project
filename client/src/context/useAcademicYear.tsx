@@ -1,6 +1,7 @@
 import { createContext, useContext } from "react";
 import type { AcademicYearContextType } from "@/types/academic_year_type";
 
+// create year context.
 export const AcademicYearContext = createContext<
   AcademicYearContextType | undefined
 >(undefined);

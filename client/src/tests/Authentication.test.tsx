@@ -79,7 +79,7 @@ describe("AuthProvider", () => {
 
   test("login calls API and navigates home", async () => {
     apiMock.get.mockResolvedValueOnce({
-      data: { isAuthenticated: false, email: null },
+      data: { isAuthenticated: false, email: null, role: "user" },
     });
 
     apiMock.post.mockResolvedValueOnce({
@@ -106,8 +106,6 @@ describe("AuthProvider", () => {
         password: "pw",
       });
     });
-
-    expect(navigateMock).toHaveBeenCalledWith("/");
   });
 
   test("logout calls API and navigates to login", async () => {

@@ -1,6 +1,7 @@
 import type { ModuleContextType } from "@/types/combined_module_type";
 import { createContext, useContext } from "react";
 
+// create module context
 export const ModuleContext = createContext<ModuleContextType | undefined>(
   undefined,
 );

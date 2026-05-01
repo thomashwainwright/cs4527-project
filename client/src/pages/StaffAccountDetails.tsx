@@ -8,14 +8,18 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate, useOutletContext } from "react-router-dom";
 
 export default function AccountDetails() {
+  // extract email from URL and determine if creating a new user
   const email = useLocation().pathname.split("/")[2];
   const new_user = email == "new-user";
+
   const navigate = useNavigate();
 
+  // access parent context refresh function
   const { incrementDetailsRefreshKey } = useOutletContext<{
     incrementDetailsRefreshKey: () => void;
   }>();
 
+  // default empty staff object for new user creation
   const empty_staff: Staff & { pw_changed: boolean } = {
     name: "",
     email: "",
@@ -33,6 +37,7 @@ export default function AccountDetails() {
     allocation_teaching: 0,
   };
 
+  // component state
   const [staff, setStaff] = useState<Staff & { pw_changed: boolean }>(
     empty_staff,
   );
@@ -40,8 +45,10 @@ export default function AccountDetails() {
   const [saveConfirmation, setSaveConfirmation] = useState<string>("");
   const [refreshKey, setRefreshKey] = useState<number>(0);
 
+  // access global staff refresh
   const { incrementRefreshKey } = useStaff();
 
+  // fetch staff details when editing an existing user
   useEffect(() => {
     if (new_user) return;
     fetchStaffByEmail(email).then(
@@ -51,6 +58,7 @@ export default function AccountDetails() {
     );
   }, [new_user, email, refreshKey]);
 
+  // return default contract hours based on contract type
   function defaultHours(value: string): string {
     switch (value) {
       case "TS":
@@ -65,6 +73,7 @@ export default function AccountDetails() {
     return "0";
   }
 
+  // validate and save staff data to backend
   function saveStaffData(): void {
     // check required fields present
 
@@ -82,8 +91,7 @@ export default function AccountDetails() {
       return;
     }
 
-    // save data
-
+    // send data to API
     saveStaff(staff)
       .then(() => {
         navigate(`/staff/${staff.email}/account_details`, { replace: true });
@@ -96,6 +104,7 @@ export default function AccountDetails() {
       });
   }
 
+  // delete staff member after fs confirmation
   function deleteStaffData(): void {
     setConfirmPopup(false);
     deleteStaff(staff).then(() => {

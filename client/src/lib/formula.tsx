@@ -1,3 +1,5 @@
+// Formula evaluation function.
+
 import type { Assignment } from "@/types/assignment_type";
 import type { ModuleOffering } from "@/types/module_offering_type";
 import type { Module } from "@/types/module_type";

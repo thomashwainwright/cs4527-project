@@ -13,15 +13,19 @@ export function Staff() {
   const navigate = useNavigate();
   // const { selectedYear } = useAcademicYear();
 
+  // navigate to staff details page when a row is clicked
   const handleRowClick = (email: string) => {
     navigate(`/staff/${email}`);
   };
 
   // const [data, setData] = useState<(Staff & { allocation: number })[]>([]);
+
+  // filter state for searching staff by name
   const [filter, setFilter] = useState({
     search: "",
   });
 
+  // access shared staff data and updater
   const { staffData, setStaffData } = useStaff();
 
   // useEffect(() => {
@@ -59,12 +63,14 @@ export function Staff() {
   //   });
   // }, [selectedYear]);
 
+  // filter staff list based on search input
   function getFilteredData() {
     return staffData?.filter((staff: Staff) => {
       return staff.name?.toLowerCase().includes(filter.search.toLowerCase());
     });
   }
 
+  // create a new staff entry and navigate to account creation page
   function addUser() {
     const newUser: Staff & { allocation: number } = {
       user_id: undefined,

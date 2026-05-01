@@ -15,6 +15,7 @@ export function ModuleProvider({ children }: { children: ReactNode }) {
     setRefreshKey(moduleRefreshKey + 1);
   };
 
+  // update effect when selected year is changed or refresh key is changed (used to manually update data after change)
   useEffect(() => {
     if (!selectedYear) return;
 
@@ -34,6 +35,8 @@ export function ModuleProvider({ children }: { children: ReactNode }) {
       },
     );
   }, [selectedYear, moduleRefreshKey]);
+
+  // provide module state and updater to child components
 
   return (
     <ModuleContext.Provider

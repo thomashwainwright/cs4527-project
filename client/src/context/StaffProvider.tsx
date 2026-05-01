@@ -14,6 +14,7 @@ export function StaffProvider({ children }: { children: ReactNode }) {
 
   const incrementRefreshKey = () => setRefreshKey((prev) => prev + 1);
 
+  // update effect when selected year is changed or refresh key is changed (used to manually update data after change)
   useEffect(() => {
     // fetch staff data to be used for context.
     fetchStaff().then((staff: Staff[]) => {
@@ -133,6 +134,8 @@ export function StaffProvider({ children }: { children: ReactNode }) {
       );
     });
   }, [selectedYear, refreshKey]);
+
+  // provide staff state and updater to child components
 
   return (
     <StaffContext.Provider

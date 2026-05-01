@@ -41,7 +41,7 @@ export default function AssignModule({
     value: boolean,
   ) => {
     e.preventDefault();
-
+    // update data selected value where user id matches
     setData((prev) =>
       prev?.map((item) =>
         item.user_id === user_id ? { ...item, selected: value } : item,

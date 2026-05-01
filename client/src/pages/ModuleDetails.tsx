@@ -19,6 +19,7 @@ import type { AssignmentRow } from "@/types/assignment_row";
 import deleteIcon from "../assets/icons/delete-icon.svg";
 import OkDialog from "@/fullscreen_popups/OkDialog";
 import { useStaff } from "@/context/useStaff";
+import { useModules } from "@/context/useModules";
 
 export default function ModuleDetails() {
   const code = useParams().code as string;
@@ -40,10 +41,11 @@ export default function ModuleDetails() {
     fullscreenUserDoesNotExistDiolog,
     setFullscreenUserDoesNotExistDiolog,
   ] = useState<boolean>(false);
-
+  const { incrementModuleRefreshKey } = useModules();
   const navigate = useNavigate();
   const { selectedYear } = useAcademicYear();
 
+  // map strings to alpha/beta values for preset function
   const calculationParameterMap: Record<
     string,
     { alpha: number; beta: number }
@@ -55,6 +57,7 @@ export default function ModuleDetails() {
     group_proj: { alpha: 0, beta: 0.8 },
   };
 
+  // map alpha/beta values to preset name string, for obtaining preset from given values.
   const reverseCalculationParameterMap = Object.fromEntries(
     Object.entries(calculationParameterMap).map(([key, val]) => [
       `${val.alpha}_${val.beta}`,
@@ -62,6 +65,7 @@ export default function ModuleDetails() {
     ]),
   );
 
+  // handle table row clicking, navigate to staff page.
   const handleRowClick = (user_id: number | undefined) => {
     if (!user_id || !staffData) return;
 
@@ -117,6 +121,7 @@ export default function ModuleDetails() {
       });
   }, [code, selectedYear, editAssignments, refreshKey]);
 
+  // Alpha/beta preset update separately.
   useEffect(() => {
     if (!moduleDetails) return;
 
@@ -147,6 +152,7 @@ export default function ModuleDetails() {
       });
   }
 
+  // validate data then server request to save data
   function saveAssignmentData() {
     // save data to db
 
@@ -181,10 +187,12 @@ export default function ModuleDetails() {
       .then(() => {
         setSaveConfirmation("Saved changes.");
         incrementRefreshKey();
+        incrementModuleRefreshKey();
       })
       .catch(() => setSaveConfirmation("Error saving changes."));
   }
 
+  // update module assignments with selected staff
   function addAssignments(staff: Staff[] | undefined): void {
     // console.log(moduleAssignments);
     // console.log(staff)
@@ -201,6 +209,7 @@ export default function ModuleDetails() {
         0,
       );
 
+      // add empty assignment entry
       const newEntries: AssignmentRow[] = staff.map((s, index) => ({
         name: s.name,
         email: s.email,
@@ -229,6 +238,7 @@ export default function ModuleDetails() {
     });
   }
 
+  // save new module details state data to db through server
   function updateStateData(
     row: HTMLTableRowElement,
     assignment: AssignmentRow,
@@ -268,6 +278,7 @@ export default function ModuleDetails() {
     );
   }
 
+  // mark assignment row for deletion when save pressed.
   function markDel(assignment: AssignmentRow, value: boolean) {
     setModuleAssignments((prev) =>
       prev

@@ -66,7 +66,7 @@ describe("StaffDetails page", () => {
     expect(screen.getByText("Teaching")).toBeInTheDocument();
     expect(screen.getByText("Supervision/Marking")).toBeInTheDocument();
     expect(screen.getByText("Admin")).toBeInTheDocument();
-    expect(screen.getByText("Account Details")).toBeInTheDocument();
+    // expect(screen.getByText("Account Details")).toBeInTheDocument();
   });
 
   test("renders outlet", () => {

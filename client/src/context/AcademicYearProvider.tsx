@@ -6,6 +6,7 @@ import { AcademicYearContext } from "./useAcademicYear";
 export const AcademicYearProvider = ({ children }: { children: ReactNode }) => {
   const [selectedYear, setSelectedYear] = useState<AcademicYear | null>(null);
 
+  // refresh effect function when selected academic year is changed.
   useEffect(() => {
     if (selectedYear) {
       // use storage to remember selected academic year for reloads.
@@ -14,6 +15,7 @@ export const AcademicYearProvider = ({ children }: { children: ReactNode }) => {
     }
   }, [selectedYear]);
 
+  // provide selected academic year state and updater to child components
   return (
     <AcademicYearContext.Provider value={{ selectedYear, setSelectedYear }}>
       {children}

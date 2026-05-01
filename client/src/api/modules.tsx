@@ -7,6 +7,7 @@ import type { AcademicYear } from "@/types/academic_year_type";
 import type { AssignmentRow } from "@/types/assignment_row";
 import type { CombinedAssignmentType } from "@/types/combined_assignment_type";
 
+// fetch list of all modules
 export const fetchModules = async () => {
   try {
     const response = await api.get("/api/modules");
@@ -17,6 +18,7 @@ export const fetchModules = async () => {
   }
 };
 
+// fetch all module offerings by academic year
 export const fetchModulesWithOfferings = async (year_id: number) => {
   try {
     const response = await api.get(`/api/module_offerings/${year_id}`);
@@ -27,8 +29,10 @@ export const fetchModulesWithOfferings = async (year_id: number) => {
   }
 };
 
+// fetch specific module details by module code and academic year.
 export const fetchModuleDetails = async (code: string, year_id: number) => {
   try {
+    // request server with code and year_id params.
     const response = await api.get(
       `/api/module_offerings/${code}/year_id/${year_id}`,
     );
@@ -39,6 +43,7 @@ export const fetchModuleDetails = async (code: string, year_id: number) => {
   }
 };
 
+// fetch all assignments (staff_id to offering_id) given module id and academic year id.
 export const fetchModuleAssignments = async (
   module_id: number,
   year_id: number,
@@ -62,6 +67,7 @@ export const fetchModuleAssignments = async (
   }
 };
 
+// for restore formula function, get formulas for given offering on different year for a user.
 export const fetchOtherYearsFormula = async (
   offering_id: number,
   user_id: number,
@@ -85,6 +91,7 @@ export const fetchOtherYearsFormula = async (
   }
 };
 
+// get modules not already assigned to academic year as offering, for assigning module to year as offering.
 export const fetchModulesNotAssignedTo = async (year: AcademicYear) => {
   try {
     // app.get("/api/assignments/module_id/:module_id/year_id/:year_id", async (req, res) => {
@@ -105,6 +112,7 @@ export const fetchModulesNotAssignedTo = async (year: AcademicYear) => {
   }
 };
 
+// get staff available to be assigned to an offering (not already assigned)
 export const fetchAvailableStaff = async (offering_id: number) => {
   try {
     // app.get("/api/assignments/module_id/:module_id/year_id/:year_id", async (req, res) => {
@@ -127,6 +135,7 @@ export const fetchAvailableStaff = async (offering_id: number) => {
 
 // POSTs
 
+// Given which data is delted, edited and new, save module changes to the database. Used by the save button on the module details page.
 export const commitModuleChanges = async (
   deletedData: CombinedModuleType[] | undefined,
   editedData: CombinedModuleType[] | undefined,
@@ -151,6 +160,7 @@ export const commitModuleChanges = async (
   }
 };
 
+// Given which data is delted, edited and new, save offering changes to the database.
 export const commitModuleOfferingChanges = async (
   deletedData: CombinedModuleType[] | undefined,
   editedData: CombinedModuleType[] | undefined,
@@ -177,6 +187,7 @@ export const commitModuleOfferingChanges = async (
   }
 };
 
+// Save offering parameters, for module details page.
 export const commitModuleOfferingDetailChanges = async (
   offering_id: number | undefined,
   estimated_number_students: number | undefined,
@@ -208,6 +219,7 @@ export const commitModuleOfferingDetailChanges = async (
   }
 };
 
+// save assignment data given new, edited and deleted data. for editing staff assignments + details.
 export const commitAssignmentData = async (
   deletedData: AssignmentRow[] | undefined,
   editedData: AssignmentRow[] | undefined,
@@ -232,6 +244,7 @@ export const commitAssignmentData = async (
   }
 };
 
+// change formula for staff assignment
 export const commitFormulaChanges = async (
   editedData: CombinedAssignmentType[] | undefined,
 ) => {

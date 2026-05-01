@@ -1,3 +1,5 @@
+// Component displays and manages staff assignment hours for a given tab, including formula editing and total calculation.
+
 import { useEffect, useState } from "react";
 import { useNavigate, useOutletContext } from "react-router-dom";
 import evaluateFormula from "@/lib/formula";
@@ -20,32 +22,42 @@ export default function HoursTab({
   include: string[];
 }) {
   const navigate = useNavigate();
+
+  // access shared assignment data from parent route
   const { data, setData } = useOutletContext<{
     data: CombinedAssignmentType[];
     setData: React.Dispatch<React.SetStateAction<CombinedAssignmentType[]>>;
   }>();
 
+  const { role } = useAuth();
+
+  // determine number of columns for layout
   const numberOfColumns =
     tab == "teaching" ? 9 : tab == "supervision_marking" ? 5 : 4;
+
+  // navigate to module details when row is clicked (if permitted)
   const handleRowClick = (code: string) => {
     if (role == "teaching") return;
     navigate(`/modules/${code}`);
   };
 
+  // component state
   const [fullscreenOpen, setFullscreenOpen] = useState<number>(-1);
   const [totalHours, setTotalHours] = useState<number>(0);
   const [saveConfirmation, setSaveConfirmation] = useState<string>("");
-  const { incrementRefreshKey } = useStaff();
-  const { role } = useAuth();
 
+  const { incrementRefreshKey } = useStaff();
+
+  // calculate total hours whenever data or tab changes
   useEffect(() => {
     const total = data
       .filter((a) => a.module_type === tab)
       .reduce((sum, a) => sum + Number(a.hours ?? 0), 0);
 
     setTotalHours(total);
-  }, [data, tab]); // run only when data or tab changes
+  }, [data, tab]);
 
+  // handle submission of edited formula and recalculate hours
   const handleFormulaSubmit = (
     assignment: CombinedAssignmentType,
     text: string,
@@ -69,6 +81,7 @@ export default function HoursTab({
     );
   };
 
+  // set focus state for editing formula cell
   const setFocused = (assignment: CombinedAssignmentType, focus: boolean) => {
     setData((prev) =>
       prev.map((item) =>
@@ -79,6 +92,7 @@ export default function HoursTab({
     );
   };
 
+  // configuration for dynamic table columns
   const columns = [
     {
       key: "alpha",
@@ -134,12 +148,16 @@ export default function HoursTab({
     { key: "h", label: "h", render: (a: CombinedAssignmentType) => a.h },
   ];
 
+  // save edited formulas to backend
   function saveData() {
     const editedData = data?.filter((item) => item.edit);
+
+    // prevent saving if any formula evaluation failed
     if (editedData.some((a) => a.hours === "ERROR")) {
       setSaveConfirmation("Error. Attempt to save invalid formula!");
       return;
     }
+
     commitFormulaChanges(editedData)
       .then(() => {
         setSaveConfirmation("Saved changes.");
@@ -156,18 +174,21 @@ export default function HoursTab({
             <tr>
               <th className="px-4 py-2 border">Code</th>
               <th className="px-4 py-2 border">Name</th>
+
+              {/* dynamically render selected columns */}
               {columns
                 .filter((col) => include.includes(col.key))
                 .map((col) => (
                   <th className="px-4 py-2 border">{col.label}</th>
                 ))}
+
               <th className="px-4 py-2 border w-1/3">Hours</th>
             </tr>
           </thead>
 
           <tbody>
             {
-              // filter data and render
+              // render filtered assignments for current tab
               data
                 .filter((item) => item.module_type === tab)
                 .map((assignment: CombinedAssignmentType) => (
@@ -190,6 +211,7 @@ export default function HoursTab({
                         </td>
                       ))}
 
+                    {/* editable hours/formula cell */}
                     <td
                       className={
                         "px-4 py-2 border " +
@@ -204,11 +226,8 @@ export default function HoursTab({
                         e.stopPropagation();
                         setFocused(assignment, true);
                       }}
-                      onKeyDown={(
-                        e: React.KeyboardEvent<HTMLTableCellElement>,
-                      ) => {
+                      onKeyDown={(e) => {
                         if (e.key == "Enter") {
-                          console.log("Enter submit");
                           e.preventDefault();
                           e.currentTarget?.blur();
                           handleFormulaSubmit(
@@ -217,7 +236,7 @@ export default function HoursTab({
                           );
                         }
                       }}
-                      onBlur={(e: React.FocusEvent<HTMLTableCellElement>) => {
+                      onBlur={(e) => {
                         handleFormulaSubmit(
                           assignment,
                           e.currentTarget.textContent as string,
@@ -228,6 +247,8 @@ export default function HoursTab({
                         ? assignment.custom_formula
                         : assignment.hours}
                     </td>
+
+                    {/* restore formula from previous year */}
                     {role != "teaching" && (
                       <td className="group-hover:bg-white">
                         <button
@@ -242,6 +263,7 @@ export default function HoursTab({
                         >
                           <img alt="" src={restoreIcon} className="w-10" />
                         </button>
+
                         <Fullscreen
                           open={fullscreenOpen == assignment.assignment_id}
                           onClose={() => setFullscreenOpen(-1)}
@@ -267,8 +289,9 @@ export default function HoursTab({
                   </tr>
                 ))
             }
+
+            {/* total hours row */}
             <tr>
-              {/* Display hours total TODO */}
               {Array.from({ length: numberOfColumns - 1 }).map((_, i) => (
                 <td key={i} />
               ))}
@@ -277,29 +300,28 @@ export default function HoursTab({
               </td>
               <td
                 className={
-                  "px-4 py-2 border " + (totalHours >= 0 ? " " : "bg-red-200")
+                  "px-4 py-2 border " + (totalHours >= 0 ? "" : "bg-red-200")
                 }
               >
                 {totalHours >= 0 ? totalHours : "ERROR"}
               </td>
             </tr>
+
+            {/* save button row */}
             {!(role == "teaching") && (
               <tr>
-                {" "}
-                {/* Save formulas button */}
                 {Array.from({ length: numberOfColumns }).map((_, i) => (
                   <td key={i} />
                 ))}
                 <td className="flex pt-2">
                   <button
-                    className={
-                      "ml-auto border border-gray-200 rounded-md px-4 py-2 cursor-pointer text-gray text-xl text-gray-700 hover:bg-gray-200"
-                    }
+                    className="ml-auto border border-gray-200 rounded-md px-4 py-2 cursor-pointer text-gray text-xl text-gray-700 hover:bg-gray-200"
                     onClick={saveData}
                     title="Save changes to formulas."
                   >
                     Save formulas
                   </button>
+
                   <Fullscreen
                     open={saveConfirmation != ""}
                     onClose={() => setSaveConfirmation("")}

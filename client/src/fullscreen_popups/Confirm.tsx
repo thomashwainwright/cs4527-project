@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 
+// take children (content inside confirm screen), onYes, onNo props. onYes, onNo, called when yes / no button pressed.
 export default function Confirm({
   children,
   onYes,
@@ -11,7 +12,7 @@ export default function Confirm({
 }) {
   return (
     <>
-      {/* content passed into the confirm (e.g. message) */}
+      {/* content passed into the confirm */}
       <div>{children}</div>
 
       {/* action buttons */}
